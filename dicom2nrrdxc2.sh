@@ -6,7 +6,7 @@ usage() {
 }
 
 operation=""
-
+seriesnumber=""
 while getopts hi:o:w:sn: OPTION; do
     case $OPTION in
         h) usage ;;
@@ -66,27 +66,28 @@ elif [[ ${mriweighting} = "dwi" ]]; then
 fi
 
 if [[ -d "${casedir}/${newdir}/${partofname}-dicom" ]]; then
-    echo " ${newdir}/${partofname}-dicom directory is already exists. "
-    exit 1
+    echo " ${newdir}/${partofname}-dicom directory is already exists. "; exit 1
 fi
 
 if [[ -d "${casedir}/${newdir}/${caseid}-${partofname}-dicom" ]]; then
-    echo " ${newdir}/${caseid}-${partofname}-dicom directory is already exists. "
-    exit 1
+    echo " ${newdir}/${caseid}-${partofname}-dicom directory is already exists. "; exit 1
 fi
 
-echo "start" | tee /tmp/log.log
-echo "caseid is ${caseid}" | tee -a /tmp/log.log
-echo "mriweighting is ${mriweighting}" | tee -a /tmp/log.log
-echo "operation is ${operation}, partofname is ${partofname}" | tee -a /tmp/log.log
-echo "original dicom directory name is ${originaldicomdirname}" | tee -a /tmp/log.log
-echo "serisnumber is ${seriesnumber}" | tee -a /tmp/log.log
+command=$(basename $0)
+echo -e "start ${command}" | tee /tmp/log.log
+echo -e "
+caseid is ${caseid}
+mriweighting is ${mriweighting}
+operation is ${operation}, partofname is ${partofname}
+original dicom directory name is ${originaldicomdirname}
+serisnumber is ${seriesnumber}
+" | tee -a /tmp/log.log
 
 # set cmdcp
 
-if [[ -n seriesnumber ]]; then 
-    seriesnumberf=$(printf "%0d" ${seriesnumber});
-    cmdcp="cp ${originaldicomdir}/*-${seriesnumberf}-*.dcm.gz ${newdir}/${caseid}-${partofname}-dicom"
+if [[ -n ${seriesnumber} ]]; then 
+    seriesnumberf=$(printf "%09d" ${seriesnumber});
+    cmdcp="cp ${originaldicomdirname}/*-${seriesnumberf}-*.dcm.gz ${newdir}/${caseid}-${partofname}-dicom"
     else cmdcp="cp ${originaldicomdirname}/*.dcm.gz ${newdir}/${caseid}-${partofname}-dicom"
 fi
 
@@ -103,5 +104,6 @@ center.py -i ${caseid}-${partofname}-x.nrrd -o ${caseid}-${partofname}-xc.nrrd;"
 echo -e "$cmd" "\n" 2>&1 | tee -a /tmp/log.log 
 eval $cmd 2>&1 | tee -a /tmp/log.log
 
-command=$(basename $0)
 mv /tmp/log.log ${casedir}/${newdir}/${caseid}-${partofname}-${command}.log
+
+

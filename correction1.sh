@@ -13,7 +13,7 @@ partofname=${mriweights}${operation}
 
 cmd="
 cd ${casedir}
-if [ ! -e strct/orig-space]; then exit 1; fi
+if [ ! -e strct/orig-space ]; then exit 1; fi
 cd strct/orig-space
 mkdir ${dir}
 if [ ! -e ${caseid}-t1w${operation}-xc.nrrd ]; then exit 1; fi
@@ -34,6 +34,4 @@ timestampm=$(date +%Y%m%d%H%M)
 logfilename=${scriptname}${timestampm}.log
 echo "${cmd}" | tee ${logfilename}
 eval "${cmd}" 2>&1 | tee -a ${logfilename}
-
-
 

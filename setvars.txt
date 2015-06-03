@@ -1,7 +1,13 @@
 
-caseid=
+caseid=$1    #
 casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
-operation=$2
-partofname=t${mriweighting}w${operation}
+mriweights=$2    # t1w or t2w or dwi
+operation=$3    # nothing or _run1 or _run2
 partofname=${mriweights}${operation}
+scriptname=$(basename $0)
+timestamps=$(date +%Y%m%d%H%M%S)
+timestampm=$(date +%Y%m%d%H%M)
+logfilename=${scriptname}${timestampm}.log
+logfileleme=${caseid}-${partofname}-${scriptname}.log
+logfile=${workingdir}/${logfilename}
 

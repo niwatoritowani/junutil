@@ -74,8 +74,8 @@ if [[ -d "${casedir}/${newdir}/${caseid}-${partofname}-dicom" ]]; then
 fi
 
 command=$(basename $0)
-echo -e "start ${command}" | tee /tmp/log.log
-echo -e "
+echo "start ${command}" | tee /tmp/log.log
+echo "
 caseid is ${caseid}
 mriweighting is ${mriweighting}
 operation is ${operation}, partofname is ${partofname}
@@ -101,7 +101,7 @@ ${cmdD2N};
 axis_align_nrrd.py --infile ${caseid}-${partofname}.nrrd --outfile ${caseid}-${partofname}-x.nrrd;
 center.py -i ${caseid}-${partofname}-x.nrrd -o ${caseid}-${partofname}-xc.nrrd;"
 
-echo -e "$cmd" "\n" 2>&1 | tee -a /tmp/log.log 
+echo "$cmd" "\n" 2>&1 | tee -a /tmp/log.log 
 eval $cmd 2>&1 | tee -a /tmp/log.log
 
 mv /tmp/log.log ${casedir}/${newdir}/${caseid}-${partofname}-${command}.log

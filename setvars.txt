@@ -1,0 +1,7 @@
+
+caseid=
+casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
+operation=$2
+partofname=t${mriweighting}w${operation}
+partofname=${mriweights}${operation}
+

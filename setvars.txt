@@ -9,5 +9,11 @@ timestamps=$(date +%Y%m%d%H%M%S)
 timestampm=$(date +%Y%m%d%H%M)
 logfilename=${scriptname}${timestampm}.log
 logfileleme=${caseid}-${partofname}-${scriptname}.log
-logfile=${workingdir}/${logfilename}
 
+logfile=${workingdir}/${logfilename}
+logfile=${newdir}/${caseid}-${partofname}-${scriptname}.log
+# path/to/dir/fileroot.ext
+# file name or base name consists of file root and file extention.
+# full path or absolute path consist of directory name and file name. 
+# "path/to" is called base directory in git. 
+# "dir/fileroot.ext" is called relative path. ? 

@@ -8,8 +8,8 @@ scriptname=$(basename $0)
 timestamps=$(date +%Y%m%d%H%M%S)
 timestampm=$(date +%Y%m%d%H%M)
 logfilename=${scriptname}${timestampm}.log
-logfileleme=${caseid}-${partofname}-${scriptname}.log
-
+logfilename=${caseid}-${partofname}-${scriptname}.log
+logfilename=${outputfilename}.log
 logfile=${workingdir}/${logfilename}
 logfile=${newdir}/${caseid}-${partofname}-${scriptname}.log
 # path/to/dir/fileroot.ext

@@ -80,7 +80,7 @@ fi
 # set cmdcp
 
 if [[ -n ${seriesnumber} ]]; then 
-    seriesnumberf=$(printf "%09d" ${seriesnumber});
+    seriesnumberf=$(printf "%06d" ${seriesnumber});
     cmdcp="cp ${originaldicomdir}/*-${seriesnumberf}-*.dcm.gz ${newdir}/${caseid}-${partofname}-dicom"
     else cmdcp="cp ${originaldicomdir}/*.dcm.gz ${newdir}/${caseid}-${partofname}-dicom"
 fi
@@ -88,14 +88,15 @@ fi
 # show variables and run script
 
 command=$(basename $0)
-echo "start ${command}" | tee /tmp/log.log
+logfilename=${caseid}-${partofname}-${command}.log
+echo "start ${command}" | tee /tmp/${logfilename}
 echo "
 caseid is ${caseid}
 mriweighting is ${mriweighting}
 operation is ${operation}, partofname is ${partofname}
 original dicom directory is ${originaldicomdir}
 serisnumber is ${seriesnumber} -> ${seriesnumberf}
-" | tee -a /tmp/log.log
+" | tee -a /tmp/${logfilename}
 
 cmd="
 cd ${casedir}
@@ -108,8 +109,8 @@ ${cmdD2N}
 axis_align_nrrd.py --infile ${caseid}-${partofname}.nrrd --outfile ${caseid}-${partofname}-x.nrrd
 /home/jkonishi/junutil/center_jun.py -i ${caseid}-${partofname}-x.nrrd -o ${caseid}-${partofname}-xc.nrrd
 "
-echo "$cmd" | tee -a /tmp/log.log 
-eval "$cmd" 2>&1 | tee -a /tmp/log.log
-mv /tmp/log.log ${newdir}/${caseid}-${partofname}-${command}.log
+echo "$cmd" | tee -a /tmp/${logfilename} 
+eval "$cmd" 2>&1 | tee -a /tmp/${logfilename}
+mv /tmp/${logfilename} ${newdir}/${logfilename}
 
 

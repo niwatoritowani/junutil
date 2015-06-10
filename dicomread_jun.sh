@@ -1,5 +1,6 @@
 #!/bin/bash
 
+caseid=""
 caseid=$1
 projectdir=/projects/schiz/3Tprojects/2015-jun-prodrome
 casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
@@ -7,7 +8,8 @@ casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
 # filebasename=${filename%\.*}        # such as 00000-dwi
 originaldicomdir=${casedir}/raw/${caseid}-dwi
 
-cd ${originaldicomdir}
+# if argument exists, move to the directory, or in current directory
+if [[ -n ${caseid} ]]; then cd ${originaldicomdir}; fi
 ls *-*-000001.dcm.gz
 dicomread *-*-000001.dcm.gz | grep \
 -e '(0008, 103e) Series Description' \

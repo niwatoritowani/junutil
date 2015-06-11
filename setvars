@@ -1,3 +1,4 @@
+projectdir=
 
 caseid=$1    #
 casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}

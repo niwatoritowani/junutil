@@ -8,8 +8,8 @@ usage() {
 
 usage
 cmd="
-/home/jkonishi/junutil/dicom2nrrdxc.sh -i $1 -w 1
-/home/jkonishi/junutil/dicom2nrrdxc.sh -i $1 -w 2
+/home/jkonishi/junutil/dicom2nrrdxc.sh -i $1 -w t1w
+/home/jkonishi/junutil/dicom2nrrdxc.sh -i $1 -w t2w
 /home/jkonishi/junutil/dicom2nrrdxc.sh -i $1 -w dwi -s $2
 "
 echo "$cmd"

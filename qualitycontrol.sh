@@ -4,8 +4,9 @@
 caseid=$1
 casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
 origspacedir=${casedir}/strct_jun/orig-space
+#echo "${origspacedir}/${caseid}-t1w-xc.nrrd"
 if [[ -e ${origspacedir}/${caseid}-t1w-xc.nrrd ]]; then operation=""
-elif [[ -e ${origspacedir}/${caseid}_run1-t1w-xc.nrrd ]]; then operation="_run1"
+elif [[ -e ${origspacedir}/${caseid}-t1w_run1-xc.nrrd ]]; then operation="_run1"
 else echo "${caseid}-t1w-xc.nrrd or -t1w_run1-xc.nrrd don't exist"; exit 1; fi  
 t1xc=${origspacedir}/${caseid}-t1w${operation}-xc.nrrd
 s4=/projects/schiz/software/slicer/Slicer-4.3.1-2014-01-12-linux-amd64/Slicer

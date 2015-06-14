@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#source setvar_local
+#project=2015-jun-prodrome
+#source setvar
 caseid=$1
 casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
 origspacedir=${casedir}/strct_jun/orig-space

@@ -1,35 +1,33 @@
 
-if [[ $project = "2015-jun-prdrome" ]]; do
-    projectdir=/projects/schiz/3Tprojects/2015-jun-prodrome
-    caseid=$1    #
+projectdir=/projects/schiz/3Tprojects/2015-jun-prodrome
+caseid=$1    #
 
-    #casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
-    cd=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
-    
-    #mriweights=
-    #mriweighting=$2    # t1w or t2w or dwi
-    #w=$2    # t1w or t2w or dwi
-    
-    operation=$3    # nothing or _run1 or _run2
-    
-    #partofname=${mriweight}${operation}
-    pn=${mriweight}${operation}
+#casedir=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
+cd=/projects/schiz/3Tdata/PRODROMES/2015-jun-prodrome/${caseid}
 
-    #scriptname=$(basename $0)
-    sn=$(basename $0)
+#mriweights=
+#mriweighting=$2    # t1w or t2w or dwi
+#w=$2    # t1w or t2w or dwi
 
-    #timestamps=$(date +%Y%m%d%H%M%S)
-    ts=$(date +%Y%m%d%H%M%S)
-    
-    #timestampm=$(date +%Y%m%d%H%M)
-    tm=$(date +%Y%m%d%H%M)
-    
-    logfilename=${scriptname}${timestampm}.log
-    logfilename=${caseid}-${partofname}-${scriptname}.log
-    logfilename=${outputfilename}.log
-    logfile=${workingdir}/${logfilename}
-    logfile=${newdir}/${caseid}-${partofname}-${scriptname}.log
-done
+operation=$3    # nothing or _run1 or _run2
+
+#partofname=${mriweight}${operation}
+pn=${mriweight}${operation}
+
+#scriptname=$(basename $0)
+sn=$(basename $0)
+
+#timestamps=$(date +%Y%m%d%H%M%S)
+ts=$(date +%Y%m%d%H%M%S)
+
+#timestampm=$(date +%Y%m%d%H%M)
+tm=$(date +%Y%m%d%H%M)
+
+logfilename=${scriptname}${timestampm}.log
+logfilename=${caseid}-${partofname}-${scriptname}.log
+logfilename=${outputfilename}.log
+logfile=${workingdir}/${logfilename}
+logfile=${newdir}/${caseid}-${partofname}-${scriptname}.log
 
 # path/to/dir/fileroot.ext
 # file name or base name consists of file root and file extention.

@@ -6,7 +6,7 @@
 # source ${sourcedir}/util.sh
 
 sourcescriptname=$(basename $(readlink -f "$0"))
-if [ -z "${scriptdir} ]; then
+if [ -z "${scriptdir}" ]; then
     scriptdir=$(dirname "$0")
 fi
 
@@ -34,10 +34,19 @@ usage() {
 #--------------------------------------
 # Begin logging section
 
-cmdlog() {
-    echo "$1" | tee -a $2
-    eval "$1" 2>&1 | tee -a $2
+#cmdlog() {
+#    echo "$1" | tee -a $2
+#    eval "$1" 2>&1 | tee -a $2
+#}
+
+#-----editing-----
+log() {}
+
+run() {
+    log "$@"
+    eval "$@"
 }
+#-----end editing-----
 
 # End logging section
 #-------------------------------------

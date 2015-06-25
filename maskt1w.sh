@@ -21,7 +21,7 @@ betmaskroot=${realigndir}/${caseid}-${partofname}-realign-brain_mask
 
 if [[ ! -e ${realigndir}/${caseid}-t1w-realign.nrrd ]]; then
     if [[ -e ${realigndir}/${caseid}-t1w_run1-realign.nrrd ]]; then
-        ln -s ${realigndir}/${caseid}-t1w_run1-realign.nrrd ${realigndir}/${caseid}-t1w_run1-realign.nrrd
+        ln -s ${realigndir}/${caseid}-t1w_run1-realign.nrrd ${realigndir}/${caseid}-t1w-realign.nrrd
     fi
 fi
 

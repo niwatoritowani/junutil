@@ -7,6 +7,9 @@ usage() {
     exit 0
 }
 
+# The input caselist file is read in current working directory. 
+# The outputfile is created in current working directory.
+
 while getopts hc:o: OPTION; do
     case $OPTION in
         h) usage ;;
@@ -24,14 +27,12 @@ if [[ -f "${outputfile}" ]]; then
 fi
 
 #caselist=caselist.txt
-IFS=$'\n'
 cases=($(cat ${caselist}))
-IFS=" "
 
-# file pattern of the data with freewater
-#inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/\${case}-cc-ukf-values.csv
+# # file pattern of the data with freewater correction
+# inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/\${case}-cc-ukf-values.csv
 
-# file pattern of the data without freewater
+# # file pattern of the data without freewater correnction
 inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/without-freeWater/\${case}-cc-ukf-values.csv
 
 

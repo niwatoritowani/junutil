@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash 
 
 # # In a script 
 # sourcedir=$(dirname $(readlink -f $0))
@@ -35,19 +35,28 @@ usage() {
 # Begin logging section
 
 #cmdlog() {
-#    echo "$1" | tee -a $2
+#    echo "$*" | tee -a $2
 #    eval "$1" 2>&1 | tee -a $2
 #}
 
 #-----editing-----
-log() {}
+log() {
+    echo "$@"
+}
 
 run() {
     log "$@"
-    eval "$@"
+    eval "$@" 2>
 }
 #-----end editing-----
 
 # End logging section
 #-------------------------------------
 
+
+#-----memo-----
+
+
+
+# End memo section
+#----------------------------------

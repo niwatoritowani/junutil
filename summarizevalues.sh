@@ -30,7 +30,7 @@ fi
 cases=($(cat ${caselist}))
 
 # # file pattern of the data with freewater correction
-# inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/\${case}-cc-ukf-values.csv
+#inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/\${case}-cc-ukf-values.csv
 
 # # file pattern of the data without freewater correnction
 inputfilepattern=/projects/schiz/3Tdata/case\${case}/projects/2015-delre-corpuscallosum/without-freeWater/\${case}-cc-ukf-values.csv

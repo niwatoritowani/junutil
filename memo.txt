@@ -1,0 +1,14 @@
+2015/07/08, 
+----------------------------------------------From terminal
+<2008> pnl-d74-1 /home/jkonishi/Downloads % firefox/firefox
+1436372277918	addons.repository	WARN	Search failed when repopulating cache
+1436372277931	addons.update-checker	WARN	HTTP Request failed for an unknown reason
+1436372277933	addons.update-checker	WARN	HTTP Request failed for an unknown reason
+<2009> pnl-d74-1 /home/jkonishi/Downloads % cd 
+<2010> pnl-d74-1 /home/jkonishi % firefox -p
+<2011> pnl-d74-1 /home/jkonishi % cd Downloads/
+<2012> pnl-d74-1 /home/jkonishi/Downloads % firefox/firefox
+LoadPlugin: failed to initialize shared library /usr/lib/flash-plugin/libflashplayer.so [/usr/lib/flash-plugin/libflashplayer.so: wrong ELF class: ELFCLASS32]
+LoadPlugin: failed to initialize shared library /usr/lib/mozilla/plugins/nppdf.so [/usr/lib/mozilla/plugins/nppdf.so: wrong ELF class: ELFCLASS32]
+<2013> pnl-d74-1 /home/jkonishi/Downloads % 
+-----------------------------------------------End

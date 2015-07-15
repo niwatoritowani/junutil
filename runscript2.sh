@@ -41,7 +41,7 @@ for caseid in ${cases}; do    # variable cases is expanded separated by space (b
     
     # set output directory
     outputdir=${caseprojdir}/$2
-    if [[ -e ${outputdir} ]]; then
+    if [[ ! -e ${outputdir} ]]; then
         mkdir ${outputdir}
         echo "make directory outputdir ${outputdir}"
     else 

@@ -31,15 +31,15 @@ func_ICC("radial.mean")
 func_ICC("axial.mean")
 
 # ----------------------------------------------------20150721
-# row 15, 16, 37, 38 are case01299
-# so, d1[c(-15,-16,-37,-38),] means deliting these rows. 
-# d2=d1[c(-15,-16,-37,-38),]
+# row 5, 6, 17, 18 are case01299
+# so, d1[c(-5,-6,-17,-18),] means deliting these rows. 
+# d2=d1[c(-5,-6,-17,-18),]
 
 # set input file name
 inputfile="results_calcinterrater.csv"
 d1=read.csv(inputfile,header=TRUE)
 # delete row 15,16,37,38
-d2=d1[c(-15,-16,-37,-38),]
+d2=d1[c(-5,-6,-17,-18),]
 # estimate ICC by function, arguments are data frame and its column 
 func_ICC <- function(dx,measured){
     testee=c("A","A","B","B","C","C","D","D","E","E","F","F","G","G","H","H","I","I","J","J")  # a vector

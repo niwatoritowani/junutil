@@ -41,6 +41,7 @@ d1=read.csv(inputfile,header=TRUE)
 # delete row 15,16,37,38
 d2=d1[c(-5,-6,-17,-18),]
 # estimate ICC by function, arguments are data frame and its column 
+library("ICC")
 func_ICC <- function(dx,measured){
     testee=c("A","A","B","B","C","C","D","D","E","E","F","F","G","G","H","H","I","I","J","J")  # a vector
     # d1[[measured]] is a vector, underbar is turend to period, 

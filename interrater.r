@@ -1,15 +1,11 @@
 # in project 2015-melissa
-# read values from csv
+# read values from csv, calculate ICC, display the results
 
-# set input file name
+# set input file name in the directory where input file exists
 inputfile="results_calcinterrater.csv"
 d1=read.csv(inputfile,header=TRUE)
 
-# check the names of d1
-names(d1)
-
 # # estimate ICC in command line
-# 
 # testee=c("A","A","B","B","C","C","D","D","E","E")  # a vector
 # measured=d1[["FA.mean"]]   # a vector, underbar is turend to period, 
 # r1=ICCest(testee,measured)
@@ -19,6 +15,7 @@ names(d1)
 # ## [1] "ICC"     "LowerCI" "UpperCI" "N"       "k"       "varw"    "vara" 
 
 # estimate ICC by function
+library("ICC")
 func_ICC <- function(measured){
     testee=c("A","A","B","B","C","C","D","D","E","E","F","F","G","G","H","H","I","I","J","J")  # a vector
     # d1[[measured]] is a vector, underbar is turend to period, 
@@ -30,21 +27,18 @@ func_ICC("trace.mean")
 func_ICC("radial.mean")
 func_ICC("axial.mean")
 
-# ----------------------------------------------------20150721
-# row 5, 6, 17, 18 are case01299
-# so, d1[c(-5,-6,-17,-18),] means deliting these rows. 
-# d2=d1[c(-5,-6,-17,-18),]
+# ----------------------------------------------------Begin 20150721
 
-# set input file name
+# set input file name in the directory where input file exists
 inputfile="results_calcinterrater.csv"
 d1=read.csv(inputfile,header=TRUE)
-# delete row 15,16,37,38
+# delete row 5,6,17,18 whic are the tracts of case01299
 d2=d1[c(-5,-6,-17,-18),]
 # estimate ICC by function, arguments are data frame and its column 
 library("ICC")
 func_ICC <- function(dx,measured){
     testee=c("A","A","B","B","C","C","D","D","E","E","F","F","G","G","H","H","I","I","J","J")  # a vector
-    # d1[[measured]] is a vector, underbar is turend to period, 
+    # dx[[measured]] is a vector, underbar is turend to period, 
     r1=ICCest(testee,dx[[measured]])
     r1["ICC"]
 }
@@ -52,6 +46,7 @@ func_ICC(d2,"FA.mean")
 func_ICC(d2,"trace.mean")
 func_ICC(d2,"radial.mean")
 func_ICC(d2,"axial.mean")
+
 # -----------------------------------------------------End of 20150721
 
 # output results to file or ?

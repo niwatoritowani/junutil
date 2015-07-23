@@ -12,3 +12,25 @@ LoadPlugin: failed to initialize shared library /usr/lib/flash-plugin/libflashpl
 LoadPlugin: failed to initialize shared library /usr/lib/mozilla/plugins/nppdf.so [/usr/lib/mozilla/plugins/nppdf.so: wrong ELF class: ELFCLASS32]
 <2013> pnl-d74-1 /home/jkonishi/Downloads % 
 -----------------------------------------------End
+
+20150723
+
+# copy pipeline-delisi
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi
+cp -r /home/jkonishi/junutil/pipeline-delisi pipeline-delisi
+
+# rewrite pipeline-delisi
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi
+rm -r pipeline-delisi
+cp -r /home/jkonishi/junutil/pipeline-delisi pipeline-delisi
+
+# trial
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
+redo DELISI_HM_0503
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
+redo DELISI_HM_0603
+
+

@@ -4,8 +4,8 @@ case=$(basename $2)
 #T1=$(eval echo $(<config/REALIGN_T1))
 #T2=$(eval echo $(<config/T2))
 
-T1=${case}.t1w-realign.brain.nrrd
-T2=${case}.t2w.brain.nrrd
+T1=${case}.t1w-realign-brain.nrrd
+T2=${case}.t2w-brain.nrrd
 
 #redo-ifchange config/REALIGN_T1 config/T2 $T1 $T2
 

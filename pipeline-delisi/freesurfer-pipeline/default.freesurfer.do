@@ -1,4 +1,4 @@
-if [ -d $1 ]; then
+if [ -d $1 ]; then    # $1 is $case.freesurfer
     echo "$1 already exists, delete it if you would like to recompute it"
     exit 1
 fi

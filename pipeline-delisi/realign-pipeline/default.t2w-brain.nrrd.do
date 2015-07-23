@@ -9,5 +9,5 @@ t2brainnii=/tmp/${case}.t2w-brain.nii.gz
 ConvertBetweenFileFormats $T2 $t2nii
 
 bet ${t2nii} ${t2brainnii} -m -f 0.50
-ConvertbetweenFileFormats ${t2brainnii} ${3}
+ConvertBetweenFileFormats ${t2brainnii} ${3}
 rm $t2nii ${t2brainnii}

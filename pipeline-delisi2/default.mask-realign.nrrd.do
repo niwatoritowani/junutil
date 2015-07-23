@@ -1,8 +1,8 @@
-case=$2
-XFM=$(eval echo $(<config/XFM))
-STRUCTURAL=$(eval echo $(<config/STRUCTURAL))
-REALIGN_T1=$(eval echo $(<config/REALIGN_T1))
+#!/bin/bash
 
-redo-ifchange $XFM # $STRUCTURAL
+case=$(basename $2)
+source SetUpData_pipeline.sh
 
-scripts/applyxfm.sh $STRUCTURAL $XFM $REALIGN_T1 $3
+redo-ifchange $xfm 
+
+scripts/applyxfm.sh $t2atlasmask $xfm $t1align $3

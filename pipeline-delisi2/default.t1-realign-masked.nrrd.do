@@ -1,7 +1,8 @@
-case=$2
-REALIGN_T1=$(eval echo $(<config/REALIGN_T1))
-MASK=$case.mask-realign.nrrd
+#!/bin/bash -eu
 
-redo-ifchange $MASK
+case=$(basename $2)
+source SetUpData_pipeline.sh
 
-unu 3op ifelse $MASK $REALIGN_T1 -w 1 0 | unu save -e gzip -f nrrd -o $3
+redo-ifchange $maskalign
+
+unu 3op ifelse $maskalign $t1align -w 1 0 | unu save -e gzip -f nrrd -o $3

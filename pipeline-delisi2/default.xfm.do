@@ -1,17 +1,16 @@
-case=$2
-#T1=$(eval echo $(<config/REALIGN_T1))
-#T2=$(eval echo $(<config/T2))
+#!/bin/bash -eu
 
-T1=${case}.t1w-realign.brain.nrrd
-T2=${case}.t2w.brain.nrrd
+case=$(basename $2)
+source SetUpData_pipeline.sh
 
-#redo-ifchange config/REALIGN_T1 config/T2 $T1 $T2
+T1=${strct}/${case}.t1w-realign.brain.nrrd
+T2=${scrct}/${case}.t2w.brain.nrrd
 
 redo-ifchange $T1 $T2
 
 t1nii=/tmp/$(basename $T1).nii.gz
 t2nii=/tmp/$(basename $T2).nii.gz
-t2realign=$2.t2w.brain.realign.nrrd
+t2realign=${strct}/$2.t2w.brain.realign.nrrd
 
 ConvertBetweenFileFormats $T1 $t1nii
 ConvertBetweenFileFormats $T2 $t2nii

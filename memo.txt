@@ -33,4 +33,20 @@ redo DELISI_HM_0503
 cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
 redo DELISI_HM_0603
 
+# trial in 2015/07/24
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
+redo DELISI_HM_0403
+redo DELISI_HM_0703
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
+redo DELISI_HM_0903
+redo DELISI_HM_1003
+
+cd /rfanfs/pnl-a/pnl/Collaborators/Delisi/pipeline-delisi/freesurfer-pipeline/
+redo DELISI_HM_1103
+redo DELISI_HM_1203
+
+
+
 

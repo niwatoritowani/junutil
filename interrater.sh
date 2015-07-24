@@ -28,3 +28,20 @@ measureTracts.py \
     -o results_20150723.csv
 
 # ----------------------------------------------------------
+
+
+measureTracts.py \ 
+    -i /projects/schiz/ra/melissa/Thesis_Project/interraterreliability/vtk_lh_stria/01099-lh-stria.vtk \
+    -o results_201507240958.csv
+
+# I deleted the results_201507240958.csv and re-cerate the same name file in different vtk data
+
+measureTracts.py \ 
+    -i /projects/schiz/ra/melissa/Thesis_Project/interraterreliability/vtk_lh_stria/01099-lh-stria.vtk \
+    -o results_201507240958.csv
+
+measureTracts.py \ 
+    -i /projects/schiz/ra/melissa/Thesis_Project/interraterreliability/vtk_lh_stria/01222-lh-stria.vtk \
+    -o results_201507241055.csv
+
+

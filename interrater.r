@@ -49,7 +49,7 @@ func_ICC(d2,"axial.mean")
 
 # -----------------------------------------------------End of 20150721
 
-
+# calculate ICC only in FA mean with separately in lh and rh
 func_ICC10 <- function(dx,measured){
     testee=c("A","A","B","B","C","C","D","D","E","E")  # a vector
     # dx[[measured]] is a vector, underbar is turend to period, 
@@ -71,6 +71,7 @@ func_ICC10(dr,"FA.mean")
 
 # --------------------------------------------------------
 
+# change the results of 01099-lh, 01222-lh, 01373-lh, 01222-lh, 01222-rh
 inputfile="results_20150723.csv"
 d3=read.csv(inputfile,header=TRUE)
 # 01099-lh, 01222-lh, 01373-lh, 01222-lh, 01222-rh
@@ -79,6 +80,7 @@ dl[3,]=d3[2,]
 dl[9,]=d3[3,]
 dr[3,]=d3[4,]
 dr[7,]=d3[5,]
+# But this resuts are not good. So I will try to replace results in each tract. 
 
 ## > dl[["FA.mean"]]
 ##  [1] 377.3233 388.1824 367.7719 338.7199 410.5894 405.5672 406.4336 407.7659
@@ -86,6 +88,28 @@ dr[7,]=d3[5,]
 ## > dr[["FA.mean"]]
 ##  [1] 326.0770 330.2872 298.7690 339.3762 371.5756 369.8417 358.9787 396.4071
 ##  [9] 375.4050 374.9215
+
+# --------------------------------------------------------
+
+# create original dl and lr
+dl=d1[c(1,2,3,4,7,8,9,10,11,12),]
+dr=d1[c(13,14,15,16,19,20,21,22,23,24),]
+
+# input the results of 01099-lh-stria.vtk
+inputfile="results_201507240958.csv"
+d4=read.csv(inputfile,header=TRUE)
+# 01099-lh of mine is in row 1 in data dl
+dl[1,]=d4[1,]
+dl[["FA.mean"]]
+func_ICC10(dl,"FA.mean")
+
+# input the results of 01222-lh-stria.vtk
+inputfile="results_201507241055.csv"
+d5=read.csv(inputfile,header=TRUE)
+# 01222-lh of mine is in row 3 in data dl
+dl[3,]=d5[1,]
+dl[["FA.mean"]]
+func_ICC10(dl,"FA.mean")
 
 
 # output results to file or ?

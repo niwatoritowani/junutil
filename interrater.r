@@ -32,7 +32,7 @@ func_ICC("axial.mean")
 # set input file name in the directory where input file exists
 inputfile="results_calcinterrater.csv"
 d1=read.csv(inputfile,header=TRUE)
-# delete row 5,6,17,18 whic are the tracts of case01299
+# delete row 5,6,17,18 whic are the tracts of case01229
 d2=d1[c(-5,-6,-17,-18),]
 # estimate ICC by function, arguments are data frame and its column 
 library("ICC")
@@ -111,6 +111,68 @@ dl[3,]=d5[1,]
 dl[["FA.mean"]]
 func_ICC10(dl,"FA.mean")
 
+# input the results of 01373-lh-stria.vtk
+inputfile="results_201507270941.csv"
+d6=read.csv(inputfile,header=TRUE)
+# 01222-lh of mine is in row 9 in data dl
+dl[9,]=d6[1,]
+dl[["FA.mean"]]
+func_ICC10(dl,"FA.mean")
+
+# input the results of 01222-rh-stria.vtk
+inputfile="results_201507271010.csv"
+d7=read.csv(inputfile,header=TRUE)
+# 01222-rh of mine is in row 3 in data dl
+dr[3,]=d7[1,]
+dr[["FA.mean"]]
+func_ICC10(dr,"FA.mean")
+
+# input the results of 01362-rh-stria.vtk
+inputfile="results_201507271257.csv"
+d8=read.csv(inputfile,header=TRUE)
+# 01362-rh of mine is in row 7 in data dl
+dr[7,]=d8[1,]
+dr[["FA.mean"]]
+func_ICC10(dr,"FA.mean")
+
+
+# ----------------------------------------------------
+
+# 2015/07/27
+# start these command after all editing is finished
+
+# set input file name in the directory where input file exists
+inputfile="results_calcinterrater201507271333.csv"
+d1=read.csv(inputfile,header=TRUE)
+library("ICC")
+
+# calculate ICC only in FA mean with separately in lh and rh
+func_ICC10 <- function(dx,measured){
+    testee=c("A","A","B","B","C","C","D","D","E","E")  # a vector
+    # dx[[measured]] is a vector, underbar is turend to period, 
+    r1=ICCest(testee,dx[[measured]])
+    r1["ICC"]
+}
+# extract left data
+dl=d1[c(1,2,3,4,5,6,7,8,9,10),]
+# extract right data
+dr=d1[c(11,12,13,14,15,16,17,18,19,20),]
+
+# display FA mean data and calculate ICC. 
+dl[["FA.mean"]]
+dr[["FA.mean"]]
+func_ICC10(dl,"FA.mean")
+func_ICC10(dr,"FA.mean")
+
+## > func_ICC10(dl,"FA.mean")
+## $ICC
+## [1] 0.9523677
+## 
+## > func_ICC10(dr,"FA.mean")
+## $ICC
+## [1] 0.9550325
+
+# ----------------------------------------------------
 
 # output results to file or ?
 

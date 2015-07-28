@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# project 2015-jun-prodrome
+
 IFS=$'\n'
 subjID=($(awk 'NR > 1 {print $7}' /projects/schiz/3Tprojects/2015-jun-prodrome/caselist_jun2_blind.txt))
 subjDir=($(awk 'NR > 1 {print $8}' /projects/schiz/3Tprojects/2015-jun-prodrome/caselist_jun2_blind.txt))

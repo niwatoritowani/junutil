@@ -1,0 +1,86 @@
+> ICCest
+
+1:function (x, y, data = NULL, alpha = 0.05, CI.type = c("THD", 
+2:    "Smith")) 
+3:{
+4:    square <- function(z) {
+5:        z^2
+6:    }
+7:    icall <- list(y = substitute(y), x = substitute(x))
+8:    if (is.character(icall$y)) {
+9:        warning("passing a character string to 'y' is deprecated since ICC vesion 2.3.0 and will not be supported in future versions. The argument to 'y' should either be an unquoted column name of 'data' or an object")
+10:        if (missing(data)) 
+11:            stop("Supply either the unquoted name of the object containing 'y' or supply both 'data' and then 'y' as an unquoted column name to 'data'")
+12:        icall$y <- eval(as.name(y), data, parent.frame())
+13:    }
+14:    if (is.name(icall$y)) 
+15:        icall$y <- eval(icall$y, data, parent.frame())
+16:    if (is.call(icall$y)) 
+17:        icall$y <- eval(icall$y, data, parent.frame())
+18:    if (is.character(icall$y)) 
+19:        icall$y <- eval(as.name(icall$y), data, parent.frame())
+20:    if (is.character(icall$x)) {
+21:        warning("passing a character string to 'x' is deprecated since ICC vesion 2.3.0 and will not be supported in future versions. The argument to 'x' should either be an unquoted column name of 'data' or an object")
+22:        if (missing(data)) 
+23:            stop("Supply either the unquoted name of the object containing 'x' or supply both 'data' and then 'x' as an unquoted column name to 'data'")
+24:        icall$x <- eval(as.name(x), data, parent.frame())
+25:    }
+26:    if (is.name(icall$x)) 
+27:        icall$x <- eval(icall$x, data, parent.frame())
+28:    if (is.call(icall$x)) 
+29:        icall$x <- eval(icall$x, data, parent.frame())
+30:    if (is.character(icall$x) && length(icall$x) == 1) 
+31:        icall$x <- eval(as.name(icall$x), data, parent.frame())
+32:    tdata <- data.frame(icall)
+33:    tdata <- na.omit(tdata)
+34:    a <- length(unique(tdata$x))
+35:    if (!is.null(attributes(tdata)$na.action)) {
+36:        warning(cat("NAs removed from rows:\n", unclass(attributes(tdata)$na.action), 
+37:            "\n"))
+38:    }
+39:    if (!is.factor(tdata$x)) {
+40:        warning("'x' has been coerced to a factor")
+41:        tdata$x <- as.factor(tdata$x)
+42:    }
+43:    else {
+44:        if (length(levels(tdata$x)) > a) {
+45:            tdata$x <- factor(as.character(tdata$x), levels = unique(tdata$x))
+46:            warning("Missing levels of 'x' have been removed")
+47:        }
+48:    }
+49:    tmpbb <- anova(aov(y ~ x, data = tdata))
+50:    num.df <- tmpbb$Df[1]
+51:    denom.df <- tmpbb$Df[2]
+52:    MSa <- tmpbb$"Mean Sq"[1]
+53:    MSw <- var.w <- tmpbb$"Mean Sq"[2]
+54:    tmp.outj <- aggregate(y ~ x, data = tdata, FUN = length)$y
+55:    k <- (1/(a - 1)) * (sum(tmp.outj) - (sum(square(tmp.outj))/sum(tmp.outj)))
+56:    var.a <- (MSa - MSw)/k
+57:    r <- var.a/(var.w + var.a)
+58:    low.F <- qf(alpha/2, num.df, denom.df, lower.tail = FALSE)
+59:    N <- nrow(tdata)
+60:    n.bar <- N/a
+61:    n.not <- n.bar - sum(square(tmp.outj - n.bar)/((a - 1) * 
+62:        N))
+63:    type <- match.arg(CI.type)
+64:    if (type == "THD") {
+65:        up.F <- qf(alpha/2, denom.df, num.df, lower.tail = FALSE)
+66:        FL <- (MSa/MSw)/low.F
+67:        FU <- (MSa/MSw) * up.F
+68:        low.CI <- (FL - 1)/(FL + n.not - 1)
+69:        up.CI <- (FU - 1)/(FU + n.not - 1)
+70:    }
+71:    if (type == "Smith") {
+72:        z.not <- qnorm(alpha/2)
+73:        Vr <- (2 * square(1 - r)/square(n.not)) * ((square((1 + 
+74:            r * (n.not - 1)))/(N - a)) + ((a - 1) * (1 - r) * 
+75:            (1 + r * (2 * n.not - 1)) + square(r) * (sum(square(tmp.outj)) - 
+76:            2 * (1/N) * sum((tmp.outj^3)) + (1/square(N)) * square(sum(square(tmp.outj)))))/square(a - 
+77:            1))
+78:        low.CI <- r + z.not * sqrt(Vr)
+79:        up.CI <- r - z.not * sqrt(Vr)
+80:    }
+81:    list(ICC = r, LowerCI = low.CI, UpperCI = up.CI, N = a, k = k, 
+82:        varw = var.w, vara = var.a)
+83:}
+84:<environment: namespace:ICC>

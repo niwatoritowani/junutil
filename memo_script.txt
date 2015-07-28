@@ -3,4 +3,14 @@
 echo "\$(pwd) : $(pwd)"
 echo "\$(readlink -m \${BASH_SOURCE[0]}) : $(readlink -m ${BASH_SOURCE[0]})"
 
+echo "kaki kukeko
+sasi suseso
+tati tuteto
+nani nuneno
+mami mumemo
+yayi yuyeyo
+rari rurero
+wawi wuwewo" > test.txt
+awk 'if ($2 == "mumemo"){print $1}'
 
+20150728. 

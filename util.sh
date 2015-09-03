@@ -1,13 +1,9 @@
 #!/bin/bash 
 
-# # In a script 
-# sourcedir=$(dirname $(readlink -f $0))
-# export PATH=$PATH:${sourcedir}
-# source ${sourcedir}/util.sh
-
-sourcescriptname=$(basename $(readlink -f "$0"))
-if [ -z "${scriptdir}" ]; then
-    scriptdir=$(dirname "$0")
+SCRIPT_NAME=$(readlink -m "$0")
+SCRIPT_NAME=${SCRIPT_NAME##*/}
+if [ -z "${SCRIPTDIR-}" ]; then
+    SCRIPTDIR=$(dirname "$0")
 fi
 
 #--------------------------------------

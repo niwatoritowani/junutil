@@ -30,29 +30,36 @@ usage() {
 #--------------------------------------
 # Begin logging section
 
-#cmdlog() {
-#    echo "$*" | tee -a $2
-#    eval "$1" 2>&1 | tee -a $2
-#}
+scrubcolors() {
+    sed -i "s/[[:cntrl:]]\[[0-9;]*m//g" $1
+}
 
-#-----editing-----
 log() {
-    echo "$@"
+    local log_text="$1"
+    echo -e "${log_text}" >&2;
+    return 0;
 }
 
 run() {
-    log "$@"
-    eval "$@" 2>
+    log "$*"
+    eval "$@"
 }
-#-----end editing-----
+
 
 # End logging section
 #-------------------------------------
 
+startlogging() {
+    _tmplog=$(mktemp).log
+    exec &> >(tee "$_tmplog")  # pipe stderr and stdout to logfile as well as console
+}
+
+stoplogging() {
+    cp $_tmplog $1
+    scrubcolors $1
+}
 
 #-----memo-----
 
 
-
-# End memo section
 #----------------------------------

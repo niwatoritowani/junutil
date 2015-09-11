@@ -19,11 +19,17 @@ demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist
 # install.packages("xlsx", dep=T) # only necessary if it is not installed
 library(xlsx)
 data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
+data1=subset(data1,! is.na(Case..))
 # field labels: 
 # dx: diagnosis 1 for PRO, 2 for HVPRO
 # AGE
 # SEX: 0 or 1
 # Case..: case ID
+
+# sheet4=read.xlsx(demographictable,sheetName="Sheet4",header=TRUE)
+# sheet4=subset(sheet4,! is.na(Case..))
+# # nrow(sheet4) is ...
+# # sheet4[44,] 
 
 # load the freesurfer output table
 
@@ -40,6 +46,11 @@ data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
 # merge tables
 
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+data6=subset(data5,! is.na(SEX))
+data6$SEX=as.factor(data6$SEX)
+
+data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
+write.csv(data7,file="output20150911")
 
 # AGE as a nuisance variable
 
@@ -79,6 +90,41 @@ myfunc3(data5,CC_Central,"plot_CCCent.png")
 myfunc3(data5,CC_Mid_Anterior,"plot_CCMidAnt.png")
 myfunc3(data5,CC_Anterior,"plot_CCAnt.png")
 
+# ggplot
+
+library(ggplot2)
+myfunc4 <- function(fieldlabel){
+    ggplot(data6, aes(x=GROUP,y=fieldlabel)) +
+        geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+}
+# message : Error in eval(expr, envir, enclos) : object 'fieldlabel' not found
+# why?
+
+ggplot(data6, aes(x=GROUP,y=CC_Anterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+ggplot(data6, aes(x=GROUP,y=CC_Central)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+ggplot(data6, aes(x=GROUP,y=CC_Posterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+ 
+
+myfunc5(input,column,output){
+    png(output)
+        ggplot(input, aes(x=GROUP,y=column)) +
+            geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+    dev.off()
+}
+# This probably does not work. 
+
+
+
+
+
+# ----------------------------------------------------------------------
 # Notes: 
 # CC_Posterior, CC_Mid_Posterior, CC_Central, CC_Mid_Anterior, CC_Anterior	
 # CC_Posterior is numeric? Dx is factor? AGE is numeric? 
@@ -86,4 +132,4 @@ myfunc3(data5,CC_Anterior,"plot_CCAnt.png")
 # references of functions: 
 #   setwd() sets working directory, 
 #   list.files() shows files in current directory, 
-
+#   objects() shows all objects

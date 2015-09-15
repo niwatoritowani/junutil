@@ -21,10 +21,10 @@ library(xlsx)
 data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
 data1=subset(data1,! is.na(Case..))
 # field labels: 
-# dx: diagnosis 1 for PRO, 2 for HVPRO
-# AGE
-# SEX: 0 or 1
-# Case..: case ID
+#     dx: diagnosis 1 for PRO, 2 for HVPRO
+#     AGE
+#     SEX: 0 or 1
+#     Case..: case ID
 
 # sheet4=read.xlsx(demographictable,sheetName="Sheet4",header=TRUE)
 # sheet4=subset(sheet4,! is.na(Case..))
@@ -48,9 +48,12 @@ data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))
 data6$SEX=as.factor(data6$SEX)
+data6$ICV=data6$EstimatedTotalIntraCranialVol
 
-data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
-write.csv(data7,file="output20150911")
+# # extract imprtatnt data
+# 
+# data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
+# write.csv(data7,file="output20150911")
 
 # AGE as a nuisance variable
 
@@ -75,6 +78,26 @@ myfunc2(data5,CC_Mid_Posterio,result_CCMidPost)
 myfunc2(data5,CC_Central,result_CCCent)
 myfunc2(data5,CC_Mid_Anterior,result_CCMidAnt)
 myfunc2(data5,CC_Anterior,result_CCAnt)
+
+# model: group, sex, ICV as factors
+
+myfunc <- function(input,column,output){
+  txt=paste(output,"=lm(",column,"~dx*SEX+ICV,data=",input,")",sep="")
+  eval(parse(text=txt))
+  summary(output)
+}
+myfunc("data6","CC_Posterior","result_CCPost")
+myfunc(data6,CC_Mid_Posterior,result_CCMidPost)
+myfunc(data6,CC_Central,result_CCCent)
+myfunc(data6,CC_Mid_Anterior,result_CCMidAnt)
+myfunc(data6,CC_Anterior,result_CCAnt)
+
+# This does not work.
+# eval(parse(text = "command1 command2"))
+
+r=lm(CC_Posterior~dx*SEX+ICV,data=data6)
+summary(r)
+
 
 # plot data
 
@@ -119,6 +142,8 @@ myfunc5(input,column,output){
     dev.off()
 }
 # This probably does not work. 
+# eval(parse(text = "command1 command2"))
+# may work.
 
 
 

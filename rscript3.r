@@ -23,7 +23,7 @@ data1=subset(data1,! is.na(Case..))
 # field labels: 
 #     dx: diagnosis 1 for PRO, 2 for HVPRO
 #     AGE
-#     SEX: 0 or 1
+#     SEX: 0 or 1; need to be changed to factor(class)
 #     Case..: case ID
 
 # sheet4=read.xlsx(demographictable,sheetName="Sheet4",header=TRUE)
@@ -49,109 +49,141 @@ data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))
 data6$SEX=as.factor(data6$SEX)
 data6$ICV=data6$EstimatedTotalIntraCranialVol
+data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle
 
 # # extract imprtatnt data
 # 
 # data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
 # write.csv(data7,file="output20150911")
 
-# AGE as a nuisance variable
 
-myfunc <- function(input,column,output){
-  output=lm(column~dx+AGE,data=input)
-  summary(output)
+# # plot data
+# 
+# library(Rcmdr)
+# myfunc3 <- function(input,column,output){
+#   png(output)
+#     plotMeans(input$column,input$Dx,error.bars="se")
+#   dev.off()
+# }
+# myfunc3(data5,CC_Posterio,"plot_CCPost.png")
+# myfunc3(data5,CC_Mid_Posterio,"plot_CCMidPost.png")
+# myfunc3(data5,CC_Central,"plot_CCCent.png")
+# myfunc3(data5,CC_Mid_Anterior,"plot_CCMidAnt.png")
+# myfunc3(data5,CC_Anterior,"plot_CCAnt.png")
+
+#----------------------------------------------
+# Example functions
+
+mkcmd <- function(arg1){
+# arg1: characters
+  txt1="start"
+  txt2=arg1
+  txt3="end"
+  paste(txt1,txt2,txt3,sep="")
 }
-myfunc(data5,CC_Posterio,result_CCPost)
-myfunc(data5,CC_Mid_Posterio,result_CCMidPost)
-myfunc(data5,CC_Central,result_CCCent)
-myfunc(data5,CC_Mid_Anterior,result_CCMidAnt)
-myfunc(data5,CC_Anterior,result_CCAnt)
 
-# ICV as a nuisance variable
+# What if command include double-quotation-marks?
 
-myfunc2 <- function(input,column,output){
-  output=lm(column~dx+EstimatedTotalIntraCranialVol,data=input)
-  summary(output)
+run <- function(arg1){
+#    arg1: characters
+#    print(arg1)
+#    log(arg1)    # not yet defined
+    eval(parse(text=print(arg1)))
 }
-myfunc2(data5,CC_Posterio,result_CCPost)
-myfunc2(data5,CC_Mid_Posterio,result_CCMidPost)
-myfunc2(data5,CC_Central,result_CCCent)
-myfunc2(data5,CC_Mid_Anterior,result_CCMidAnt)
-myfunc2(data5,CC_Anterior,result_CCAnt)
 
-# model: group, sex, ICV as factors
+#----------------------------------------------
 
-myfunc <- function(input,column,output){
-  txt=paste(output,"=lm(",column,"~dx*SEX+ICV,data=",input,")",sep="")
-  eval(parse(text=txt))
-  summary(output)
+regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
+
+funclm1 <- function(arg1){
+    # arg1: characters
+    # r=lm(CC_Posterior~GROUP*SEX+ICV,data=data6)
+    # print(summary(r))
+   
+    txt1="r=lm("
+    txt2=arg1
+    txt3="~GROUP*SEX+ICV,data=data6)"
+    txt0=paste(txt1,txt2,txt3,sep="")
+
+    print(txt0)
+    eval(parse(text=txt0))
+   
+    print(summary(r))
 }
-myfunc("data6","CC_Posterior","result_CCPost")
-myfunc(data6,CC_Mid_Posterior,result_CCMidPost)
-myfunc(data6,CC_Central,result_CCCent)
-myfunc(data6,CC_Mid_Anterior,result_CCMidAnt)
-myfunc(data6,CC_Anterior,result_CCAnt)
 
-# This does not work.
-# eval(parse(text = "command1 command2"))
+for (region in regions ) {
+    funclm1(region)
+}
 
-r=lm(CC_Posterior~dx*SEX+ICV,data=data6)
+funclm2 <- function(arg1){
+    # arg1: characters
+    # r=lm(arg1~GROUP+ICV,data=data6)
+    # print(summary(r))
+   
+    txt1="r=lm("
+    txt2=arg1
+    txt3="~GROUP+ICV,data=data6)"
+    txt0=paste(txt1,txt2,txt3,sep="")
+
+    print(txt0)
+    eval(parse(text=txt0))
+   
+    print(summary(r))
+}
+
+for (region in regions ) {
+    funclm2(region)
+}
+
+regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
+for (region in regions2 ) {
+    funclm1(region)
+}
+
+dlvrt=data.frame(GROUP=data6$GROUP, volume=data6$Right.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="rt")
+dlvlt=data.frame(GROUP=data6$GROUP, volume=data6$Left.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="lt")
+dlv=rbind(dlvrt,dlvlt)
+r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv)
+summary(r)
+r=lm(volume~GROUP*hemi+ICV,data=dlv)
 summary(r)
 
-
-# plot data
-
-library(Rcmdr)
-myfunc3 <- function(input,column,output){
-  png(output)
-    plotMeans(input$column,input$Dx,error.bars="se")
-  dev.off()
+regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+for (region in regions3 ) {
+    funclm1(region)
 }
-myfunc3(data5,CC_Posterio,"plot_CCPost.png")
-myfunc3(data5,CC_Mid_Posterio,"plot_CCMidPost.png")
-myfunc3(data5,CC_Central,"plot_CCCent.png")
-myfunc3(data5,CC_Mid_Anterior,"plot_CCMidAnt.png")
-myfunc3(data5,CC_Anterior,"plot_CCAnt.png")
-
-# ggplot
 
 library(ggplot2)
-myfunc4 <- function(fieldlabel){
-    ggplot(data6, aes(x=GROUP,y=fieldlabel)) +
-        geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-}
-# message : Error in eval(expr, envir, enclos) : object 'fieldlabel' not found
-# why?
+library(gridExtra)
+pdf("output.pdf")
+p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+p3=ggplot(data6, aes(x=GROUP,y=CC_Central)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
+p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center")
+p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle)) +
+    geom_dotplot(binaxis="y",binwidth=40,stackdir="center")
+p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center")
 
-ggplot(data6, aes(x=GROUP,y=CC_Anterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-ggplot(data6, aes(x=GROUP,y=CC_Central)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-ggplot(data6, aes(x=GROUP,y=CC_Posterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
- 
-
-myfunc5(input,column,output){
-    png(output)
-        ggplot(input, aes(x=GROUP,y=column)) +
-            geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-    dev.off()
-}
-# This probably does not work. 
-# eval(parse(text = "command1 command2"))
-# may work.
-
-
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of corpus callosum")
+dev.off()
+# This function includes double-quotation-marks, so it's difficult to use eval...
 
 
 
 # ----------------------------------------------------------------------
 # Notes: 
 # CC_Posterior, CC_Mid_Posterior, CC_Central, CC_Mid_Anterior, CC_Anterior	
+# "Right.Lateral.Ventricle", "Left.Lateral.Ventricle", "X3rd.Ventricle"
+# "EstimatedTotalIntraCranialVol"
 # CC_Posterior is numeric? Dx is factor? AGE is numeric? 
 # check by mode(), or is.numeric(), is.factor(), change by as.numeric(), as.factor()
 # references of functions: 

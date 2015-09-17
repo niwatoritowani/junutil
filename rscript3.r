@@ -1,14 +1,13 @@
 # This file is a script for R and run by
-# R --vanilla < script.r
+#     R --vanilla < rscript3.r
 
 # set variables
-# in the future, variables should be set in other "SetUpData.sh" file. 
+#     in the future, variables should be set in other "SetUpData.sh" file. 
 
 # project=2015-delisi
-# projectdir=/rfanfs/pnl-a/pnl/Collaborators/Delisi
+# projectdir=/projects/schiz/3Tprojects/2015-jun-prodrome
 # statdir=${projectdir}/stat
-# statdir=/rfanfs/pnl-a/pnl/Collaborators/Delisi/pipelines-realign/test_stats
-# fsstatdir=/rfanfs/pnl-a/pnl/Collaborators/Delisi/pipelines-realign/test_stats
+# fsstatdir=
 fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
@@ -34,8 +33,9 @@ data1=subset(data1,! is.na(Case..))
 # load the freesurfer output table
 
 data4=read.table(fsstatfile,header=TRUE)
-# Measure:volume (field label) is turened to Measure.volume 
-# and its data is for example DELISI_HM_0403.freesurfer
+# field labels:
+#     Measure:volume (field label) is turened to Measure.volume 
+#     and its data is for example DELISI_HM_0403.freesurfer
 
 # formatting the strings of case id
 
@@ -46,30 +46,15 @@ data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
 # merge tables
 
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-data6=subset(data5,! is.na(SEX))
-data6$SEX=as.factor(data6$SEX)
-data6$ICV=data6$EstimatedTotalIntraCranialVol
-data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle
+data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data.
+data6$SEX=as.factor(data6$SEX)    # change into class:factor
+data6$ICV=data6$EstimatedTotalIntraCranialVol    # change field name to be handled easier
+data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle    # sum lt rt into bilateral
 
 # # extract imprtatnt data
 # 
 # data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
 # write.csv(data7,file="output20150911")
-
-
-# # plot data
-# 
-# library(Rcmdr)
-# myfunc3 <- function(input,column,output){
-#   png(output)
-#     plotMeans(input$column,input$Dx,error.bars="se")
-#   dev.off()
-# }
-# myfunc3(data5,CC_Posterio,"plot_CCPost.png")
-# myfunc3(data5,CC_Mid_Posterio,"plot_CCMidPost.png")
-# myfunc3(data5,CC_Central,"plot_CCCent.png")
-# myfunc3(data5,CC_Mid_Anterior,"plot_CCMidAnt.png")
-# myfunc3(data5,CC_Anterior,"plot_CCAnt.png")
 
 #----------------------------------------------
 # Example functions
@@ -86,18 +71,24 @@ mkcmd <- function(arg1){
 
 run <- function(arg1){
 #    arg1: characters
-#    print(arg1)
+#    print(arg1)    # maybe not necessary
 #    log(arg1)    # not yet defined
     eval(parse(text=print(arg1)))
 }
 
 #----------------------------------------------
 
+# set variables
+
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
+regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
+regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+
+# ANOVA with factors: GROUP, SEX, ICV
 
 funclm1 <- function(arg1){
     # arg1: characters
-    # r=lm(CC_Posterior~GROUP*SEX+ICV,data=data6)
+    # r=lm(arg1~GROUP*SEX+ICV,data=data6)
     # print(summary(r))
    
     txt1="r=lm("
@@ -105,15 +96,21 @@ funclm1 <- function(arg1){
     txt3="~GROUP*SEX+ICV,data=data6)"
     txt0=paste(txt1,txt2,txt3,sep="")
 
-    print(txt0)
+#    print(txt0)
     eval(parse(text=txt0))
    
-    print(summary(r))
+#    print(summary(r))
+    s=summary(r)
+    cat("----------------\n")
+    print(s[[1]])
+    print(s[[4]][,c(1,4)])
 }
 
 for (region in regions ) {
     funclm1(region)
 }
+
+# ANOVA with factors: GROUP, ICV
 
 funclm2 <- function(arg1){
     # arg1: characters
@@ -125,37 +122,59 @@ funclm2 <- function(arg1){
     txt3="~GROUP+ICV,data=data6)"
     txt0=paste(txt1,txt2,txt3,sep="")
 
-    print(txt0)
+#    print(txt0)
     eval(parse(text=txt0))
    
-    print(summary(r))
+#    print(summary(r))
+    s=summary(r)
+    cat("----------------\n")
+    print(s[[1]])
+    print(s[[4]][,c(1,4)])
 }
 
 for (region in regions ) {
     funclm2(region)
 }
 
-regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
 for (region in regions2 ) {
     funclm1(region)
 }
 
+# make data.frame for the analyses with hemisphere as factor
+
 dlvrt=data.frame(GROUP=data6$GROUP, volume=data6$Right.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="rt")
 dlvlt=data.frame(GROUP=data6$GROUP, volume=data6$Left.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="lt")
 dlv=rbind(dlvrt,dlvlt)
-r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv)
-summary(r)
-r=lm(volume~GROUP*hemi+ICV,data=dlv)
-summary(r)
 
-regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+# ANOVA with factors: GROUP, hemi, SEX, ICV
+
+r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv)
+#print(summary(r))
+    s=summary(r)
+    cat("----------------\n")
+    print(s[[1]])
+    print(s[[4]][,c(1,4)])
+
+# ANOVA with factors: GROUP, hemi, ICV
+
+r=lm(volume~GROUP*hemi+ICV,data=dlv)
+#print(summary(r))
+    s=summary(r)
+    cat("----------------\n")
+    print(s[[1]])
+    print(s[[4]][,c(1,4)])
+
+# ANOVA with factors: GROUP, ICV
+
 for (region in regions3 ) {
     funclm1(region)
 }
 
+# plot
+
 library(ggplot2)
 library(gridExtra)
-pdf("output.pdf")
+#pdf("output.pdf")
 p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
 p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior)) +
@@ -174,10 +193,11 @@ p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle)) +
     geom_dotplot(binaxis="y",binwidth=2000,stackdir="center")
 
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of corpus callosum")
-dev.off()
+# dev.off()
+
 # This function includes double-quotation-marks, so it's difficult to use eval...
-
-
+#     It would work just using \" 
+# I did not set the plot output settings. Rplots.pdf is output and saved. Why? 
 
 # ----------------------------------------------------------------------
 # Notes: 
@@ -190,3 +210,24 @@ dev.off()
 #   setwd() sets working directory, 
 #   list.files() shows files in current directory, 
 #   objects() shows all objects
+# 
+# r=ln(...)
+# s=summary(r)
+# s[[1]], s$call; 
+# s[[4]], s$coefficients; class:matrix, 
+#     # How to get the row and column labels of matrix?
+# colnames(s[[4]]) ... "Estimate" "Std. Error" "t value" "Pr(>|t|)"
+# rownames(summary_r[[4]]) ... "(Intercept)" "GROUPPRO" "SEX1" "ICV" "GROUPPRO:SEX1"
+#     - print(s[[1]]), print(s[[4]][,c(1,4)})
+# 
+# atomic-data-type: character, complex, double, integer, logical
+# structural-data-type: vector, matrix, list, data.frame
+# class: factor, 
+# 
+# list[["name"]] is a element
+# list["name"] is list
+# 
+# R options: 
+#     -q, --quiet           Don't print startup message
+#     --slave               Make R run as quietly as possible
+ 

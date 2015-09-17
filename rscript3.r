@@ -1,6 +1,7 @@
 # This file is a script for R and run by
 #     R --vanilla < rscript3.r
 
+# -------------------------------------------------------------
 # set variables
 #     in the future, variables should be set in other "SetUpData.sh" file. 
 
@@ -12,6 +13,7 @@ fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
 # ----------------------------------------------------------
+# set up data
 
 # load the demographic table
 
@@ -27,8 +29,6 @@ data1=subset(data1,! is.na(Case..))
 
 # sheet4=read.xlsx(demographictable,sheetName="Sheet4",header=TRUE)
 # sheet4=subset(sheet4,! is.na(Case..))
-# # nrow(sheet4) is ...
-# # sheet4[44,] 
 
 # load the freesurfer output table
 
@@ -56,27 +56,8 @@ data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ven
 # data7=subset(data6,select=c(GROUP,SEX,CC_Posterior,CC_Mid_Posterior,CC_Central,CC_Mid_Anterior,CC_Anterior,Left.Lateral.Ventricle,Right.Lateral.Ventricle,X3rd.Ventricle,EstimatedTotalIntraCranialVol))
 # write.csv(data7,file="output20150911")
 
-#----------------------------------------------
-# Example functions
-
-mkcmd <- function(arg1){
-# arg1: characters
-  txt1="start"
-  txt2=arg1
-  txt3="end"
-  paste(txt1,txt2,txt3,sep="")
-}
-
-# What if command include double-quotation-marks?
-
-run <- function(arg1){
-#    arg1: characters
-#    print(arg1)    # maybe not necessary
-#    log(arg1)    # not yet defined
-    eval(parse(text=print(arg1)))
-}
-
-#----------------------------------------------
+# -------------------------------------------------------------------------
+# statistical analysis
 
 # set variables
 
@@ -136,6 +117,8 @@ for (region in regions ) {
     funclm2(region)
 }
 
+# ANOVA with factors: GROUP, SEX, ICV
+
 for (region in regions2 ) {
     funclm1(region)
 }
@@ -175,22 +158,47 @@ for (region in regions3 ) {
 library(ggplot2)
 library(gridExtra)
 #pdf("output.pdf")
-p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-p3=ggplot(data6, aes(x=GROUP,y=CC_Central)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center")
-p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle)) +
-    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center")
-p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle)) +
-    geom_dotplot(binaxis="y",binwidth=40,stackdir="center")
-p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle)) +
-    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center")
+p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p3=ggplot(data6, aes(x=GROUP,y=CC_Central,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=40,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE)     # don't display guide
+# geom_dotplot(); color:, filll:, 
+# stat_summary(); ymin:, ymax:, 
 
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of corpus callosum")
 # dev.off()
@@ -198,6 +206,26 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of 
 # This function includes double-quotation-marks, so it's difficult to use eval...
 #     It would work just using \" 
 # I did not set the plot output settings. Rplots.pdf is output and saved. Why? 
+
+
+# ----------------------------------------------------------
+# # plot with jitter
+# 
+# p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=GROUP)) +
+#     geom_point(size=3,shape=21,position=position_jitter(width=.1,height=0))+
+#     stat_summary(fun.y="mean",goem="point",shape="-",size=6,color="black",ymin=0,ymax=0) +
+#     guides(fill=FALSE) +    # don't display guide
+#     theme(axis.title.x=element_blank()) +    # don't display x-axis-label
+#     annotate("segment",x=1,xend=2,y=1150,yend=1150,arrow=arrow(ends="both",angle=90)) +    # add a bar
+#     annotate("text",x=1.5,y=1120,label="*",size=10)    # add a * 
+
+# ------------------------------------------------------------
+# # plot for correlation matrix
+# 
+# mcor=cor([data.frame],use="complete.obs")
+#     # option use : for NA
+# library(corrplot)
+# corrplot(mcor)
 
 # ----------------------------------------------------------------------
 # Notes: 
@@ -231,3 +259,24 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of 
 #     -q, --quiet           Don't print startup message
 #     --slave               Make R run as quietly as possible
  
+#----------------------------------------------
+# Example functions
+
+mkcmd <- function(arg1){
+# arg1: characters
+  txt1="start"
+  txt2=arg1
+  txt3="end"
+  paste(txt1,txt2,txt3,sep="")
+}
+
+# What if command include double-quotation-marks?
+
+run <- function(arg1){
+#    arg1: characters
+#    print(arg1)    # maybe not necessary
+#    log(arg1)    # not yet defined
+    eval(parse(text=print(arg1)))
+}
+
+#----------------------------------------------

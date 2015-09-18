@@ -147,11 +147,114 @@ r=lm(volume~GROUP*hemi+ICV,data=dlv)
     print(s[[1]])
     print(s[[4]][,c(1,4)])
 
-# ANOVA with factors: GROUP, ICV
+# ANOVA with factors: GROUP, SEX, ICV
 
 for (region in regions3 ) {
     funclm1(region)
 }
+
+# ANOVA with factors: GROUP, ICV
+
+for (region in regions3 ) {
+    funclm2(region)
+}
+
+# correlation analysis
+
+mcor=cor(cbind(data6[c(regions,regions3)]),use="complete.obs")
+#     # option use : for NA
+# mcor=cor(na.omit(cbind(data6[c(regions,regions3)])))    # same as above
+
+datax=na.omit(cbind(data6[c(regions,regions3)]))
+plot(datax)    # plot of correlation matrix
+
+n=length(datax)
+mcorp=matrix(0,n,n)
+for (j in 1:n) {    # matrix of correlation p-value
+    for (i in 1:n) {
+        mcorp[i,j]=cor.test(datax[[j]],datax[[i]])[["p.value"]]
+    }
+}
+rownames(mcorp)=names(datax)
+colnames(mcorp)=names(datax)
+mask=(mcorp < 0.05)
+mcorp.sig=mcorp
+mcorp.sig[!mask]=NA
+mcorp.sig.round=sprintf("%.2f",mcorp.sig)
+mcorp.sig.round=as.numeric(mcorp.sig.round)
+dim(mcorp.sig.round)=c(n,n)
+rownames(mcorp.sig.round)=names(datax)
+colnames(mcorp.sig.round)=names(datax)
+
+datax=
+    cbind(
+        data6[c(1:15)],
+#        data6[c(44:344)],
+        data6[c("READSTD","WASIIQ","GAFC","GAFH")],
+        data6[c(regions,regions3)]
+    )
+mask=sapply(datax,is.numeric)
+# datax=datax[mask]    # ... this does not work
+datax=subset(datax,select=mask)
+
+# datax=na.omit(datax)    # ... this does not work
+n=length(datax)
+for (i in 1:n) {
+#    print(names(datax[i]))
+#    print(cor.test(datax[["CC_Mid_Posterior"]],datax[[i]])[["p.value"]])
+    mcorp[i]=cor.test(datax[["CC_Mid_Posterior"]],datax[[i]])[["p.value"]]
+}
+# ... this does not work ... error in columns which have NAs
+
+myfunc = function(arg1){
+    # arg1: vector:numeric
+    print(cor.test(datax[["CC_Mid_Posterior"]],datax[[arg1]])[["p.value"]])
+}
+myfunc("READSTD")
+myfunc("WASIIQ")
+myfunc("GAFC")
+myfunc("GAFH")
+
+cor.test(datax[["CC_Mid_Posterior"]],datax[["READSTD"]])[["p.value"]]    # 0.8071653
+cor.test(datax[["CC_Mid_Posterior"]],datax[["WASIIQ"]])[["p.value"]]    # 0.8257893
+cor.test(datax[["CC_Mid_Posterior"]],datax[["GAFC"]])[["p.value"]]    # 0.2955193
+cor.test(datax[["CC_Mid_Posterior"]],datax[["GAFH"]])[["p.value"]]    # 0.2031281
+cor.test(datax[["Bil.Lateral.Ventricle"]],datax[["READSTD"]])[["p.value"]]    # 0.1728446
+cor.test(datax[["Bil.Lateral.Ventricle"]],datax[["WASIIQ"]])[["p.value"]]    # 0.8411307
+cor.test(datax[["Bil.Lateral.Ventricle"]],datax[["GAFC"]])[["p.value"]]    # 0.04665685
+cor.test(datax[["Bil.Lateral.Ventricle"]],datax[["GAFH"]])[["p.value"]]    # 0.09014714
+
+# ... cor.test: arg1:vector, arg2:vector,
+
+
+x=datax[["CC_Mid_Posterior"]]    # vector
+mask=!is.na(x)    # vector:logical
+x=x[mask]    # vector:numeric
+y=datax[["READSTD"]][mask]
+f=datax[["GROUP"]][mask]
+func = function(arg1){
+    # arg1 : vector:numeric
+    print(cor.test(x,arg1)[["p.value"]])
+}
+tapply(y,f,func)
+
+# in "func", x is not devided two. 
+# so it does not work. 
+
+
+maskfpro=(f == "PRO")    # vector:logical
+
+
+
+
+names(mcorp)=names(datax)
+mask=(mcorp < 0.05)
+mcorp.sig=mcorp
+mcorp.sig[!mask]=NA
+mcorp.sig.round=printf("%.2f",mcorp.sig)
+mcorp.sig.round=as.numeric(mcorp.sig.round)
+names(mcorp.sig.round)=names(detax)
+
 
 # plot
 
@@ -249,8 +352,10 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of 
 #     - print(s[[1]]), print(s[[4]][,c(1,4)})
 # 
 # atomic-data-type: character, complex, double, integer, logical
-# structural-data-type: vector, matrix, list, data.frame
-# class: factor, 
+# structural-data-type: vector, (matrix,) list, data.frame
+# mode: numeric, character, list, function, ... mode()
+# class: factor, ... class()
+
 # 
 # list[["name"]] is a element
 # list["name"] is list

@@ -385,3 +385,105 @@ run <- function(arg1){
 }
 
 #----------------------------------------------
+
+
+# =======================
+# data setting in home PC
+# =======================
+
+setwd("C:/Users/jun/Documents/test")
+fsstatfile="output20150911.csv"
+demographictable="Caselist_CC_prodromes.xlsx"
+data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
+data4=read.csv(fsstatfile,header=TRUE)
+data6=data4
+data6=cbind(data6,data1)    # NOT paired data only for tryal analyses
+data6_pro=subset(data6,GROUP="PRO")    # NOT paired data only for tryal analyses
+
+# ===================================
+# ANOVA with factors: GROUP, SEX, ICV
+# ===================================
+
+funclm1 <- function(arg1){
+    # arg1: characters
+    # r=lm(arg1~GROUP*SEX+ICV,data=data6)
+    # print(summary(r))
+   
+    txt1="r=lm("
+    txt2=arg1
+    txt3="~GROUP*SEX+ICV,data=data6)"
+    txt0=paste(txt1,txt2,txt3,sep="")
+
+#    print(txt0)
+    eval(parse(text=txt0))
+   
+#    print(summary(r))
+    s=summary(r)
+    cat("----------------\n")
+    print(s[[1]])
+    print(s[[4]][,c(1,4)])
+}
+
+funclm1("CC_Mid_Posterior")
+funclm1("Bil.Lateral.Ventricle")
+
+# ====================
+# correlation analyses
+# ====================
+
+# todo
+# - which values should we analyses? 
+
+# extract PRO data for correlation analyses
+
+data6_pro=subset(data6,GROUP=="PRO")
+    # memo: NA in volume are in HVPRO
+    #       no need to delete lines including NA in PRO
+
+# set data.frame
+
+datax=data6_pro
+
+# set function
+
+func = function(arg1){
+    # arg1 : vector:numeric
+    print(cor.test(x,arg1,method="spearman")[["p.value"]])
+}
+
+# analyses
+
+x=datax[["CC_Mid_Posterior"]]    # vector
+mask=!is.na(x)    # vector:logical
+x=x[mask]    # vector:numeric
+
+y=datax[["READSTD"]][mask]
+func(y)
+y=datax[["WASIIQ"]][mask]
+func(y)
+y=datax[["GAFC"]][mask]
+func(y)
+y=datax[["GAFH"]][mask]
+func(y)
+
+
+x=datax[["Bil.Lateral.Ventricle"]]    # vector
+mask=!is.na(x)    # vector:logical
+x=x[mask]    # vector:numeric
+
+y=datax[["READSTD"]][mask]
+func(y)
+y=datax[["WASIIQ"]][mask]
+func(y)
+y=datax[["GAFC"]][mask]
+func(y)
+y=datax[["GAFH"]][mask]
+func(y)
+
+
+# -----------------------------------------------
+# Note
+# ----------------------------------------------
+
+# - Can I install Sublime Text 3 in PNL PC?
+

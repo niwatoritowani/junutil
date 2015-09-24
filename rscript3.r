@@ -50,6 +50,7 @@ data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data
 data6$SEX=as.factor(data6$SEX)    # change into class:factor
+# data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
 data6$ICV=data6$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
 data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle    # summarize lt rt into bilateral
 data6$rRight.Lateral.Ventricle=data6$Right.Lateral.Ventricle/data6$ICV
@@ -641,19 +642,39 @@ ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
 
 data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
 p1=ggplot(data6, aes(x=GROUPSEX,y=CC_Mid_Posterior,fill=GROUPSEX)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#    guides(fill=FALSE) +    # don't display guide
+    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-
-data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
 p2=ggplot(data6, aes(x=GROUPSEX,y=rCC_Mid_Posterior,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#    guides(fill=FALSE) +    # don't display guide
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p3=ggplot(data6, aes(x=GROUPSEX,y=Bil.Lateral.Ventricle,fill=GROUPSEX)) +
+    geom_dotplot(binaxis="y",stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p4=ggplot(data6, aes(x=GROUPSEX,y=rBil.Lateral.Ventricle,fill=GROUPSEX)) +
+    geom_dotplot(binaxis="y",stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p5=ggplot(data6, aes(x=GROUPSEX,y=Left.Lateral.Ventricle,fill=GROUPSEX)) +
+    geom_dotplot(binaxis="y",stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p6=ggplot(data6, aes(x=GROUPSEX,y=rLeft.Lateral.Ventricle,fill=GROUPSEX)) +
+    geom_dotplot(binaxis="y",stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
 
-grid.arrange(p1,p2)
+pdf("CCMid_LV_by_GROUPSEX.pdf")
+grid.arrange(p1,p2,p3,p4,p5,p6,nrow=3,ncol=2)
+dev.off()
 
 # ----------------------------------------------------------
 # # plot with jitter

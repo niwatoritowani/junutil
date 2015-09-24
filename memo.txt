@@ -49,4 +49,21 @@ redo DELISI_HM_1203
 
 
 
+-----------------------------------------------------------------
+[Thu Sep 24 13:46:57 EDT 2015]
 
+structure of this directory
+
+- junutil
+    - util.sh
+    - todo.txt
+    - memo.txt
+    - scripts-all
+        - symbolic link to all scripts
+    - scripts-...
+        - entity of scripts
+    - scripts-r
+    - scripts-pipeline
+    - pipeline
+        - do files
+        - scripts-pipeline (symbolic link to ../scripts-pipelines)

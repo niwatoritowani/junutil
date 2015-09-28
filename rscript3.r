@@ -45,12 +45,11 @@ data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
 data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
 # substring(object,start,end) index starts from 1 not 0
 
-# merge tables
+# merge tables and arrange the field names
 
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data
 data6$SEX=as.factor(data6$SEX)    # change into class:factor
-# data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
 data6$ICV=data6$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
 data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle    # summarize lt rt into bilateral
 data6$rRight.Lateral.Ventricle=data6$Right.Lateral.Ventricle/data6$ICV
@@ -62,6 +61,8 @@ data6$rCC_Mid_Anterior      =data6$CC_Mid_Anterior      /data6$ICV
 data6$rCC_Central           =data6$CC_Central           /data6$ICV
 data6$rCC_Mid_Posterior     =data6$CC_Mid_Posterior     /data6$ICV
 data6$rCC_Posterior         =data6$CC_Posterior         /data6$ICV
+data6$SEX2=as.character(data6$SEX);mask=(data6$SEX2=="0");data6$SEX2[mask]="M";data6$SEX2[!mask]="F";data6$SEX2=as.factor(data6$SEX2)
+data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
 
 # set variables
 
@@ -231,8 +232,7 @@ datax=cbind(data6[c(regions,regions3)])  # set datax
 mcor=cor(datax,use="complete.obs")    # correlation matrix with correlation coefficients but not p-values
 plot(datax)    # plot of correlation matrix
 
-# you may use below
-# datax=na.omit(datax)    # omit rows including NA for correlation analysis
+# you may use "datax=na.omit(datax)"    # omit rows including NA for correlation analysis
 
 # correlation analysis - output p-values of the analyses
 # ------------------------------------------------------
@@ -874,7 +874,7 @@ y=datax[["GAFH"]]    ;func(y)
 y=datax[["ROLEFX"]]  ;func(y)
 
 # =================
-# inprotant analyses
+# improtant analyses
 # ==================
 
 # --------------------------------------
@@ -1124,4 +1124,176 @@ pdf("plot_Bil.Lateral.Ventricle.pdf");p6;dev.off()
 pdf("plot_scatter.pdf")
 ggplot(datax, aes(x=SINTOTEV, y=Bil.Lateral.Ventricle,colour=SEX)) + geom_point()
 dev.off()
+
+# ------------------------
+# edit at home, 2015/09/28
+# ------------------------
+
+# output files 
+write.csv(data6,file="caselist_prodromes_jun.csv",na="")
+write.xlsx(data6,file="caselist_prodromes_jun.xlsx",showNA=FALSE)
+# The right-bttom of the xlsx table isZQ44
+
+# -----------------------
+# lm(), aov() and anova()
+# -----------------------
+
+> r
+
+Call:
+lm(formula = CC_Mid_Posterior ~ GROUP * SEX + ICV, data = data6)
+
+Coefficients:
+  (Intercept)       GROUPPRO           SEX1            ICV  GROUPPRO:SEX1  
+    4.042e+02     -7.465e+01     -5.415e+01      3.805e-05      9.976e+01  
+
+> summary(r)
+
+Call:
+lm(formula = CC_Mid_Posterior ~ GROUP * SEX + ICV, data = data6)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-197.037  -46.741    3.802   45.112  233.177 
+
+Coefficients:
+                Estimate Std. Error t value Pr(>|t|)  
+(Intercept)    4.042e+02  1.900e+02   2.127   0.0401 *
+GROUPPRO      -7.465e+01  3.501e+01  -2.132   0.0397 *
+SEX1          -5.415e+01  4.191e+01  -1.292   0.2044  
+ICV            3.805e-05  1.217e-04   0.313   0.7562  
+GROUPPRO:SEX1  9.976e+01  5.554e+01   1.796   0.0806 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 87.47 on 37 degrees of freedom
+  (1 observation deleted due to missingness)
+Multiple R-squared:  0.1219,    Adjusted R-squared:  0.02699 
+F-statistic: 1.284 on 4 and 37 DF,  p-value: 0.2938
+
+> anova(r)
+Analysis of Variance Table
+
+Response: CC_Mid_Posterior
+          Df Sum Sq Mean Sq F value  Pr(>F)  
+GROUP      1  11837 11836.8  1.5473 0.22137  
+SEX        1   2195  2194.9  0.2869 0.59541  
+ICV        1    590   590.2  0.0771 0.78275  
+GROUP:SEX  1  24681 24680.8  3.2262 0.08064 .
+Residuals 37 283058  7650.2                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> aov(r)
+Call:
+   aov(formula = r)
+
+Terms:
+                    GROUP       SEX       ICV GROUP:SEX Residuals
+Sum of Squares   11836.80   2194.92    590.17  24680.84 283058.11
+Deg. of Freedom         1         1         1         1        37
+
+Residual standard error: 87.46553
+Estimated effects may be unbalanced
+1 observation deleted due to missingness
+> summary(anova(r))
+       Df           Sum Sq            Mean Sq           F value       
+ Min.   : 1.0   Min.   :   590.2   Min.   :  590.2   Min.   :0.07714  
+ 1st Qu.: 1.0   1st Qu.:  2194.9   1st Qu.: 2194.9   1st Qu.:0.23447  
+ Median : 1.0   Median : 11836.8   Median : 7650.2   Median :0.91708  
+ Mean   : 8.2   Mean   : 64472.2   Mean   : 9390.6   Mean   :1.28437  
+ 3rd Qu.: 1.0   3rd Qu.: 24680.8   3rd Qu.:11836.8   3rd Qu.:1.96698  
+ Max.   :37.0   Max.   :283058.1   Max.   :24680.8   Max.   :3.22616  
+                                                     NA's   :1        
+     Pr(>F)       
+ Min.   :0.08064  
+ 1st Qu.:0.18618  
+ Median :0.40839  
+ Mean   :0.42004  
+ 3rd Qu.:0.64225  
+ Max.   :0.78275  
+ NA's   :1        
+> summary(aov(r))
+            Df Sum Sq Mean Sq F value Pr(>F)  
+GROUP        1  11837   11837   1.547 0.2214  
+SEX          1   2195    2195   0.287 0.5954  
+ICV          1    590     590   0.077 0.7828  
+GROUP:SEX    1  24681   24681   3.226 0.0806 .
+Residuals   37 283058    7650                 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+1 observation deleted due to missingness
+> anova(r)
+Analysis of Variance Table
+
+Response: CC_Mid_Posterior
+          Df Sum Sq Mean Sq F value  Pr(>F)  
+GROUP      1  11837 11836.8  1.5473 0.22137  
+SEX        1   2195  2194.9  0.2869 0.59541  
+ICV        1    590   590.2  0.0771 0.78275  
+GROUP:SEX  1  24681 24680.8  3.2262 0.08064 .
+Residuals 37 283058  7650.2                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+>
+
+# End of lm(), aov() and anova()
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------
+# flexible function for linear model
+# -----------------------------------
+
+funclm <- function(arg1,arg2){
+    # arg1: character;arg2:character; r=lm(arg1~arg2,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~";txt4=arg2;txt5=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
+    eval(parse(text=txt0));s=summary(r);a=anova(r)
+    cat("----------------------------------------\n")
+    print(s[["call"]]);print(a)
+}
+datax=data6;for (region in regions ) { funclm(region,"GROUP*SEX+ICV") } # CC
+datax=data6;for (region in regions2 ) {funclm(region,"GROUP*SEX+ICV")} # ventricles
+datax=data6;for (region in regions ) { funclm(region,"GROUP+SEX+ICV") } # CC
+datax=data6;for (region in regions2 ) {funclm(region,"GROUP+SEX+ICV")} # ventricles
+datax=data6;for (region in regions ) { funclm(region,"GROUP+ICV") } # CC
+datax=data6;for (region in regions2 ) {funclm(region,"GROUP+ICV")} # ventricles
+datax=data6;funclm("CC_Mid_Posterior","GROUP*SEX+ICV")
+datax=data6;funclm("CC_Mid_Posterior","+ICV+GROUP*SEX")
+datax=data6;for (region in regions ) { funclm(region,"+ICV+GROUP*SEX") } # CC
+
+# -----------------------------
+# the same analysis as in SPSS
+# -----------------------------
+
+library(car)
+options(contrasts = c("contr.sum", "contr.sum"))
+r2=lm( CC_Mid_Posterior ~ ICV + GROUP * SEX , data = data6)
+Anova(r2,type=3)
+
+# -----------------------------------
+# more flexible function for linear model
+# -----------------------------------
+
+funclm <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    cat("---------------------------\n")
+    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
+    print(anova(r))
+}
+myfunc=function(item,datacol,arg3){
+    m=length(item); n=length(datacol)
+    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+}
+datax=subset(datax,GROUP=="PRO")
+item=c(regions,regions2)
+datacol=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV",parameters1)
+myfunc(item,datacol,"+ICV")
+myfunc(item,datacol,"+SEX+ICV")
+myfunc("Left.Lateral.Ventricle","ROLEFX","+ICV")
+myfunc("ROLEFX","Left.Lateral.Ventricle","+ICV")
+
 

@@ -62,7 +62,7 @@ data6$rCC_Central           =data6$CC_Central           /data6$ICV
 data6$rCC_Mid_Posterior     =data6$CC_Mid_Posterior     /data6$ICV
 data6$rCC_Posterior         =data6$CC_Posterior         /data6$ICV
 data6$SEX2=as.character(data6$SEX);mask=(data6$SEX2=="0");data6$SEX2[mask]="M";data6$SEX2[!mask]="F";data6$SEX2=as.factor(data6$SEX2)
-data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
+data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
 
 # set variables
 
@@ -72,6 +72,7 @@ regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
 regions4=c("rCC_Anterior", "rCC_Mid_Anterior", "rCC_Central", "rCC_Mid_Posterior", "rCC_Posterior", "rRight.Lateral.Ventricle","rLeft.Lateral.Ventricle","rBil.Lateral.Ventricle","rX3rd.Ventricle")
 demographics1=c("GROUP","AGE","SEX")
 parameters1=c("SOCFXC","ROLEFX")
+parameters2=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 parameters_sip=c("SIP1SEV","SIP1SEV","SIP1SEV","SIP1SEV","SIP5SEV")
 parameters_sin=c("SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN6SEV")
 parameters_sid=c("SID1SEV","SID1SEV","SID1SEV","SID4SEV")
@@ -86,10 +87,63 @@ parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
 # demographics
 # -----------------------
 
-by(data6[demographics1],data6$SEX,summary)
-by(data6[demographics1],data6$GROUP,summary)
+summary(data6[,c(demographics1,parameters2,parameters1)])
+#by(data6[demographics1],data6$SEX,summary)
+by(data6[,c(demographics1,parameters2)],data6$GROUP,summary)
 summary(table(data6$GROUP,data6$SEX)) # chi test
 t.test(subset(data6,GROUP=="PRO")["AGE"],subset(data6,GROUP=="HVPRO")["AGE"]) # t test
+
+# ---------------------------------------------
+# output demographic table
+# ---------------------------------------------
+
+datax=data6
+#datax=data6[-29,]  # exclude a case which have no volume data
+#datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
+items=c("AGE","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV","SOCFXC","ROLEFX")
+v1=sapply(datax[,items],mean,na.rm=TRUE)
+v2=sapply(datax[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,GROUP=="PRO");
+v3=sapply(datay[,items],mean,na.rm=TRUE)
+v4=sapply(datay[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,!GROUP=="PRO");
+v5=sapply(datay[,items],mean,na.rm=TRUE)
+v6=sapply(datay[,items],sd,na.rm=TRUE)
+
+n=length(items);v7=numeric(n);
+for ( i in 1:n){
+    r1=t.test(subset(datax,GROUP=="PRO")[items[i]],subset(datax,GROUP=="HVPRO")[items[i]])
+    v7[i]=r1[["p.value"]]
+}
+
+table1=data.frame(tot_mean=v1,tot_sd=v2,pro_mean=v3,pro_sd=v4,hc_mean=v5,hc_sd=v6,p.value=v7)
+
+m=by(datax[,c("SEX")],datax$GROUP,summary) # ... use table() ?
+r=summary(table(datax$GROUP,datax$SEX))[["p.value"]]  # chi test
+table1=rbind(table1,c("","",m[["PRO"]][["0"]],"",m[["HVPRO"]][["0"]],"",r))
+rownames(table1)[nrow(table1)]="male"
+
+table1[1,c(1:6)]=sprintf("%.1f",as.numeric(table1[1,c(1:6)])) 
+table1[2,c(1:6)]=sprintf("%.1f",as.numeric(table1[2,c(1:6)])) 
+table1[3,c(1:6)]=sprintf("%.1f",as.numeric(table1[3,c(1:6)])) 
+table1[4,c(1:6)]=sprintf("%.1f",as.numeric(table1[4,c(1:6)])) 
+table1[5,c(1:6)]=sprintf("%.2f",as.numeric(table1[5,c(1:6)])) 
+table1[6,c(1:6)]=sprintf("%.2f",as.numeric(table1[6,c(1:6)])) 
+table1[7,c(1:6)]=sprintf("%.2f",as.numeric(table1[7,c(1:6)])) 
+table1[8,c(1:6)]=sprintf("%.2f",as.numeric(table1[8,c(1:6)])) 
+table1[9,c(1:6)]=sprintf("%.2f",as.numeric(table1[9,c(1:6)])) 
+table1[10,c(1:6)]=sprintf("%.2f",as.numeric(table1[10,c(1:6)])) 
+table1[11,c(1:6)]=sprintf("%.2f",as.numeric(table1[11,c(1:6)])) 
+table1[,7]=sprintf("%.3f",as.numeric(table1[,7])) 
+
+n=nrow(table1); tablex=rbind(table1[n,])
+for ( i in 1:(n-1) ) {
+    tablex=rbind(tablex,table1[i,])
+} 
+table1=tablex
+print(table1)
 
 # ---------------------------
 # analyses of corpus callosum
@@ -152,7 +206,7 @@ datax=data6;t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)
 datax=subset(data6,GROUP=="PRO");t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)["CC_Mid_Posterior"])
 datax=subset(data6,GROUP=="HVPRO");t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)["CC_Mid_Posterior"])
     # results: PRO < HVPRO in all
-    # results: PRO << HVPRO in male, but p=0.007493, 
+    # results: PRO << HVPRO in male, but p=0.07493, 
     # results: PRO > HVPRO in female
     # results: male < female in all
     # results: male > female in HVPRO
@@ -639,7 +693,6 @@ ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
     theme(axis.title.x=element_blank())    # don't display x-axis-label
 
 library(ggplot2); library(gridExtra)
-data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
 p1=ggplot(data6, aes(x=GROUPSEX,y=CC_Mid_Posterior,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
@@ -704,13 +757,11 @@ p15=ggplot(datax, aes(x=ROLEFX,y=ICV,colour=SEX)) +
     geom_point(size=4)
 grid.arrange(p10,p11,p12,p13,p14,p15,nrow=2)
 
-# install.packages("rg1")
+# install.packages("rgl") # for 3D plot
 library(rgl)
 
 # plot with mark which explain where difference exist
 library(ggplot2); library(gridExtra)
-data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
-data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
 p1=ggplot(data6, aes(x=GROUPSEX,y=rCC_Mid_Posterior,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
@@ -972,8 +1023,10 @@ for ( j in 1:m) {
 # --------------
 
 library(ggplot2); library(gridExtra)
-data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
-data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
+#data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
+#data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
+
+pdf("plot.pdf")
 p4=ggplot(data6, aes(x=GROUP,y=rCC_Mid_Posterior,fill=SEX)) +
     scale_fill_manual(values=c("blue","red")) +
     geom_dotplot(binaxis="y",stackdir="center") +
@@ -999,12 +1052,14 @@ p7=ggplot(data6, aes(x=SEX,y=rLeft.Lateral.Ventricle,fill=GROUP)) +
 #    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
 grid.arrange(p4,p5,p6,p7,nrow=2)
+dev.off()
+
 
 # -------------------
 # scatter plot
 # -------------------
 
-
+pdf("scatterplot.pfd")
 datax=subset(data6,GROUP=="PRO")
 p11=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Anterior,colour=SEX)) +
     geom_point(size=4)
@@ -1025,7 +1080,7 @@ p18=ggplot(datax, aes(x=ROLEFX,y=rRight.Lateral.Ventricle,colour=SEX)) +
 p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
     geom_point(size=4)
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
-
+dev.off()
 
 # --------------------------------------------------------------------------------------------
 # old records
@@ -1047,8 +1102,6 @@ funclm1 <- function(arg1){
 funclm1("CC_Mid_Posterior")
 funclm1("Left.Lateral.Ventricle")
 funclm1("Bil.Lateral.Ventricle")
-
-# 
 
 # association in prodromes
 # between Bil.Lateral.Ventricle and 
@@ -1281,19 +1334,46 @@ funclm <- function(arg1,arg2,arg3){
     txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
     eval(parse(text=txt0)); s=summary(r)
     cat("---------------------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
+#    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
     print(anova(r))
 }
 myfunc=function(item,datacol,arg3){
     m=length(item); n=length(datacol)
     for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
 }
-datax=subset(datax,GROUP=="PRO")
+datax=subset(data6,GROUP=="PRO")
 item=c(regions,regions2)
 datacol=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV",parameters1)
 myfunc(item,datacol,"+ICV")
 myfunc(item,datacol,"+SEX+ICV")
 myfunc("Left.Lateral.Ventricle","ROLEFX","+ICV")
 myfunc("ROLEFX","Left.Lateral.Ventricle","+ICV")
+sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
+
+
+library(car) # for Anova()
+options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
+funclm <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    cat("---------------------------\n")
+#    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
+    print(Anova(r,type=3))
+}
+myfunc=function(item,datacol,arg3){
+    m=length(item); n=length(datacol)
+    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+}
+datax=subset(data6,GROUP=="PRO")
+item=c(regions,regions2)
+datacol=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV",parameters1)
+myfunc(item,datacol,"+ICV")
+myfunc(item,datacol,"+SEX+ICV")
+myfunc("Left.Lateral.Ventricle","ROLEFX","+ICV")
+myfunc("ROLEFX","Left.Lateral.Ventricle","+ICV")
+sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
+sink(file="tmp",append=FALSE);myfunc(datacol,item,"+ICV");sink()
 
 

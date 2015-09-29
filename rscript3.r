@@ -2,19 +2,11 @@
 #     R --vanilla < rscript3.r
 
 # =============
-# set variables
-# =============
-
-# project=2015-jun-prodrome
-# projectdir=/projects/schiz/3Tprojects/2015-jun-prodrome
-# statdir=${projectdir}/stat
-# fsstatdir=
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
-demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
-
-# =============
 # set up data
 # =============
+
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
+demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
 # load the demographic table
 
@@ -39,14 +31,10 @@ data4=read.table(fsstatfile,header=TRUE)
 #     Measure:volume (field label) is turened to Measure.volume 
 #     and its data is for example DELISI_HM_0403.freesurfer
 
-# formatting the strings of case id
+# format the strings of case id, merge tables, arrange field names
 
 data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
 data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
-# substring(object,start,end) index starts from 1 not 0
-
-# merge tables and arrange the field names
-
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data
 data6$SEX=as.factor(data6$SEX)    # change into class:factor
@@ -144,6 +132,7 @@ for ( i in 1:(n-1) ) {
 } 
 table1=tablex
 print(table1)
+knitr::kable(table1)
 
 # ---------------------------
 # analyses of corpus callosum
@@ -925,7 +914,7 @@ y=datax[["GAFH"]]    ;func(y)
 y=datax[["ROLEFX"]]  ;func(y)
 
 # =================
-# improtant analyses
+# important analyses
 # ==================
 
 # --------------------------------------

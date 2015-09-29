@@ -1,0 +1,169 @@
+# 2015-jun-prodrome
+
+`r Sys.Date()` @jkonishi
+
+- analysis with R
+- output with R Markdown (render("report.Rmd"))
+
+```{r echo=FALSE}
+# don't show codes
+
+datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
+items=c("AGE","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV","SOCFXC","ROLEFX")
+v1=sapply(datax[,items],mean,na.rm=TRUE)
+v2=sapply(datax[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,GROUP=="PRO");
+v3=sapply(datay[,items],mean,na.rm=TRUE)
+v4=sapply(datay[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,!GROUP=="PRO");
+v5=sapply(datay[,items],mean,na.rm=TRUE)
+v6=sapply(datay[,items],sd,na.rm=TRUE)
+
+n=length(items);v7=numeric(n);
+for ( i in 1:n){
+    r1=t.test(subset(datax,GROUP=="PRO")[items[i]],subset(datax,GROUP=="HVPRO")[items[i]])
+    v7[i]=r1[["p.value"]]
+}
+
+table1=data.frame(tot.mean=v1,tot.sd=v2,pro.mean=v3,pro.sd=v4,hc.mean=v5,hc.sd=v6,p.value=v7)
+
+m=by(datax[,c("SEX")],datax$GROUP,summary) # ... use table() ?
+r=summary(table(datax$GROUP,datax$SEX))[["p.value"]]  # chi test
+table1=rbind(table1,c("","",m[["PRO"]][["0"]],"",m[["HVPRO"]][["0"]],"",r))
+rownames(table1)[nrow(table1)]="male"
+
+table1[1,c(1:6)]=sprintf("%.1f",as.numeric(table1[1,c(1:6)])) 
+table1[2,c(1:6)]=sprintf("%.1f",as.numeric(table1[2,c(1:6)])) 
+table1[3,c(1:6)]=sprintf("%.1f",as.numeric(table1[3,c(1:6)])) 
+table1[4,c(1:6)]=sprintf("%.1f",as.numeric(table1[4,c(1:6)])) 
+table1[5,c(1:6)]=sprintf("%.2f",as.numeric(table1[5,c(1:6)])) 
+table1[6,c(1:6)]=sprintf("%.2f",as.numeric(table1[6,c(1:6)])) 
+table1[7,c(1:6)]=sprintf("%.2f",as.numeric(table1[7,c(1:6)])) 
+table1[8,c(1:6)]=sprintf("%.2f",as.numeric(table1[8,c(1:6)])) 
+table1[9,c(1:6)]=sprintf("%.2f",as.numeric(table1[9,c(1:6)])) 
+table1[10,c(1:6)]=sprintf("%.2f",as.numeric(table1[10,c(1:6)])) 
+table1[11,c(1:6)]=sprintf("%.2f",as.numeric(table1[11,c(1:6)])) 
+table1[,7]=sprintf("%.3f",as.numeric(table1[,7])) 
+
+n=nrow(table1); tablex=rbind(table1[n,])
+for ( i in 1:(n-1) ) {
+    tablex=rbind(tablex,table1[i,])
+} 
+table1=tablex
+```
+
+```{r table-head, echo=FALSE,align="c"}
+knitr::kable(table1)
+
+```
+
+```{r}
+# 
+#
+#
+
+funclm1 <- function(arg1){
+    # arg1: characters; r=lm(arg1~GROUP*SEX+ICV,data=data6)
+    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+ICV,data=data6)"
+    txt0=paste(txt1,txt2,txt3,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    cat("----------------\n")
+    print(s[[1]]); print(s[[4]][,c(1,4)])
+}
+for (region in regions ) { funclm1(region) } # CC
+for (region in regions2 ) {funclm1(region)} # centricles
+```
+
+- correlation analyses
+
+
+```{r,echo=TRUE,message=FALSE,warning=FALSE}
+# -----------------------------
+# correlation analyses: relative volume (divided by ICV)
+# -----------------------------
+
+datax=    cbind(
+    data6[c(1:15)],
+    data6[c("READSTD","WASIIQ","GAFC","GAFH")],
+    data6[c("SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")],
+    data6[regions4],
+    data6[parameters1]
+)
+datax=subset(datax,GROUP=="PRO")
+mask=sapply(datax,is.numeric)    # apply is.numeric to each column, output nuber is same as the number of co
+datax=subset(datax,select=mask)    # select only data which are numeric
+
+col=c("estimate","p.value")    # vector:character
+item=c(regions4)
+n=length(datax)    # the number of colmuns
+m=length(col); o=length(item); lst=list()
+for (k in 1:o) {                  # process of each item
+    lst[[item[k]]]=matrix(0,n,m)
+    for (j in 1:m) {              # process of each col
+        for (i in 1:n) {          # cor test between item and each-column-in-datax
+            lst[[item[k]]][i,j]=cor.test(datax[[item[k]]],datax[[i]],method="spearman")[[col[j]]]
+        }
+    }
+    rownames(lst[[item[k]]])=names(datax)
+    colnames(lst[[item[k]]])=col
+}
+```
+
+```{r,echo=FALSE}
+print(lst)
+```
+
+```{r figure-correlation,echo=FALSE}
+library(ggplot2); library(gridExtra)
+datax=subset(data6,GROUP=="PRO")
+formatter=function(x){
+	return(sprintf("%.4f",x))
+}
+p11=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0004,0.0006,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) + 
+    xlab("SID total") + ylab("relative anterior CC")
+p12=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("SID total") + ylab("relative middle anteiror CC")
+p13=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Posterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0005,0.0007,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("SID total") + ylab("relative posterior CC")
+p14=ggplot(datax, aes(x=READSTD,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("READSTD") + ylab("relative left lateral ventricle")
+p15=ggplot(datax, aes(x=SOCFXC,y=rCC_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0004,0.0006,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Social Function") + ylab("relative anterior CC")
+p16=ggplot(datax, aes(x=SOCFXC,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Social Function") + ylab("relative middle anterior CC")
+p17=ggplot(datax, aes(x=ROLEFX,y=rCC_Posterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0005,0.0007,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Role Function") + ylab("relative posterior CC")
+p18=ggplot(datax, aes(x=ROLEFX,y=rRight.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015)+
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Role Function") + ylab("relative right lateral ventricle")
+p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015) +
+    theme(legend.position=c(.85,.85)) +
+    theme(legend.background=element_blank()) +
+    xlab("Role Function") + ylab("relative left lateral ventricle")
+p11;p12;p13;p14;p15;p16;p17;p18;p19
+```

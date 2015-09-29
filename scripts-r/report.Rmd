@@ -54,7 +54,7 @@ for ( i in 1:(n-1) ) {
 table1=tablex
 ```
 
-```{r table-head, echo=FALSE,align="c"}
+```{r table-head, echo=TRUE,align="l"}
 knitr::kable(table1)
 
 ```

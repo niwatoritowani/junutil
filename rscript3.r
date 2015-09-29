@@ -79,15 +79,15 @@ summary(data6[,c(demographics1,parameters2,parameters1)])
 #by(data6[demographics1],data6$SEX,summary)
 by(data6[,c(demographics1,parameters2)],data6$GROUP,summary)
 summary(table(data6$GROUP,data6$SEX)) # chi test
-t.test(subset(data6,GROUP=="PRO")["AGE"],subset(data6,GROUP=="HVPRO")["AGE"]) # t test
+t.test(subset(data6,GROUP=="PRO")["AGE"],subset(data6,GROUP=="HVPRO")["AGE"]) # t-test
 
 # ---------------------------------------------
 # output demographic table
 # ---------------------------------------------
 
-datax=data6
+#datax=data6
 #datax=data6[-29,]  # exclude a case which have no volume data
-#datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
+datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
 items=c("AGE","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV","SOCFXC","ROLEFX")
 v1=sapply(datax[,items],mean,na.rm=TRUE)
 v2=sapply(datax[,items],sd,na.rm=TRUE)
@@ -640,6 +640,50 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4, ncol=2, main = "Volumes of 
 # dev.off()    # use if you want to output plot. 
 
 # memo: I did not set the plot output settings. Rplots.pdf is output and saved. Why? 
+
+# -------------------------------
+# simple volume graphs, 2015/09/29
+# --------------------------------
+
+pdf("tmp.pdf",useDingbats=FALSE)
+p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p3=ggplot(data6, aes(x=GROUP,y=CC_Central,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=40,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+grid.arrange(p1, p2, p3, p4, p5, p6, p7,  nrow=4, ncol=2, main = "Volumes of corpus callosum")
+dev.off()
+
 
 # set up data within PRO
 
@@ -1421,5 +1465,20 @@ p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
     xlab("Role Function") + ylab("relative left lateral ventricle")
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
 dev.off()
+
+# ------------------------------
+# check data 2015/09/29
+# ------------------------------
+
+datax=data6[,c("caseid2","GROUP","SEX2",regions,regions2)]
+knitr::kable(datax)
+cat(knitr::kable(datax),file="tmp.txt",sep="\n")
+
+summary(datax)
+sapply(datax,sd,na.rm=TRUE)
+t1=rbind(summary(datax), sapply(datax,sd,na.rm=TRUE))
+t2=knitr::kable(t1)
+cat(t2,file="tmp.txt",sep="\n")
+
 
 

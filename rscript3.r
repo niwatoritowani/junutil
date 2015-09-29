@@ -1376,4 +1376,61 @@ myfunc("ROLEFX","Left.Lateral.Ventricle","+ICV")
 sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
 sink(file="tmp",append=FALSE);myfunc(datacol,item,"+ICV");sink()
 
+# ------------------
+# new plot
+# ------------------
+
+library(ggplot2); library(gridExtra)
+datax=subset(data6,GROUP=="PRO")
+pdf("tmp.pdf")
+formatter=function(x){
+	return(sprintf("%.4f",x))
+}
+p11=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0004,0.0006,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) + 
+    xlab("SID total") + ylab("relative anterior CC")
+p12=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("SID total") + ylab("relative middle anteiror CC")
+p13=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Posterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0005,0.0007,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("SID total") + ylab("relative posterior CC")
+p14=ggplot(datax, aes(x=READSTD,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("READSTD") + ylab("relative left lateral ventricle")
+p15=ggplot(datax, aes(x=SOCFXC,y=rCC_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0004,0.0006,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Social Function") + ylab("relative anterior CC")
+p16=ggplot(datax, aes(x=SOCFXC,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point() +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Social Function") + ylab("relative middle anterior CC")
+p17=ggplot(datax, aes(x=ROLEFX,y=rCC_Posterior,colour=SEX)) +
+    geom_point() +
+    scale_y_continuous(breaks=seq(0.0005,0.0007,0.0001),labels=formatter) +
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Role Function") + ylab("relative posterior CC")
+p18=ggplot(datax, aes(x=ROLEFX,y=rRight.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015)+
+    scale_colour_discrete(guide=FALSE) +
+    xlab("Role Function") + ylab("relative right lateral ventricle")
+p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point() +
+    ylim(0,0.015) +
+    theme(legend.position=c(.85,.85)) +
+    theme(legend.background=element_blank()) +
+    xlab("Role Function") + ylab("relative left lateral ventricle")
+grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
+dev.off()
+
 

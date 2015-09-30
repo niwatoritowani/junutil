@@ -280,8 +280,7 @@ plot(datax)    # plot of correlation matrix
 # correlation analysis - output p-values of the analyses
 # ------------------------------------------------------
 
-n=length(datax)
-mcorp=matrix(0,n,n)
+n=length(datax);mcorp=matrix(0,n,n)
 for (j in 1:n) {    # matrix of correlation p-value
     for (i in 1:n) {
         mcorp[i,j]=cor.test(datax[[j]],datax[[i]])[["p.value"]]
@@ -301,14 +300,13 @@ colnames(mcorp.sig.round)=names(datax)
 # extract column for correlation analysis  
 # -----------------------------------------
 
-datax=
-    cbind(
-        data6[c(1:15)],
-#        data6[c(44:344)],
-        data6[c("READSTD","WASIIQ","GAFC","GAFH")],
-        data6[c("SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")],
-        data6[c(regions,regions3)]
-    )
+datax=cbind(
+    data6[c(1:15)],
+#    data6[c(44:344)],
+    data6[c("READSTD","WASIIQ","GAFC","GAFH")],
+    data6[c("SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")],
+    data6[c(regions,regions3)]
+)
 
 # correlation analysis in PRO and HVPRO data
 # ------------------------------------------
@@ -316,9 +314,7 @@ datax=
 mask=sapply(datax,is.numeric)    # apply is.numeric to each column, output nuber is same as the number of columns,
 datax=subset(datax,select=mask)    # select only data which are numeric
 
-n=length(datax)    # the number of columns
-mcorp=c(1:n)    # set an vectore beforhand
-
+n=length(datax);mcorp=c(1:n)
 for (i in 1:n) {    # cor test between CC and each-column-indatax
     mcorp[i]=cor.test(datax[["CC_Mid_Posterior"]],datax[[i]],method="spearman")[["p.value"]]
 }
@@ -385,8 +381,7 @@ datax=subset(datax,select=mask)    # select only data which are numeric
 col=c("estimate","p.value")    # vector:character
 item=c("rCC_Mid_Posterior","rLeft.Lateral.Ventricle","rBil.Lateral.Ventricle")
 #item=c(regions4)
-n=length(datax)    # the number of colmuns
-m=length(col); o=length(item); lst=list()
+n=length(datax);m=length(col); o=length(item); lst=list()
 for (k in 1:o) {                  # process of each item
     lst[[item[k]]]=matrix(0,n,m)
     for (j in 1:m) {              # process of each col

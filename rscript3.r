@@ -904,6 +904,136 @@ y=datax[["ROLEFX"]]  ;func(y)
 # important analyses
 # ==================
 
+# ---------------------------------
+# set data
+# ---------------------------------
+
+# set data in PNL
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats")
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
+demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
+
+# # set data in vaio
+# setwd("C:/Users/jun/Documents/test")
+# fsstatfile="aseg_stats.txt"
+# demographictable="Caselist_CC_prodromes.xlsx"
+
+# load the demographic table
+
+library(xlsx)
+data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
+data1=subset(data1,! is.na(Case..))
+data4=read.table(fsstatfile,header=TRUE)
+
+data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
+data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
+data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data
+data6$SEX=as.factor(data6$SEX)    # change into class:factor
+data6$ICV=data6$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
+data6$Bil.Lateral.Ventricle=data6$Right.Lateral.Ventricle+data6$Left.Lateral.Ventricle    # summarize lt rt into bilateral
+data6$rRight.Lateral.Ventricle=data6$Right.Lateral.Ventricle/data6$ICV
+data6$rLeft.Lateral.Ventricle =data6$Left.Lateral.Ventricle /data6$ICV
+data6$rBil.Lateral.Ventricle  =data6$Bil.Lateral.Ventricle  /data6$ICV
+data6$rX3rd.Ventricle         =data6$X3rd.Ventricle  /data6$ICV
+data6$rCC_Anterior          =data6$CC_Anterior          /data6$ICV
+data6$rCC_Mid_Anterior      =data6$CC_Mid_Anterior      /data6$ICV
+data6$rCC_Central           =data6$CC_Central           /data6$ICV
+data6$rCC_Mid_Posterior     =data6$CC_Mid_Posterior     /data6$ICV
+data6$rCC_Posterior         =data6$CC_Posterior         /data6$ICV
+data6$SEX2=as.character(data6$SEX);mask=(data6$SEX2=="0");data6$SEX2[mask]="M";data6$SEX2[!mask]="F";data6$SEX2=as.factor(data6$SEX2)
+data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
+
+# set variables
+
+regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
+regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
+regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+regions4=c("rCC_Anterior", "rCC_Mid_Anterior", "rCC_Central", "rCC_Mid_Posterior", "rCC_Posterior", "rRight.Lateral.Ventricle","rLeft.Lateral.Ventricle","rBil.Lateral.Ventricle","rX3rd.Ventricle")
+demographics1=c("GROUP","AGE","SEX")
+parameters1=c("SOCFXC","ROLEFX")
+parameters2=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
+parameters_sip=c("SIP1SEV","SIP1SEV","SIP1SEV","SIP1SEV","SIP5SEV")
+parameters_sin=c("SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN6SEV")
+parameters_sid=c("SID1SEV","SID1SEV","SID1SEV","SID4SEV")
+parameters_sig=c("SIG1SEV","SIG1SEV","SIG1SEV","SIG4SEV")
+parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
+
+# ---------------------------------------------
+# output demographic table
+# ---------------------------------------------
+
+#datax=data6
+#datax=data6[-29,]  # exclude a case which have no volume data
+datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
+items=c("AGE","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV","SOCFXC","ROLEFX")
+v1=sapply(datax[,items],mean,na.rm=TRUE)
+v2=sapply(datax[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,GROUP=="PRO");
+v3=sapply(datay[,items],mean,na.rm=TRUE)
+v4=sapply(datay[,items],sd,na.rm=TRUE)
+
+datay=subset(datax,!GROUP=="PRO");
+v5=sapply(datay[,items],mean,na.rm=TRUE)
+v6=sapply(datay[,items],sd,na.rm=TRUE)
+
+n=length(items);v7=numeric(n);
+for ( i in 1:n){
+    r1=t.test(subset(datax,GROUP=="PRO")[items[i]],subset(datax,GROUP=="HVPRO")[items[i]])
+    v7[i]=r1[["p.value"]]
+}
+
+table1=data.frame(tot_mean=v1,tot_sd=v2,pro_mean=v3,pro_sd=v4,hc_mean=v5,hc_sd=v6,p.value=v7)
+
+m=by(datax[,c("SEX")],datax$GROUP,summary) # ... use table() ?
+r=summary(table(datax$GROUP,datax$SEX))[["p.value"]]  # chi test
+table1=rbind(table1,c("","",m[["PRO"]][["0"]],"",m[["HVPRO"]][["0"]],"",r))
+rownames(table1)[nrow(table1)]="male"
+
+table1[1,c(1:6)]=sprintf("%.1f",as.numeric(table1[1,c(1:6)])) 
+table1[2,c(1:6)]=sprintf("%.1f",as.numeric(table1[2,c(1:6)])) 
+table1[3,c(1:6)]=sprintf("%.1f",as.numeric(table1[3,c(1:6)])) 
+table1[4,c(1:6)]=sprintf("%.1f",as.numeric(table1[4,c(1:6)])) 
+table1[5,c(1:6)]=sprintf("%.2f",as.numeric(table1[5,c(1:6)])) 
+table1[6,c(1:6)]=sprintf("%.2f",as.numeric(table1[6,c(1:6)])) 
+table1[7,c(1:6)]=sprintf("%.2f",as.numeric(table1[7,c(1:6)])) 
+table1[8,c(1:6)]=sprintf("%.2f",as.numeric(table1[8,c(1:6)])) 
+table1[9,c(1:6)]=sprintf("%.2f",as.numeric(table1[9,c(1:6)])) 
+table1[10,c(1:6)]=sprintf("%.2f",as.numeric(table1[10,c(1:6)])) 
+table1[11,c(1:6)]=sprintf("%.2f",as.numeric(table1[11,c(1:6)])) 
+table1[,7]=sprintf("%.3f",as.numeric(table1[,7])) 
+
+n=nrow(table1); tablex=rbind(table1[n,])
+for ( i in 1:(n-1) ) {tablex=rbind(tablex,table1[i,])} 
+
+table1=tablex;knitr::kable(table1)
+
+
+# --------------------------------------
+# ANCOVA
+# --------------------------------------
+
+library(car) # for Anova()
+options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
+funclm <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    cat("---------------------------\n")
+    print(s[["call"]]); # print(s[["coefficients"]][,c(1,4)])
+    print(Anova(r,type=3))
+}
+myfunc=function(item,datacol,arg3){
+    m=length(item); n=length(datacol)
+    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+}
+datax=data6
+item=c(regions,regions2)
+myfunc(item,"","GROUP*SEX+ICV")
+
+
 # --------------------------------------
 # general linear model
 # --------------------------------------
@@ -1321,15 +1451,18 @@ print(t3)
 # cat(t2,file="tmp.txt",sep="\n")
 
 # ----------------------------------
+# summary
+# ----------------------------------
+
+
+# ----------------------------------
 # contents 
 # ----------------------------------
 
+- line 904: important analyses
 - simple volume graphs, 2015/09/29
 - more flexible functions for linear model and ANOVA
 - table of volumes for checking data, 2015/09/29, 
 
-# ----------------------------------
-# summary
-# ----------------------------------
 
 

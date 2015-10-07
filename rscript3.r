@@ -1,6 +1,3 @@
-# This file is a script for R and run by
-#     R --vanilla < rscript3.r
-
 # =============
 # set up data
 # =============
@@ -549,6 +546,10 @@ summary(lm(formula = CC_Mid_Posterior ~ CC_Central * SEX + ICV, data = datax))  
 # plot
 # ====
 
+# ---------------
+# volume graphs
+# ---------------
+
 library(ggplot2); library(gridExtra)
 #pdf("output.pdf")    # use if you want to ouput plot as a pdf file and finish with "dev.off()"
 p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=GROUP)) +
@@ -782,8 +783,9 @@ grid.arrange(p1,p2,p3,nrow=2)
     
 
 # ----------------------------------------------------------
-# # plot with jitter
-# 
+# plot with jitter
+# ----------------------------------------------------------
+ 
 # p1=ggplot(data6, aes(x=GROUP,y=Mid_Posterior,fill=GROUP)) +
 #     geom_point(size=3,shape=21,position=position_jitter(width=.1,height=0))+    # with jitter
 #     stat_summary(fun.y="mean",goem="point",shape="-",size=6,color="black",ymin=0,ymax=0) +    # add mean
@@ -794,14 +796,16 @@ grid.arrange(p1,p2,p3,nrow=2)
 
 # ------------------------------------------------------------
 # # plot for correlation matrix
-# 
+# ------------------------------------------------------------
+ 
 # mcor=cor([data.frame],use="complete.obs")     # option use : for data with NA
 # library(corrplot)
 # corrplot(mcor)
 
 # -------------------------------------------------------------
 # difference between with/without binpositions="all"
-# 
+# -------------------------------------------------------------
+ 
 # p51=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
 #     geom_dotplot(binaxis="y",binwidth=20,stackdir="center",binpositions="all") +
 #     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
@@ -832,6 +836,7 @@ grid.arrange(p1,p2,p3,nrow=2)
 # colnames(s[[4]]) ... "Estimate" "Std. Error" "t value" "Pr(>|t|)"
 # rownames(summary_r[[4]]) ... "(Intercept)" "GROUPPRO" "SEX1" "ICV" "GROUPPRO:SEX1"
 # 
+#     R --vanilla < rscript3.r
 # R options: 
 #     -q, --quiet           Don't print startup message
 #     --slave               Make R run as quietly as possible
@@ -994,9 +999,9 @@ for ( j in 1:m) {
     }
 }
 
-# ---------------
-# dot plots
-# --------------
+# ------------------
+# dot plots: volumes
+# ------------------
 
 library(ggplot2); library(gridExtra)
 #data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
@@ -1087,20 +1092,20 @@ funclm1("Bil.Lateral.Ventricle")
 #     "READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 # significant main effects about clinical values is only SINTOTEV on Bil.Lateral.Ventricle
 
-datax=    cbind(
-    data6[c(1:15)],
-    data6[c("READSTD","WASIIQ","GAFC","GAFH")],
-    data6[c("SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")],
-    data6[c(regions,regions3)],
-    data6[regions4], 
-    data6["ICV"]
-)
-datax=subset(datax,GROUP=="PRO")
+# -----------------------------------
+# general linear model
+# -----------------------------------
+
+datax=subset(data6,GROUP=="PRO")
 summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax))            # 0.00692
 summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Mid_Posterior * SEX + ICV, data = datax))    # <.05 
 summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Central * SEX + ICV, data = datax))          # <.05 
 summary(lm(formula = CC_Mid_Posterior ~ Bil.Lateral.Ventricle * SEX + ICV, data = datax))    # <.05
 summary(lm(formula = CC_Mid_Posterior ~ CC_Central * SEX + ICV, data = datax))               # <.05
+
+# -----------------------------------
+# plots: volumes, correlation
+# -----------------------------------
 
 library(ggplot2); library(gridExtra)
 pdf("plot_volumes.pdf")    # use if you want to ouput plot as a pdf file and finish with "dev.off()"
@@ -1146,16 +1151,16 @@ p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle,fill=SEX)) +
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4,ncol=2,top="Volumes of corpus callosum")
 dev.off()    # use if you want to output plot. 
 
-pdf("plot_CC_Mid_Posterior.pdf");p4;dev.off()
-pdf("plot_Bil.Lateral.Ventricle.pdf");p6;dev.off()
+# pdf("plot_CC_Mid_Posterior.pdf");p4;dev.off()
+# pdf("plot_Bil.Lateral.Ventricle.pdf");p6;dev.off()
 
-pdf("plot_scatter.pdf")
+# pdf("plot_scatter.pdf")
 ggplot(datax, aes(x=SINTOTEV, y=Bil.Lateral.Ventricle,colour=SEX)) + geom_point()
-dev.off()
+# dev.off()
 
-# ------------------------
+# -------------------------------------------
 # output data table, edit at home, 2015/09/28
-# ------------------------
+# -------------------------------------------
 
 write.csv(data6,file="caselist_prodromes_jun.csv",na="")
 write.xlsx(data6,file="caselist_prodromes_jun.xlsx",showNA=FALSE)
@@ -1301,9 +1306,9 @@ p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
 # dev.off()
 
-# ------------------------------
+# -----------------------------------------------
 # table of volumes for checking data, 2015/09/29, 
-# ------------------------------
+# -----------------------------------------------
 
 datax=data6[,c("caseid2","GROUP","SEX2",regions,regions2)]
 t1=knitr::kable(datax)
@@ -1315,5 +1320,16 @@ t3=knitr::kable(t3)
 print(t3)
 # cat(t2,file="tmp.txt",sep="\n")
 
+# ----------------------------------
+# contents 
+# ----------------------------------
+
+- simple volume graphs, 2015/09/29
+- more flexible functions for linear model and ANOVA
+- table of volumes for checking data, 2015/09/29, 
+
+# ----------------------------------
+# summary
+# ----------------------------------
 
 

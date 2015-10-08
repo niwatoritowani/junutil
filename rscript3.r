@@ -818,6 +818,34 @@ grid.arrange(p1,p2,p3,nrow=2)
 #     theme(axis.title.x=element_blank())    # don't display x-axis-label
 # grid.arrange(p51, p52, nrow=1, ncol=2, main = "Volumes of corpus callosum")
 
+# -------------------------------------------
+# scatter plots where significant coefficient
+# -------------------------------------------
+
+#pdf("scatterplot.pfd")
+datax=subset(data6,GROUP=="PRO")
+p11=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Anterior,colour=SEX)) +
+    geom_point(size=4)
+p12=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point(size=4)
+p13=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Posterior,colour=SEX)) +
+    geom_point(size=4)
+p14=ggplot(datax, aes(x=READSTD,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point(size=4)
+p15=ggplot(datax, aes(x=SOCFXC,y=rCC_Anterior,colour=SEX)) +
+    geom_point(size=4)
+p16=ggplot(datax, aes(x=SOCFXC,y=rCC_Mid_Anterior,colour=SEX)) +
+    geom_point(size=4)
+p17=ggplot(datax, aes(x=ROLEFX,y=rCC_Posterior,colour=SEX)) +
+    geom_point(size=4)
+p18=ggplot(datax, aes(x=ROLEFX,y=rRight.Lateral.Ventricle,colour=SEX)) +
+    geom_point(size=4)
+p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
+    geom_point(size=4)
+grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
+#dev.off()
+
+
 # ----------------------------------------------------------------------
 # Notes: about the data, R, ...
 # ----------------------------------------------------------------------
@@ -918,8 +946,6 @@ demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist
 # fsstatfile="aseg_stats.txt"
 # demographictable="Caselist_CC_prodromes.xlsx"
 
-# load the demographic table
-
 library(xlsx)
 data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
 data1=subset(data1,! is.na(Case..))
@@ -944,8 +970,6 @@ data6$rCC_Posterior         =data6$CC_Posterior         /data6$ICV
 data6$SEX2=as.character(data6$SEX);mask=(data6$SEX2=="0");data6$SEX2[mask]="M";data6$SEX2[!mask]="F";data6$SEX2=as.factor(data6$SEX2)
 data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
 
-# set variables
-
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
 regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
 regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
@@ -963,7 +987,6 @@ parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
 # output demographic table
 # ---------------------------------------------
 
-#datax=data6
 #datax=data6[-29,]  # exclude a case which have no volume data
 datax=subset(data6,subset=(!is.na(CC_Anterior))) # exclude a case which have no volume data
 items=c("AGE","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV","SOCFXC","ROLEFX")
@@ -988,8 +1011,10 @@ table1=data.frame(tot_mean=v1,tot_sd=v2,pro_mean=v3,pro_sd=v4,hc_mean=v5,hc_sd=v
 
 m=by(datax[,c("SEX")],datax$GROUP,summary) # ... use table() ?
 r=summary(table(datax$GROUP,datax$SEX))[["p.value"]]  # chi test
-table1=rbind(table1,c("","",m[["PRO"]][["0"]],"",m[["HVPRO"]][["0"]],"",r))
-rownames(table1)[nrow(table1)]="male"
+PROmalefemale=paste(m[["PRO"]]["0"],"/",m[["PRO"]]["1"],sep="")
+HVPROmalefemale=paste(m[["HVPRO"]]["0"],"/",m[["HVPRO"]]["1"],sep="")
+table1=rbind(table1,c("","",PROmalefemale,"",HVPROmalefemale,"",r))
+rownames(table1)[nrow(table1)]="male/female"
 
 table1[1,c(1:6)]=sprintf("%.1f",as.numeric(table1[1,c(1:6)])) 
 table1[2,c(1:6)]=sprintf("%.1f",as.numeric(table1[2,c(1:6)])) 
@@ -1006,9 +1031,7 @@ table1[,7]=sprintf("%.3f",as.numeric(table1[,7]))
 
 n=nrow(table1); tablex=rbind(table1[n,])
 for ( i in 1:(n-1) ) {tablex=rbind(tablex,table1[i,])} 
-
-table1=tablex;knitr::kable(table1)
-
+knitr::kable(tablex)
 
 # --------------------------------------
 # ANCOVA
@@ -1041,15 +1064,16 @@ myfunc(item,"","GROUP*SEX+ICV")
 # similar to but not the same as two-factors ANCOVA: GROUP, SEX; ICV
 
 funclm1 <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP*SEX+ICV,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+ICV,data=data6)"
+    # arg1: characters; r=lm(arg1~GROUP*SEX+ICV,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+ICV,data=datax)"
     txt0=paste(txt1,txt2,txt3,sep="")
     eval(parse(text=txt0)); s=summary(r)
     cat("----------------\n")
     print(s[[1]]); print(s[[4]][,c(1,4)])
 }
-for (region in regions ) { funclm1(region) } # CC
-for (region in regions2 ) {funclm1(region)} # centricles
+datax=data6;for (region in regions ) { funclm1(region) } # CC
+datax=data6;for (region in regions2 ) {funclm1(region)} # centricles
+
 
 # -------------------------------------
 # Follow-up analyses: 
@@ -1134,63 +1158,61 @@ for ( j in 1:m) {
 # ------------------
 
 library(ggplot2); library(gridExtra)
-#data6$SEX=as.character(data6$SEX);mask=(data6$SEX=="0");data6$SEX[mask]="M";data6$SEX[!mask]="F";data6$SEX=as.factor(data6$SEX)
-#data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX),sep=""))
-
-pdf("plot.pdf")
-p4=ggplot(data6, aes(x=GROUP,y=rCC_Mid_Posterior,fill=SEX)) +
-    scale_fill_manual(values=c("blue","red")) +
+#pdf("plot.pdf")
+p4=ggplot(data6, aes(x=GROUP,y=rCC_Mid_Posterior,fill=SEX2)) +
+    scale_fill_manual(values=c("red","blue")) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
 #    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p5=ggplot(data6, aes(x=GROUP,y=rLeft.Lateral.Ventricle,fill=SEX)) +
-    scale_fill_manual(values=c("blue","red")) +
+p5=ggplot(data6, aes(x=GROUP,y=rLeft.Lateral.Ventricle,fill=SEX2)) +
+    scale_fill_manual(values=c("red","blue")) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
 #    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p6=ggplot(data6, aes(x=SEX,y=rRight.Lateral.Ventricle,fill=GROUP)) +
+p6=ggplot(data6, aes(x=SEX2,y=rRight.Lateral.Ventricle,fill=GROUP)) +
     scale_fill_manual(values=c("#E69F00","#009E73")) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
 #    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p7=ggplot(data6, aes(x=SEX,y=rLeft.Lateral.Ventricle,fill=GROUP)) +
+p7=ggplot(data6, aes(x=SEX2,y=rLeft.Lateral.Ventricle,fill=GROUP)) +
     scale_fill_manual(values=c("#E69F00","#009E73")) +
     geom_dotplot(binaxis="y",stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
 #    guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
 grid.arrange(p4,p5,p6,p7,nrow=2)
-dev.off()
+#dev.off()
 
 # -------------------
 # scatter plot
 # -------------------
 
-pdf("scatterplot.pfd")
+#pdf("scatterplot.pfd")
+library(ggplot2); library(gridExtra)
 datax=subset(data6,GROUP=="PRO")
 p11=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Anterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p12=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Mid_Anterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p13=ggplot(datax, aes(x=SIDTOTEV,y=rCC_Posterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p14=ggplot(datax, aes(x=READSTD,y=rLeft.Lateral.Ventricle,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p15=ggplot(datax, aes(x=SOCFXC,y=rCC_Anterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p16=ggplot(datax, aes(x=SOCFXC,y=rCC_Mid_Anterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p17=ggplot(datax, aes(x=ROLEFX,y=rCC_Posterior,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p18=ggplot(datax, aes(x=ROLEFX,y=rRight.Lateral.Ventricle,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
-    geom_point(size=4)
+    geom_point()
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
-dev.off()
+#dev.off()
 
 # --------------------------------------------------------------------------------------------
 # old records of important abalyses

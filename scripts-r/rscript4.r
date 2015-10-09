@@ -1,9 +1,14 @@
+--------------------
+filename: rscript4.r
+author: Jun Konishi
+--------------------
+
 # =============
 # set up data
 # =============
 
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats")
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
+# directory: /projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
 # load the demographic table
@@ -31,7 +36,7 @@ data4=read.table(fsstatfile,header=TRUE)
 # format the strings of case id, merge tables, arrange field names
 
 data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
-data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
+data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)     # this work even in fs-edited file
 data5=merge(data1,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 data6=subset(data5,! is.na(SEX))    # exclude rows which don't have SEX data
 data6$SEX=as.factor(data6$SEX)    # change into class:factor
@@ -65,21 +70,13 @@ parameters_sig=c("SIG1SEV","SIG1SEV","SIG1SEV","SIG4SEV")
 parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
 
 # =======================
-# SetUpData in home PC
+# data setting in home PC
 # =======================
 
 setwd("C:/Users/jun/Documents/test")
 #fsstatfile="output20150911.csv"
 fsstatfile="aseg_stats.txt"
 demographictable="Caselist_CC_prodromes.xlsx"
-
-# ================================
-# SetUpData in 02_editedfreesurfer
-# ================================
-
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/")
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aseg_stats.txt"
-demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
 # ====================
 # statistical analysis
@@ -149,53 +146,49 @@ table1=tablex;knitr::kable(table1)
 # analyses of corpus callosum
 # ---------------------------
 
+
+options(contrasts =c("contr.treatment","contr.poly")) # default contrast
+funclm <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    cat("---------------------------\n")
+    print(s[["call"]]);     # show model
+    print(s[["coefficients"]][,c(1,4)])
+#    print(anova(r))    # for anova
+}
+myfunc=function(item,datacol,arg3){
+    m=length(item); n=length(datacol)
+    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+}
+# sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
+
+
 # General linear model with factors: GROUP, SEX, GROUP*SEX, ICV
 
-funclm1 <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP*SEX+ICV,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+ICV,data=data6)"
-    txt0=paste(txt1,txt2,txt3,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-for (region in regions ) { funclm1(region) } # CC
-for (region in regions2 ) {funclm1(region)} # ventricles
-for (region in regions3 ) {funclm1(region)} # ventricles, bil.LV
-# results: significant group difference of Left.Lateral.Ventricle
-
+datax=data6
+item=c(regions,regions2);myfunc(item,"","GROUP*SEX+ICV")    # CC, ventricles
+item=c(regions3);        myfunc(item,"","GROUP*SEX+ICV")    # ventricles, bil.LV
 
 # General linear model with factors: GROUP, ICV
 
-funclm2 <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP+ICV,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP+ICV,data=data6)"
-    txt0=paste(txt1,txt2,txt3,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-for (region in regions ) { funclm2(region) } # CCs
-for (region in regions2 ) {funclm2(region)} # ventricles
-for (region in regions3 ) {funclm2(region)} # ventricles, bil.LV
-# results: no significant group difference
+datax=data6
+item=c(regions,regions2);myfunc(item,"","GROUP+ICV")  # CC, ventricles
+item=c(regions3);        myfunc(item,"","GROUP+ICV")  # ventricles, bil.LV
 
 # General linear model with factors: GROUP, ICV, by SEX
 
-funclm2 <- function(arg1){
-    # arg1:character; arg2:character; r=lm(arg1~GROUP+ICV,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP+ICV,data="; txt4="datax";txt5=")"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-functmp=function(arg1){
-    # arg1:vecotr:character,
-    for (region in arg1 ) { funclm2(region) }
-}
-datax=subset(data6,SEX==0); functmp(regions)
-datax=subset(data6,SEX==1); functmp(regions)
+datax=subset(data6,SEX==0); item=c(regions); myfunc(item,"","GROUP+ICV")
+datax=subset(data6,SEX==1); item=c(regions); myfunc(item,"","GROUP+ICV")
+
+# General linear model with factors: GROUP, SEX; relative volume
+
+datax=data6; item=c(regions4); myfunc(item,"","GROUP*SEX")
+
+# General linear model with factors: GROUP, AGE, SEX, ICV
+
+datax=data6; item=c(regions); myfunc(item,"","GROUP*SEX+AGE+ICV")
 
 # t-test on "CC_Mid_Posterior" by GROUP, SEX
 
@@ -205,50 +198,16 @@ datax=subset(data6,SEX==1); t.test(subset(datax,GROUP=="PRO")["CC_Mid_Posterior"
 datax=data6;t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)["CC_Mid_Posterior"])
 datax=subset(data6,GROUP=="PRO");t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)["CC_Mid_Posterior"])
 datax=subset(data6,GROUP=="HVPRO");t.test(subset(datax,SEX==0)["CC_Mid_Posterior"],subset(datax,SEX==1)["CC_Mid_Posterior"])
-    # results: PRO < HVPRO in all
-    # results: PRO << HVPRO in male, but p=0.07493, 
-    # results: PRO > HVPRO in female
-    # results: male < female in all
-    # results: male > female in HVPRO
-    # results: male < female in PRO
+    # results: PRO  < HC     in all (PRO  << HC    in male, PRO  > HC     in female)
+    # results: male < female in all (male > female in HC,   male < female in PRO)
 datax=data6; t.test(subset(datax,GROUP=="PRO")["rCC_Mid_Posterior"],subset(datax,GROUP=="HVPRO")["rCC_Mid_Posterior"])
 datax=subset(data6,SEX==0); t.test(subset(datax,GROUP=="PRO")["rCC_Mid_Posterior"],subset(datax,GROUP=="HVPRO")["rCC_Mid_Posterior"])
 datax=subset(data6,SEX==1); t.test(subset(datax,GROUP=="PRO")["rCC_Mid_Posterior"],subset(datax,GROUP=="HVPRO")["rCC_Mid_Posterior"])
 datax=data6;t.test(subset(datax,SEX==0)["rCC_Mid_Posterior"],subset(datax,SEX==1)["rCC_Mid_Posterior"])
 datax=subset(data6,GROUP=="PRO");t.test(subset(datax,SEX==0)["rCC_Mid_Posterior"],subset(datax,SEX==1)["rCC_Mid_Posterior"])
 datax=subset(data6,GROUP=="HVPRO");t.test(subset(datax,SEX==0)["rCC_Mid_Posterior"],subset(datax,SEX==1)["rCC_Mid_Posterior"])
-    # results: PRO < HVPRO in all
-    # results: PRO << HVPRO in male, but p=0.09395, 
-    # results: PRO > HVPRO in female
-    # results: male < female in all
-    # results: male < female in PRO
-    # results: male > female in HVPRO
-
-# General linear model with factors: GROUP, SEX; relative volume
-
-funclm3 <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP*SEX,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX,data=data6)"
-    txt0=paste(txt1,txt2,txt3,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-for (region in regions4 ) { funclm3(region) }
-# results: no significant group difference
-
-# General linear model with factors: GROUP, AGE, SEX, ICV
-
-funclm <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP*SEX+AGE+ICV,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+AGE+ICV,data=data6)"
-    txt0=paste(txt1,txt2,txt3,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-for (region in regions ) { funclm(region) }
-# results: no significant group difference
+    # results: PRO  < HC  in all    (PRO  << HC     in male, PRO  > HC     in female)
+    # results: male < female in all (male <  female in PRO,  male > female in HC)
 
 # ---------------------
 # analyses of venricles
@@ -263,13 +222,11 @@ dlv=rbind(dlvrt,dlvlt)
 # General linear model with factors: GROUP, hemi, SEX, ICV
 
 r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv); s=summary(r)
-    cat("----------------\n")
     print(s[[1]]); print(s[[4]][,c(1,4)])
 
 # General linear model with factors: GROUP, hemi, ICV
 
 r=lm(volume~GROUP*hemi+ICV,data=dlv); s=summary(r)
-    cat("----------------\n")
     print(s[[1]]); print(s[[4]][,c(1,4)])
 
 # General linear model with factors: GROUP, SEX, ICV  --> above
@@ -329,61 +286,6 @@ mcorp.round=as.numeric(mcorp.round)    # change character to numecit
 mcorp.names=names(datax)    # set names
 cbind(mcorp.names,mcorp.round)    # output table
 
-# -----------------------------------------
-# corelation analysis in PRO data
-# -----------------------------------------
-
-datax=subset(datax,GROUP=="PRO")
-mask=sapply(datax,is.numeric)    # apply is.numeric to each column, output nuber is same as the number of column of input
-datax=subset(datax,select=mask)    # select only data which are numeric
-
-n=length(datax)    # the number of columns
-mcorp=c(1:n)    # set an vectore beforhand
-
-for (i in 1:n) {    # cor test between CC and each-column-indatax
-    mcorp[i]=cor.test(datax[["CC_Mid_Posterior"]],datax[[i]],method="spearman")[["p.value"]]
-}
-mcorp.round=sprintf("%.5f",mcorp)    # round the values
-mcorp.round=as.numeric(mcorp.round)    # change character to numecit
-mcorp.names=names(datax)    # set names
-cbind(mcorp.names,mcorp.round)    # output table
-
-for (i in 1:n) {    # cor test between CC and each-column-indatax
-    mcorp[i]=cor.test(datax[["CC_Mid_Posterior"]],datax[[i]],method="spearman")[["estimate"]]
-}
-mcorp.round=sprintf("%.5f",mcorp)    # round the values
-mcorp.round=as.numeric(mcorp.round)    # change character to numecit
-mcorp.names=names(datax)    # set names
-cbind(mcorp.names,mcorp.round)    # output table
-
-for (i in 1:n) {    # cor test between CC and each-column-indatax
-    mcorp[i]=cor.test(datax[["Bil.Lateral.Ventricle"]],datax[[i]],method="spearman")[["p.value"]]
-}
-mcorp.round=sprintf("%.5f",mcorp)    # round the values
-mcorp.round=as.numeric(mcorp.round)    # change character to numecit
-mcorp.names=names(datax)    # set names
-cbind(mcorp.names,mcorp.round)    # output table
-
-# -----------------------------------
-# correlation analyses, simple script
-# -----------------------------------
-
-datax=subset(data6,GROUP=="PRO")
-func=function(arg1){print(cor.test(x,arg1,method="spearman")[["p.value"]])}
-
-x=datax[["rCC_Mid_Posterior"]]    # vector
-y=datax[["READSTD"]] ;func(y)
-y=datax[["WASIIQ"]]  ;func(y)
-y=datax[["GAFC"]]    ;func(y)
-y=datax[["GAFH"]]    ;func(y)
-
-x=datax[["rBil.Lateral.Ventricle"]]    # vector
-y=datax[["READSTD"]] ;func(y)
-y=datax[["WASIIQ"]]  ;func(y)
-y=datax[["GAFC"]]    ;func(y)
-y=datax[["GAFH"]]    ;func(y)
-y=datax[["ROLEFX"]]  ;func(y)
-
 # -------------------------------------------
 # more simple script for correlation analysis
 # -------------------------------------------
@@ -423,143 +325,54 @@ print(lst)
 # use linear model, analyses in subgroups
 # ---------------------------------------
 
-# set up data within PRO
-
-datax=subset(data6,GROUP=="PRO")
-# datax=subset(data6,SEX==0)
-# datax=subset(data6,SEX==1)
-
 # General linear model with factors: ICV in PRO (or in Male/Female)
 
-funclm4 <- function(arg1,arg2){
-    # arg1: character; arg2: character; r=lm(arg1~arg2+ICV,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5="+ICV,data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
-}
 #item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
 item=c(regions,regions2)
 #datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 #datacol=c(parameters_si)
 datacol=c(parameters1)
 #datacol=c(regions,regions2)
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm4(item[j],datacol[i]) } }
 
-# results: 
-# lm(formula = CC_Mid_Posterior ~ Bil.Lateral.Ventricle + ICV, data = datax), Bil.Lateral.Ventricle p=0.001746613
-# lm(formula = Bil.Lateral.Ventricle ~ CC_Mid_Posterior + ICV, data = datax), CC_Mid_Posterior p=0.001746613
-# lm(formula = Left.Lateral.Ventricle ~ CC_Mid_Posterior + ICV,data = datax), CC_Mid_Posterior p=0.0005963888
-# lm(formula = Left.Lateral.Ventricle ~ READSTD + ICV, data = datax), READSTD p=0.02829156
-# lm(formula = Bil.Lateral.Ventricle ~ ROLEFX + ICV, data = datax), ROLEFX p=0.001543687
-# lm(formula = Left.Lateral.Ventricle ~ ROLEFX + ICV, data = datax), ROLEFX p=0.001245743
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+ICV")
 
-datax=subset(data6,SEX==0);funclm4("Left.Lateral.Ventricle","GROUP")
-datax=subset(data6,SEX==1);funclm4("Left.Lateral.Ventricle","GROUP")
-datax=subset(data6,GROUP=="PRO");funclm4("Left.Lateral.Ventricle","SEX")
-datax=subset(data6,!GROUP=="PRO");funclm4("Left.Lateral.Ventricle","SEX")
+datax=subset(data6,SEX==0);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
+datax=subset(data6,SEX==1);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
+datax=subset(data6,GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
+datax=subset(data6,!GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
 
 # General linear model with factors:SEX, ICV in PRO
 
-funclm5 <- function(arg1,arg2){
-    # arg1: character; arg2: character; r=lm(arg1~arg2+SEX+ICV,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5="+SEX+ICV,data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
-}
 item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
 #datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 #datacol=c(parameters_si)
 datacol=c(parameters1)
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm5(item[j],datacol[i]) } }
 
-# results:
-# lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + ICV, data = datax), SINTOTEV p-value 0.05189117
-# lm(formula = Left.Lateral.Ventricle ~ SINTOTEV + SEX + ICV, data = datax), SINTOTEV p-value 0.05510382
-# lm(formula = Left.Lateral.Ventricle ~ READSTD + SEX + ICV, data = datax), READSTD p-value 0.03022078
-# lm(formula = Bil.Lateral.Ventricle ~ SIN6SEV + SEX + ICV, data = datax), SIN6SEV p-value 0.023728336
-# lm(formula = Left.Lateral.Ventricle ~ SIN6SEV + SEX + ICV, data = datax), SIN6SEV p-value 0.03883535
-# lm(formula = Bil.Lateral.Ventricle ~ ROLEFX + SEX + ICV, data = datax), ROLEFX p-value 0.0003735877
-# lm(formula = Left.Lateral.Ventricle ~ ROLEFX + SEX + ICV, data = datax), ROLEFX p-value 0.0003480755
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+ICV")
+
 
 # General linear model with factors:SEX in PRO, relative volume
 
-funclm <- function(arg1,arg2){
-    # arg1: character; arg2: character; r=lm(arg1~arg2+SEX,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5="+SEX,data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
-}
 item=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle")
 datacol=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm(item[j],datacol[i]) } }
-
-# results:
-# lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV + SEX, data = datax), SINTOTEV     p-value 0.08179919
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX")
 
 # General linear model with factors:SEX, AGE, ICV in PRO
 
-funclm <- function(arg1,arg2){
-    # arg1: character; arg2: character
-    # r=lm(arg1~arg2+SEX+AGE+ICV,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5="+SEX+AGE+ICV,data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
-}
 item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle")
 datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm(item[j],datacol[i]) } }
-
-# results:
-# lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE + ICV, data = datax), SINTOTEV:  p-value 0.05904023
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+AGE+ICV")
 
 # General linear model with factors:SEX, :SEX, ICV in PRO
 
-funclm <- function(arg1,arg2){
-    # arg1: character; arg2: character; r=lm(arg1~arg2*SEX+ICV,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5="*SEX+ICV,data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[["call"]]); print(s[["coefficients"]][,c(1,4)])
-}
 item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
 datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 #datacol=c(parameters_si)
 #datacol=c(parameters1)
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm(item[j],datacol[i]) } }
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"*SEX+AGE+ICV")
 
-# results: 
-# lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax), SINTOTEV p=0.006923484
-# lm(formula = Left.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax), SINTOTEV p=0.009573801
-# lm(formula = Bil.Lateral.Ventricle ~ SIN6SEV * SEX + ICV, data = datax), SIN6SEV p=0.001664064
-# lm(formula = Left.Lateral.Ventricle ~ SIN6SEV * SEX + ICV, data = datax), SIN6SEV p=0.006264122
-# lm(formula = CC_Mid_Posterior ~ ROLEFX * SEX + ICV, data = datax), ROLEFX p=0.04545495
-# lm(formula = Bil.Lateral.Ventricle ~ ROLEFX * SEX + ICV, data = datax), ROLEFX p=2.426137e-05
-# lm(formula = Left.Lateral.Ventricle ~ ROLEFX * SEX + ICV, data = datax), ROLEFX p=1.902738e-05
 
-item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle")
-datacol=c(regions,"Bil.Lateral.Ventricle")
-m=length(item); n=length(datacol)
-for ( j in 1:m) { for ( i in 1:n ) { funclm(item[j],datacol[i]) } }
-
-# results:
-#      CC_Mid_Posterior: significant effect of CC_Central, Bil.Lateral.Ventricle
-#      Bil.Lateral.Ventricle: signicficant effect of CC_Central, CC_Mid_Posterior
-
-# General linear model with Bil.Lateral.Ventricle ~ SINTOTEV, p-value of SINTOTEV
+datax=subset(data6,GROUP=="PRO")
 summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE + ICV, data = datax))   # 0.0590
 summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + ICV, data = datax))         # 0.0519
 summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax))         # 0.00692
@@ -643,6 +456,60 @@ library(ggplot2); library(gridExtra)
 # pdf("tmp.pdf",useDingbats=FALSE)
 p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p3=ggplot(data6, aes(x=GROUP,y=CC_Central,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=40,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p8=ggplot(data6, aes(x=GROUP,y=Right.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p9=ggplot(data6, aes(x=GROUP,y=Left.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Volumes of corpus callosum")
+# dev.off()
+
+# ---------------------------------
+# simple volume graph 2, 2015/10/09
+# ---------------------------------
+
+library(ggplot2); library(gridExtra)
+pdf("tmp.pdf",useDingbats=FALSE)
+p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
@@ -676,8 +543,19 @@ p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=SEX)) +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-grid.arrange(p1, p2, p3, p4, p5, p6, p7,  nrow=4, ncol=2, main = "Volumes of corpus callosum")
-# dev.off()
+p8=ggplot(data6, aes(x=GROUP,y=Right.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p9=ggplot(data6, aes(x=GROUP,y=Left.Lateral.Ventricle,fill=SEX)) +
+    geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Volumes of corpus callosum")
+dev.off()
+
 
 # ---------------------------
 # plot for correlation in PRO 
@@ -943,8 +821,8 @@ log=function(arg1,arg2){
 # ---------------------------------
 
 # set data in PNL
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats")
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/aseg_stats.txt"
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/")
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
 # # set data in vaio
@@ -1458,6 +1336,7 @@ myfunc=function(item,datacol,arg3){
 #datax=data6
 datax=subset(data6,GROUP=="PRO")
 item=c(regions,regions2)
+#item=c(regions4)
 datacol=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV",parameters1)
 myfunc(item,datacol,"+ICV")
 myfunc(item,datacol,"+SEX+ICV")
@@ -1467,6 +1346,9 @@ sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
 sink(file="tmp",append=FALSE);myfunc(datacol,item,"+ICV");sink()
 myfunc(item,"","GROUP+SEX+ICV")
 myfunc(item,"","GROUP+ICV")
+myfunc(item,"","GROUP*SEX")
+myfunc(item,"","GROUP+SEX")
+myfunc(item,"","GROUP")
 
 # ---------------------------------------------------
 # new plot, correlation between volumes and parameters
@@ -1531,10 +1413,10 @@ grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
 
 datax=data6[,c("caseid2","GROUP","SEX2",regions,regions2)]
 t1=knitr::kable(datax);print(t1)
-# cat(knitr::kable(datax),file="tmp.txt",sep="\n")
+cat(knitr::kable(datax),file="tmp.txt",sep="\n")
 tx=rbind(summary(datax), sapply(datax,sd,na.rm=TRUE))
 t3=knitr::kable(tx);print(t3)
-# cat(t3,file="tmp.txt",sep="\n")
+cat(t3,file="tmp.txt",sep="\n",append=TRUE)
 
 tx=by(datax,datax$GROUP,summary);
 t4=knitr::kable(tx[[1]]);t5=knitr::kable(tx[[2]])
@@ -1592,4 +1474,6 @@ t3=knitr::kable(tx);print(t3)
 - table of volumes for checking data, 2015/09/29, 
 - summary
 
+* important analyses
+- more flexible functions for linear model and ANOVA
 

@@ -29,6 +29,7 @@ data1=subset(data1,! is.na(Case..))
 # load the freesurfer output table
 
 data4=read.table(fsstatfile,header=TRUE)
+asegnames=names(data4)
 # field labels:
 #     Measure:volume (field label) is turened to Measure.volume 
 #     and its data is for example DELISI_HM_0403.freesurfer
@@ -53,6 +54,24 @@ data6$rCC_Mid_Posterior     =data6$CC_Mid_Posterior     /data6$ICV
 data6$rCC_Posterior         =data6$CC_Posterior         /data6$ICV
 data6$SEX2=as.character(data6$SEX);mask=(data6$SEX2=="0");data6$SEX2[mask]="M";data6$SEX2[!mask]="F";data6$SEX2=as.factor(data6$SEX2)
 data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
+
+# set cerebral volumes
+
+datax=data6
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aparc_stats_rh_volume.txt"
+data4=read.table(fsstatfile,header=TRUE)
+data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
+rhnames=names(data4)
+datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+
+datax=datay
+fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aparc_stats_lh_volume.txt"
+data4=read.table(fsstatfile,header=TRUE)
+data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work even in fs-edited file
+lhnames=names(data4)
+datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+
+
 
 # set variables
 
@@ -1432,6 +1451,69 @@ t1=knitr::kable(datax);print(t1)
 tx=rbind(summary(datax), sapply(datax,sd,na.rm=TRUE))
 t3=knitr::kable(tx);print(t3)
 
+# --------------------------------------------------
+# ANCOVA or ANOVA: p-values of main effect of GROUP
+# --------------------------------------------------
+
+library(car) # for Anova()
+options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
+funclm <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+    Anova(r,type=3)["GROUP","Pr(>F)"]   # output
+}
+datax=data6
+items=c(regions,regions2)
+models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
+    "GROUP*SEX+ICV",
+    "GROUP+SEX+AGE+ICV","GROUP+AGE+ICV",
+    "GROUP","GROUP+SEX","GROUP+AGE","GROUP+AGE+SEX",
+    "GROUP+WASIIQ+ICV","GROUP+WASIIQ",
+    "GROUP+READSTD","GROUP+READSTD+ICV","GROUP+READSTD+SEX+ICV","GROUP+SEX+READSTD+ICV","GROUP*SEX+READSTD+ICV",
+    "GROUP+READSTD+AGE+ICV","GROUP+READSTD+SEX+AGE+ICV"
+    )
+pvaluesmatrix=matrix(0,length(models),length(items))
+rownames(pvaluesmatrix)=c(1:length(models))   # need to initializing the rownames
+colnames(pvaluesmatrix)=items
+for ( j in ( 1:length(models) ) ) {
+    rownames(pvaluesmatrix)[j]=paste("Volume ~",models[j])
+    for ( i in ( 1 : length(items) ) ) {
+        pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
+    }
+}
+#pvaluesmatrix
+knitr::kable(pvaluesmatrix)
+
+# settings for the analyses in other regions
+#datax=data6
+datax=datay
+models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
+#items=names(data4)[c(2:35,38,41:66)]   # exclude c(1,36,37,39,40,68) which leads errors
+items=c(asegnames[c(2:35,38,41:66)],rhnames[c(2:35)],lhnames[c(2:35)])
+knitr::kable(t(pvaluesmatrix))     # translocate matrix for display
+
+# output text file
+cat(file="tmp","\n# -------------------------------------\n",append=TRUE)
+cat(file="tmp","# ANCOVA or ANOVA: p-values of main effect of GROUP\n",append=TRUE)
+cat(file="tmp","# -------------------------------------\n\n",append=TRUE)
+#sink(file="tmp",append=TRUE);knitr::kable(pvaluesmatrix);sink()
+sink(file="tmp",append=TRUE);knitr::kable(t(pvaluesmatrix));sink()    # translocate matrix for display
+#sink(file="tmp",append=TRUE);knitr::kable(result1);sink()
+#sink(file="tmp",append=TRUE);knitr::kable(t(result3));sink()
+
+# ANOVA in caudata and amygdala
+Anova(lm(Right.Caudate~GROUP+READSTD+ICV,data=datax),type=3)
+by(datax$Right.Caudate,datax$GROUP,summary)
+Anova(lm(Left.Caudate~GROUP+READSTD+ICV,data=datax),type=3)
+by(datax$Left.Caudate,datax$GROUP,summary)
+Anova(lm(Right.Amygdala~GROUP+READSTD+ICV,data=datax),type=3)
+by(datax$Right.Amygdala,datax$GROUP,summary)
+Anova(lm(Left.Amygdala~GROUP+READSTD+ICV,data=datax),type=3)
+by(datax$Left.Amygdala,datax$GROUP,summary)
+
+
 # ----------------------------------
 # summary
 # ----------------------------------
@@ -1472,6 +1554,7 @@ t3=knitr::kable(tx);print(t3)
 - ANOVA, same as in SPSS default
 - more flexible functions for linear model and ANOVA
 - table of volumes for checking data, 2015/09/29, 
+- ANCOVA or ANOVA: p-values of main effect of GROUP
 - summary
 
 * important analyses

@@ -71,8 +71,6 @@ data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work eve
 lhnames=names(data4)
 datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 
-
-
 # set variables
 
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
@@ -165,7 +163,6 @@ table1=tablex;knitr::kable(table1)
 # analyses of corpus callosum
 # ---------------------------
 
-
 options(contrasts =c("contr.treatment","contr.poly")) # default contrast
 funclm <- function(arg1,arg2,arg3){
     # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
@@ -255,11 +252,11 @@ r=lm(volume~GROUP*hemi+ICV,data=dlv); s=summary(r)
 # correlation analysis - output correlation matrix
 # -----------------------------------------------
 
-datax=cbind(data6[c(regions,regions3)])  # set datax
+datax=cbind(data6[c(regions,regions2)])  # set datax
 mcor=cor(datax,use="complete.obs")    # correlation matrix with correlation coefficients but not p-values
-plot(datax)    # plot of correlation matrix
-
 # you may use "datax=na.omit(datax)"    # omit rows including NA for correlation analysis
+plot(datax)    # plot of correlation matrix
+library(corrplot);corrplot(mcor)
 
 # ------------------------------------------------------
 # correlation analysis - output p-values of the analyses
@@ -369,7 +366,6 @@ datacol=c(parameters1)
 
 datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+ICV")
 
-
 # General linear model with factors:SEX in PRO, relative volume
 
 item=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle")
@@ -389,7 +385,6 @@ datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","
 #datacol=c(parameters_si)
 #datacol=c(parameters1)
 datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"*SEX+AGE+ICV")
-
 
 datax=subset(data6,GROUP=="PRO")
 summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE + ICV, data = datax))   # 0.0590
@@ -580,7 +575,7 @@ dev.off()
 # plot for correlation in PRO 
 # ---------------------------
 
-datax=subset(datax,GROUP=="PRO")
+datax=subset(data6,GROUP=="PRO")
 plot(datax$SINTOTEV, datax$Bil.Lateral.Ventricle)
 library(ggplot2)
 ggplot(datax, aes(x=SINTOTEV, y=Bil.Lateral.Ventricle,colour=SEX)) + geom_point()
@@ -674,11 +669,17 @@ library(rgl)
 
 # plot with mark which explain where difference exist
 library(ggplot2); library(gridExtra)
+
+means=tapply(data6$rCC_Mid_Posterior,data6$GROUPSEX,mean,na.rm=TRUE)
 p1=ggplot(data6, aes(x=GROUPSEX,y=rCC_Mid_Posterior,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+#    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank()) +   # don't display x-axis-label
+    annotate("segment",x=0.75,xend=1.25,y=means[1],yend=means[1]) + 
+    annotate("segment",x=1.75,xend=2.25,y=means[2],yend=means[2]) + 
+    annotate("segment",x=2.75,xend=3.25,y=means[3],yend=means[3]) + 
+    annotate("segment",x=3.75,xend=4.25,y=means[4],yend=means[4]) + 
     annotate("segment",x=1.5,xend=3.5,y=0.0005,yend=0.0005) +
     annotate("segment",x=1,xend=2,y=0.000475,yend=0.000475) +
     annotate("segment",x=1,xend=1,y=0.000475,yend=0.000460) +
@@ -687,11 +688,17 @@ p1=ggplot(data6, aes(x=GROUPSEX,y=rCC_Mid_Posterior,fill=GROUPSEX)) +
     annotate("segment",x=3,xend=3,y=0.000475,yend=0.000460) +
     annotate("segment",x=4,xend=4,y=0.000475,yend=0.000460) +
     annotate("text",x=2.5,y=0.0005,label="*",size=10)    # add a * 
+
+means=tapply(data6$rRight.Lateral.Ventricle,data6$GROUPSEX,mean,na.rm=TRUE)
 p2=ggplot(data6, aes(x=GROUPSEX,y=rRight.Lateral.Ventricle,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+#    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank()) +   # don't display x-axis-label
+    annotate("segment",x=0.75,xend=1.25,y=means[1],yend=means[1]) + 
+    annotate("segment",x=1.75,xend=2.25,y=means[2],yend=means[2]) + 
+    annotate("segment",x=2.75,xend=3.25,y=means[3],yend=means[3]) + 
+    annotate("segment",x=3.75,xend=4.25,y=means[4],yend=means[4]) + 
     annotate("segment",x=1.5,xend=3.5,y=0.0145,yend=0.0145) +
     annotate("segment",x=1,xend=3,y=0.013,yend=0.013) +
     annotate("segment",x=1,xend=1,y=0.013,yend=0.0125) +
@@ -700,11 +707,17 @@ p2=ggplot(data6, aes(x=GROUPSEX,y=rRight.Lateral.Ventricle,fill=GROUPSEX)) +
     annotate("segment",x=2,xend=2,y=0.014,yend=0.0135) + 
     annotate("segment",x=4,xend=4,y=0.014,yend=0.0135) + 
     annotate("text",x=2.5,y=0.015,label="*",size=10)    # add a * 
+
+means=tapply(data6$rLeft.Lateral.Ventricle,data6$GROUPSEX,mean,na.rm=TRUE)
 p3=ggplot(data6, aes(x=GROUPSEX,y=rLeft.Lateral.Ventricle,fill=GROUPSEX)) +
     geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+#    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank()) +   # don't display x-axis-label
+    annotate("segment",x=0.75,xend=1.25,y=means[1],yend=means[1]) + 
+    annotate("segment",x=1.75,xend=2.25,y=means[2],yend=means[2]) + 
+    annotate("segment",x=2.75,xend=3.25,y=means[3],yend=means[3]) + 
+    annotate("segment",x=3.75,xend=4.25,y=means[4],yend=means[4]) + 
     annotate("segment",x=1.5,xend=3.5,y=0.016,yend=0.016) +
     annotate("segment",x=1,xend=3,y=0.0145,yend=0.0145) +
     annotate("segment",x=1,xend=1,y=0.0145,yend=0.014) +
@@ -716,43 +729,34 @@ p3=ggplot(data6, aes(x=GROUPSEX,y=rLeft.Lateral.Ventricle,fill=GROUPSEX)) +
     annotate("segment",x=1,xend=2,y=0.012,yend=0.012) +
     annotate("text",x=1.5,y=0.012,label="*",size=10)    # add a * 
 grid.arrange(p1,p2,p3,nrow=2)
-    
 
 # ----------------------------------------------------------
 # plot with jitter
 # ----------------------------------------------------------
  
-# p1=ggplot(data6, aes(x=GROUP,y=Mid_Posterior,fill=GROUP)) +
-#     geom_point(size=3,shape=21,position=position_jitter(width=.1,height=0))+    # with jitter
-#     stat_summary(fun.y="mean",goem="point",shape="-",size=6,color="black",ymin=0,ymax=0) +    # add mean
-#     guides(fill=FALSE) +    # don't display guide
-#     theme(axis.title.x=element_blank()) +    # don't display x-axis-label
-#     annotate("segment",x=1,xend=2,y=1150,yend=1150,arrow=arrow(ends="both",angle=90)) +    # add a bar
-#     annotate("text",x=1.5,y=1120,label="*",size=10)    # add a * 
-
-# ------------------------------------------------------------
-# # plot for correlation matrix
-# ------------------------------------------------------------
- 
-# mcor=cor([data.frame],use="complete.obs")     # option use : for data with NA
-# library(corrplot)
-# corrplot(mcor)
+p1=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=GROUP)) +
+    geom_point(size=3,shape=21,position=position_jitter(width=.1,height=0))+    # with jitter
+    stat_summary(fun.y="mean",goem="point",shape="-",size=6,color="black",ymin=0,ymax=0) +    # add mean
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank()) +    # don't display x-axis-label
+    annotate("segment",x=1,xend=2,y=600,yend=600,arrow=arrow(ends="both",angle=90)) +    # add a bar
+    annotate("text",x=1.5,y=580,label="*",size=10)    # add a * 
 
 # -------------------------------------------------------------
 # difference between with/without binpositions="all"
 # -------------------------------------------------------------
  
-# p51=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
-#     geom_dotplot(binaxis="y",binwidth=20,stackdir="center",binpositions="all") +
-#     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#     guides(fill=FALSE) +    # don't display guide
-#     theme(axis.title.x=element_blank())    # don't display x-axis-label
-# p52=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
-#     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-#     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#     guides(fill=FALSE) +    # don't display guide
-#     theme(axis.title.x=element_blank())    # don't display x-axis-label
-# grid.arrange(p51, p52, nrow=1, ncol=2, main = "Volumes of corpus callosum")
+p51=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center",binpositions="all") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+p52=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
+    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
+    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
+    guides(fill=FALSE) +    # don't display guide
+    theme(axis.title.x=element_blank())    # don't display x-axis-label
+grid.arrange(p51, p52, nrow=1, ncol=2, main = "Volumes of corpus callosum")
 
 # -------------------------------------------
 # scatter plots where significant coefficient
@@ -781,56 +785,6 @@ p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX)) +
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
 #dev.off()
 
-
-# ----------------------------------------------------------------------
-# Notes: about the data, R, ...
-# ----------------------------------------------------------------------
-
-# "CC_Posterior", "CC_Mid_Posterior", "CC_Central", "CC_Mid_Anterior", "CC_Anterior", 	
-# "Right.Lateral.Ventricle", "Left.Lateral.Ventricle", "X3rd.Ventricle"
-# "EstimatedTotalIntraCranialVol", 
-# check by mode(), or is.numeric(), is.factor(), change by as.numeric(), as.factor()
-# references of functions: 
-#   setwd() ... sets working directory, 
-#   list.files() ... shows files in current directory, 
-#   objects() ... shows all objects
-# 
-# r=ln(...); # s=summary(r)
-# s[[1]], s$call; s[[4]], s$coefficients; class:matrix, 
-# colnames(s[[4]]) ... "Estimate" "Std. Error" "t value" "Pr(>|t|)"
-# rownames(summary_r[[4]]) ... "(Intercept)" "GROUPPRO" "SEX1" "ICV" "GROUPPRO:SEX1"
-# 
-#     R --vanilla < rscript3.r
-# R options: 
-#     -q, --quiet           Don't print startup message
-#     --slave               Make R run as quietly as possible
-# - Can I install Sublime Text 3 in PNL PC?
-# - NA in volume are in HVPRO. no need to delete lines including NA in PRO
-
-#----------------------------------------------
-# Examples for functions
-#----------------------------------------------
-
-mkcmd <- function(arg1){
-# arg1: characters
-  t1="start"; t2=arg1; t3="end"
-  paste(t1,t2,t3,sep="")
-}
-# What if command include double-quotation-marks? -> Just use \"
-
-run <- function(arg1){
-#    arg1: character
-    print(arg1)    # maybe not necessary
-    log(arg1)    # not yet defined
-    eval(parse(text=arg1))
-}
-
-log=function(arg1,arg2){
-    # arg1: one-element:character; arg2: one-element:character
-    cat(c(arg1,"\n"),file=arg2)
-}
-
-
 # =================
 # important analyses
 # ==================
@@ -844,7 +798,7 @@ setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/")
 fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
-# # set data in vaio
+# # set data in vaio, home PC
 # setwd("C:/Users/jun/Documents/test")
 # fsstatfile="aseg_stats.txt"
 # demographictable="Caselist_CC_prodromes.xlsx"
@@ -853,6 +807,7 @@ library(xlsx)
 data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
 data1=subset(data1,! is.na(Case..))
 data4=read.table(fsstatfile,header=TRUE)
+asegnames=names(data4)
 
 data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
 data4[["caseid2"]]=substring(data4[["Measure.volume"]],1,9)
@@ -987,13 +942,10 @@ datax=    cbind(
     data6[parameters1]
 )
 datax=subset(datax,GROUP=="PRO")
-mask=sapply(datax,is.numeric)    # apply is.numeric to each column, output nuber is same as the number of co
-datax=subset(datax,select=mask)    # select only data which are numeric
+mask=sapply(datax,is.numeric);datax=subset(datax,select=mask)    # select numeric data
 
-col=c("estimate","p.value")    # vector:character
-item=c(regions4)
-n=length(datax)    # the number of colmuns
-m=length(col); o=length(item); lst=list()
+col=c("estimate","p.value");item=c(regions4)
+n=length(datax);m=length(col); o=length(item); lst=list()
 for (k in 1:o) {                  # process of each item
     lst[[item[k]]]=matrix(0,n,m)
     for (j in 1:m) {              # process of each col

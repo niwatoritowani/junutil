@@ -3,12 +3,12 @@
 case=$1
 caselist=caselist
 
-set +e 
-[ grep "$1" $caselist ] || echo "$1" >> $caselist
-set -e
+#set +e 
+grep "$1" $caselist || echo "$1" >> $caselist
+#set -e
 tmp=$(date +%Y%m%d%H%M%S.%N)
-exec &> >(tee $1.log."${tmp}")
-$out=${case}/${case}.file
+exec &> >(tee $1.log.${tmp})
+out=${case}/${case}.file
 cmd="
 mkdir $case
 echo "hello" > $out
@@ -16,7 +16,7 @@ echo "hello" > $out
 
 if [ -e $out ]; then
     echo "$out exist"
-elif
+else
     echo "$cmd"
     eval "$cmd"
 fi

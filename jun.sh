@@ -1,11 +1,24 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 case=$1
 caselist=caselist
 
-if [ ! -n grep "$1" $caselist ]; do
-    echo "$1" >> $caselist
-done
+set +e 
+[ grep "$1" $caselist ] || echo "$1" >> $caselist
+set -e
+tmp=$(date +%Y%m%d%H%M%S.%N)
+exec &> >(tee $1.log."${tmp}")
+$out=${case}/${case}.file
+cmd="
+mkdir $case
+echo "hello" > $out
+"
 
-tmp=$(date +%M)
-
+if [ -e $out ]; then
+    echo "$out exist"
+elif
+    echo "$cmd"
+    eval "$cmd"
+fi
+echo "$(date)"
+echo "Done"

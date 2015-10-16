@@ -8,13 +8,14 @@ logfile=$1.log.${tmp}
 exec &> >(tee ${logfile})
 
 case=$1
-out=${case}
+outdir="/PHShome/jk318/2015-otani/fsoutputs"
+out=${outdir}/${case}
 cmd="
     rsync -auv -e ssh \\
         jkonishi@170.223.221.158:/rfanfs/pnl-zorro/projects/mclean/filtered_spgr/${case}/${case}.nhdr \\
         jkonishi@170.223.221.158:/rfanfs/pnl-zorro/projects/mclean/filtered_spgr/${case}/${case}.raw.gz \\
         .
-    fs.sh -i ${case}.nhdr -o /PHShome/jk318/2015-otani/fsoutputs -s >> ${logfile} 2>&1 ; \\
+    fs.sh -i ${case}.nhdr -o ${outdir} -s >> ${logfile} 2>&1 ; \\
         echo \"\$(date)\" &
 "
 if [ -e $out ]; then

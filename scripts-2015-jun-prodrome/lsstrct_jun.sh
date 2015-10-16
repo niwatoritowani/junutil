@@ -7,3 +7,11 @@ for line in $lines; do
     echo "---"
 done
 
+# # thinkig more simple script
+#list=caselistfile
+#awk '{print $12}' $list | while read case ;do
+#    echo "${case}"
+#    ls ${case}/strct_jun
+#    echo "---"
+#done
+

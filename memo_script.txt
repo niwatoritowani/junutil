@@ -14,3 +14,52 @@ wawi wuwewo" > test.txt
 awk 'if ($2 == "mumemo"){print $1}'
 
 20150728. 
+
+
+
+```{cmdlog.sh}
+#!/bin/tcsh
+set cmd = $1
+set log = $2
+echo "${cmd}" | tee -a ${log} | tcsh |& tee -a ${log}
+
+# error message
+# set: Variable name must begin with a letter.
+# This works in my PC. 
+```
+
+```{cmdlog.csh}
+#!/bin/tcsh
+set cmd = $1
+set log = $2
+echo "${cmd}" | tee -a ${log} | tcsh |& tee -a ${log}
+
+# error message
+# set: Variable name must begin with a letter.
+# This works in my PC. 
+```
+
+
+
+```{default.do}
+#!/bin/bash
+
+echo '$1'"$1"
+echo '$2'"$2"
+echo '$2'"$3"
+
+# center_jun.py
+# correction1.sh
+# correction2.sh
+# dicom2nrrdxc2.sh -i $2 -w 1
+# dicom2nrrdxc2.sh -i $2 -w 2
+# dicom2nrrdxc2.sh -i $2 -w dwi
+# dicom2nrrdxc.sh
+# dicomread_jun.sh
+# eddycurrentcorrection.sh
+# README.md
+# setvars.txt
+# util.sh
+```
+
+

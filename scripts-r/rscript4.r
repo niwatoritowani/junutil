@@ -520,55 +520,57 @@ grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Volumes of corpus callo
 # simple volume graph 2, 2015/10/09
 # ---------------------------------
 
+
 library(ggplot2); library(gridExtra)
-pdf("tmp.pdf",useDingbats=FALSE)
-p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=SEX)) +
+datax=data6
+#pdf("tmp.pdf",useDingbats=FALSE)
+p1=ggplot(datax, aes(x=GROUP,y=CC_Anterior,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior,fill=SEX)) +
+p2=ggplot(datax, aes(x=GROUP,y=CC_Mid_Anterior,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p3=ggplot(data6, aes(x=GROUP,y=CC_Central,fill=SEX)) +
+p3=ggplot(datax, aes(x=GROUP,y=CC_Central,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
+p4=ggplot(datax, aes(x=GROUP,y=CC_Mid_Posterior,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=SEX)) +
+p5=ggplot(datax, aes(x=GROUP,y=CC_Posterior,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=SEX)) +
+p6=ggplot(datax, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=SEX)) +
+p7=ggplot(datax, aes(x=GROUP,y=X3rd.Ventricle,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=40,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p8=ggplot(data6, aes(x=GROUP,y=Right.Lateral.Ventricle,fill=SEX)) +
+p8=ggplot(datax, aes(x=GROUP,y=Right.Lateral.Ventricle,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
-p9=ggplot(data6, aes(x=GROUP,y=Left.Lateral.Ventricle,fill=SEX)) +
+p9=ggplot(datax, aes(x=GROUP,y=Left.Lateral.Ventricle,fill=SEX)) +
     geom_dotplot(binaxis="y",binwidth=1000,stackdir="center") +
     stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
     guides(fill=FALSE) +    # don't display guide
     theme(axis.title.x=element_blank())    # don't display x-axis-label
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Volumes of corpus callosum")
-dev.off()
+#dev.off()
 
 
 # ---------------------------
@@ -1444,6 +1446,7 @@ datax=datay
 models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 #items=names(data4)[c(2:35,38,41:66)]   # exclude c(1,36,37,39,40,68) which leads errors
 items=c(asegnames[c(2:35,38,41:66)],rhnames[c(2:35)],lhnames[c(2:35)])
+## enter the funclum and the for-roop
 knitr::kable(t(pvaluesmatrix))     # translocate matrix for display
 
 # output text file
@@ -1465,6 +1468,76 @@ by(datax$Right.Amygdala,datax$GROUP,summary)
 Anova(lm(Left.Amygdala~GROUP+READSTD+ICV,data=datax),type=3)
 by(datax$Left.Amygdala,datax$GROUP,summary)
 
+# -----------------------------------------
+# correlation analyses
+# -----------------------------------------
+
+datax=datay
+asegvol.names=asegnames[c(2:35,38,41:66)]
+rasegvol.names=paste("r.",asegvol.names,sep="")
+rhvol.names=rhnames[c(2:35)]
+rrhvol.names=paste("r.",rhvol.names,sep="")
+lhvol.names=lhnames[c(2:35)]
+rlhvol.names=paste("r.",lhvol.names,sep="")
+
+vol.names=c(asegvol.names,rhvol.names,lhvol.names)
+rvol.names=c(rasegvol.names,rrhvol.names,rlhvol.names)
+n=length(rvol.names)
+for (i in 1:n) {
+    datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
+}
+datay=datax
+
+#datax=datay
+datax=subset(datay,GROUP=="PRO")
+#items.row=c(regions4,parameters1) ; n=length(items.row)   # i
+#items.row=c(regions,regions2,parameters1) ; n=length(items.row)   # i
+#items.row=c(rvol.names) ; n=length(items.row)    # i 
+items.row=c(vol.names) ; n=length(items.row)    # i 
+#items.col=c(regions4)             ; m=length(items.col)   # j
+items.col=c(regions,regions2)             ; m=length(items.col)   # j
+items.ana=c("estimate","p.value") ; o=length(items.ana)   # k
+arr=array(0,dim=c(n,m,o))         ; dimnames(arr)=list(items.row,items.col,items.ana) 
+
+for (k in 1:o) {
+    for (j in 1:m) {
+        for (i in 1:n) {
+            arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
+#            print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names
+
+#            d=na.omit(data.frame(datax[[items.row[i]]],datax[[items.col[j]]]))      # a way to ommit NA line1
+#            arr[i,j,k]=cor.test(d[[1]],d[[2]],method="spearman")[[items.ana[k]]]    # a way to ommit NA line2
+        }
+    }
+}
+
+dimnames(arr)[[3]][2]
+knitr::kable(arr[,,2])     # translocate matrix for display
+dimnames(arr)[[3]][1]
+knitr::kable(arr[,,1])     # translocate matrix for display
+
+mask.mtx=(arr[,,2] < 0.05)                          # mask for under 0.05
+arr.p.sig.mtx=arr[,,2]
+arr.p.sig.mtx[!mask.mtx]=NA
+knitr::kable(arr.p.sig.mtx)
+arr.rho.sig.mtx=arr[,,1]
+arr.rho.sig.mtx[!mask.mtx]=NA
+knitr::kable(arr.rho.sig.mtx)
+
+
+sink(file="tmp",append=TRUE)
+cat("\n# -------------------------------------\n")
+cat("# correlation analyses: \n")
+cat("# -------------------------------------\n\n")
+cat(dimnames(arr)[[3]][2])
+cat("\n")
+print(knitr::kable(arr[,,2]))     # translocate matrix for display
+cat("\n")
+cat(dimnames(arr)[[3]][1])
+cat("\n")
+print(knitr::kable(arr[,,1]))     # translocate matrix for display
+cat("\n")
+sink()
 
 # ----------------------------------
 # summary

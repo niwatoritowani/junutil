@@ -71,6 +71,8 @@ data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work eve
 lhnames=names(data4)
 datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 
+# set other data
+
 # set variables
 
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
@@ -93,6 +95,10 @@ parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
 setwd("C:/Users/jun/Documents/test")
 #fsstatfile="output20150911.csv"
 fsstatfile="aseg_stats.txt"
+fsstatfile="edited.aseg_stats.txt"
+fsstatfile="edited.aparc_stats_rh_volume.txt"
+fsstatfile="edited.aparc_stats_lh_volume.txt"
+
 demographictable="Caselist_CC_prodromes.xlsx"
 
 # ====================
@@ -1437,7 +1443,6 @@ for ( j in ( 1:length(models) ) ) {
         pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
     }
 }
-#pvaluesmatrix
 knitr::kable(pvaluesmatrix)
 
 # settings for the analyses in other regions
@@ -1446,7 +1451,7 @@ datax=datay
 models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 #items=names(data4)[c(2:35,38,41:66)]   # exclude c(1,36,37,39,40,68) which leads errors
 items=c(asegnames[c(2:35,38,41:66)],rhnames[c(2:35)],lhnames[c(2:35)])
-## enter the funclum and the for-roop
+## here, run the funclum and the for-roop
 knitr::kable(t(pvaluesmatrix))     # translocate matrix for display
 
 # output text file
@@ -1455,10 +1460,8 @@ cat(file="tmp","# ANCOVA or ANOVA: p-values of main effect of GROUP\n",append=TR
 cat(file="tmp","# -------------------------------------\n\n",append=TRUE)
 #sink(file="tmp",append=TRUE);knitr::kable(pvaluesmatrix);sink()
 sink(file="tmp",append=TRUE);knitr::kable(t(pvaluesmatrix));sink()    # translocate matrix for display
-#sink(file="tmp",append=TRUE);knitr::kable(result1);sink()
-#sink(file="tmp",append=TRUE);knitr::kable(t(result3));sink()
 
-# ANOVA in caudata and amygdala
+# ANOVA in caudata and amygdala which were significant
 Anova(lm(Right.Caudate~GROUP+READSTD+ICV,data=datax),type=3)
 by(datax$Right.Caudate,datax$GROUP,summary)
 Anova(lm(Left.Caudate~GROUP+READSTD+ICV,data=datax),type=3)
@@ -1469,10 +1472,12 @@ Anova(lm(Left.Amygdala~GROUP+READSTD+ICV,data=datax),type=3)
 by(datax$Left.Amygdala,datax$GROUP,summary)
 
 # -----------------------------------------
-# correlation analyses
+# correlation analyses, 2015/10/19
 # -----------------------------------------
 
-datax=datay
+# set data-label
+
+datax=datay    # input as datax, datay already include ?h volume data, 
 asegvol.names=asegnames[c(2:35,38,41:66)]
 rasegvol.names=paste("r.",asegvol.names,sep="")
 rhvol.names=rhnames[c(2:35)]
@@ -1480,16 +1485,21 @@ rrhvol.names=paste("r.",rhvol.names,sep="")
 lhvol.names=lhnames[c(2:35)]
 rlhvol.names=paste("r.",lhvol.names,sep="")
 
+# calculate relative volumes
+
 vol.names=c(asegvol.names,rhvol.names,lhvol.names)
 rvol.names=c(rasegvol.names,rrhvol.names,rlhvol.names)
 n=length(rvol.names)
 for (i in 1:n) {
     datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
 }
-datay=datax
+datay=datax    # output is datay
+
+# set data
 
 #datax=datay
 datax=subset(datay,GROUP=="PRO")
+#datax=subset(datay,GROUP=="HVPRO")
 #items.row=c(regions4,parameters1) ; n=length(items.row)   # i
 #items.row=c(regions,regions2,parameters1) ; n=length(items.row)   # i
 #items.row=c(rvol.names) ; n=length(items.row)    # i 
@@ -1499,23 +1509,26 @@ items.col=c(regions,regions2)             ; m=length(items.col)   # j
 items.ana=c("estimate","p.value") ; o=length(items.ana)   # k
 arr=array(0,dim=c(n,m,o))         ; dimnames(arr)=list(items.row,items.col,items.ana) 
 
+# calculate correlation
+
 for (k in 1:o) {
     for (j in 1:m) {
         for (i in 1:n) {
             arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
-#            print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names
-
+#            print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names for debug
 #            d=na.omit(data.frame(datax[[items.row[i]]],datax[[items.col[j]]]))      # a way to ommit NA line1
 #            arr[i,j,k]=cor.test(d[[1]],d[[2]],method="spearman")[[items.ana[k]]]    # a way to ommit NA line2
         }
     }
 }
 
+# show table
 dimnames(arr)[[3]][2]
 knitr::kable(arr[,,2])     # translocate matrix for display
 dimnames(arr)[[3]][1]
 knitr::kable(arr[,,1])     # translocate matrix for display
 
+# extract significant data
 mask.mtx=(arr[,,2] < 0.05)                          # mask for under 0.05
 arr.p.sig.mtx=arr[,,2]
 arr.p.sig.mtx[!mask.mtx]=NA
@@ -1524,6 +1537,20 @@ arr.rho.sig.mtx=arr[,,1]
 arr.rho.sig.mtx[!mask.mtx]=NA
 knitr::kable(arr.rho.sig.mtx)
 
+# heat map needs to change the structure of the matrix
+volumes=as.numeric(arr.p.sig.mtx)
+xaxis=rep(rownames(arr.p.sig.mtx),length(colnames(arr.p.sig.mtx)))
+yaxis=c()
+for ( arg in colnames(arr.p.sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(arr.p.sig.mtx))))}
+forplot=data.frame(xaxis,yaxis,volumes)
+p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=volumes)) 
+p + geom_tile() +
+    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+#p + goem_raster() +
+#    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+
+
+# export to a file
 
 sink(file="tmp",append=TRUE)
 cat("\n# -------------------------------------\n")

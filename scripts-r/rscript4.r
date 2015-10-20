@@ -1500,27 +1500,35 @@ datay=datax    # output is datay
 #datax=datay
 datax=subset(datay,GROUP=="PRO")
 #datax=subset(datay,GROUP=="HVPRO")
-#items.row=c(regions4,parameters1) ; n=length(items.row)   # i
-#items.row=c(regions,regions2,parameters1) ; n=length(items.row)   # i
-#items.row=c(rvol.names) ; n=length(items.row)    # i 
-items.row=c(vol.names) ; n=length(items.row)    # i 
-#items.col=c(regions4)             ; m=length(items.col)   # j
-items.col=c(regions,regions2)             ; m=length(items.col)   # j
-items.ana=c("estimate","p.value") ; o=length(items.ana)   # k
-arr=array(0,dim=c(n,m,o))         ; dimnames(arr)=list(items.row,items.col,items.ana) 
+#items.row=c(regions4,parameters1) 
+#items.row=c(regions,regions2,parameters1)  # relative volumes
+#items.row=c(rvol.names)     # relative volumes
+items.row=c(vol.names)       # absolute volumes
+#items.col=c(regions4)             # relative volumes
+items.col=c(regions,regions2)      # absolute volumes
+items.ana=c("estimate","p.value") 
 
 # calculate correlation
 
-for (k in 1:o) {
-    for (j in 1:m) {
-        for (i in 1:n) {
-            arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
-#            print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names for debug
-#            d=na.omit(data.frame(datax[[items.row[i]]],datax[[items.col[j]]]))      # a way to ommit NA line1
-#            arr[i,j,k]=cor.test(d[[1]],d[[2]],method="spearman")[[items.ana[k]]]    # a way to ommit NA line2
+jun.cor.test <-function (items.row,items.col,items.ana,datax) {
+    n=length(items.row)    # i
+    m=length(items.col)   # j
+    o=length(items.ana)   # k
+    arr=array(0,dim=c(n,m,o))
+    dimnames(arr)=list(items.row,items.col,items.ana)
+    for (k in 1:o) {
+        for (j in 1:m) {
+            for (i in 1:n) {
+                arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
+#                print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names for debug
+#                d=na.omit(data.frame(datax[[items.row[i]]],datax[[items.col[j]]]))      # a way to ommit NA line1
+#                arr[i,j,k]=cor.test(d[[1]],d[[2]],method="spearman")[[items.ana[k]]]    # a way to ommit NA line2
+            }
         }
     }
+    arr
 }
+arr=jun.cor.test(items.row,items.col,items.ana,datax)
 
 # show table
 dimnames(arr)[[3]][2]
@@ -1538,38 +1546,129 @@ arr.rho.sig.mtx[!mask.mtx]=NA
 knitr::kable(arr.rho.sig.mtx)
 
 # heat map needs to change the structure of the matrix
-volumes=as.numeric(arr.p.sig.mtx)
-xaxis=rep(rownames(arr.p.sig.mtx),length(colnames(arr.p.sig.mtx)))
-yaxis=c()
-for ( arg in colnames(arr.p.sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(arr.p.sig.mtx))))}
-forplot=data.frame(xaxis,yaxis,volumes)
-p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=volumes)) 
-p + geom_tile() +
-    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
-#p + goem_raster() +
-#    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
-
+jun.heatmap <- function(arr.p.sig.mtx){
+    volumes=as.numeric(arr.p.sig.mtx)
+    xaxis=rep(rownames(arr.p.sig.mtx),length(colnames(arr.p.sig.mtx)))
+    yaxis=c()
+    for ( arg in colnames(arr.p.sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(arr.p.sig.mtx))))}
+    forplot=data.frame(xaxis,yaxis,volumes)
+    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=volumes)) 
+    p + geom_tile() +
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+    #p + goem_raster() +
+    #    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+}
+jun.heatmap(arr.p.sig.mtx)
 
 # export to a file
 
-sink(file="tmp",append=TRUE)
-cat("\n# -------------------------------------\n")
-cat("# correlation analyses: \n")
-cat("# -------------------------------------\n\n")
-cat(dimnames(arr)[[3]][2])
-cat("\n")
-print(knitr::kable(arr[,,2]))     # translocate matrix for display
-cat("\n")
-cat(dimnames(arr)[[3]][1])
-cat("\n")
-print(knitr::kable(arr[,,1]))     # translocate matrix for display
-cat("\n")
-sink()
+exportfile <- function(arr){
+    sink(file="tmp",append=TRUE)
+    cat("\n# -------------------------------------\n")
+    cat("# correlation analyses: \n")
+    cat("# -------------------------------------\n\n")
+    cat(dimnames(arr)[[3]][2])
+    cat("\n")
+    print(knitr::kable(arr[,,2]))     # translocate matrix for display
+    cat("\n")
+    cat(dimnames(arr)[[3]][1])
+    cat("\n")
+    print(knitr::kable(arr[,,1]))     # translocate matrix for display
+    cat("\n")
+    sink()
+}
+exportfile(arr)
+
+# -------------------------------
+# working other table
+# -------------------------------
+
+datax=datay
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+fsstatfile="edited.aparc.a2005_stats_rh_volume.txt"
+data4=read.table(fsstatfile,header=TRUE)
+data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
+aparc.a2005s.rh.volume.names=names(data4)
+aparc.a2005s.rh.volume.numeric.names=aparc.a2005s.rh.volume.names[c(2:35)] # the coordinate is an example
+aparc.a2005s.rh.rvolume.numeric.names=paste("r.",aparc.a2005s.rh.volume.numeric.names,sep="")
+datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+
+# lh is the same as rh
+# aparc; area, thickness are the same as above 
+
+mkpvalmtx <- function(datax,items,models) {
+    library(car) # for Anova()
+    options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
+    funclm <- function(arg1,arg2,arg3){
+        # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+        txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+        txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+        eval(parse(text=txt0)); s=summary(r)
+        Anova(r,type=3)["GROUP","Pr(>F)"]   # output
+    }
+    pvaluesmatrix=matrix(0,length(models),length(items))
+    rownames(pvaluesmatrix)=c(1:length(models))   # need to initializing the rownames
+    colnames(pvaluesmatrix)=items
+    for ( j in ( 1:length(models) ) ) {
+        rownames(pvaluesmatrix)[j]=paste("Volume ~",models[j])
+        for ( i in ( 1 : length(items) ) ) {
+            pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
+        }
+    }
+    pvaluesmatrix
+}
+
+datax=datay
+items=c(regions,regions2)
+#items=c(vol.names)
+models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
+    "GROUP*SEX+ICV",
+    "GROUP+SEX+AGE+ICV","GROUP+AGE+ICV",
+    "GROUP","GROUP+SEX","GROUP+AGE","GROUP+AGE+SEX",
+    "GROUP+WASIIQ+ICV","GROUP+WASIIQ",
+    "GROUP+READSTD","GROUP+READSTD+SEX+ICV","GROUP+SEX+READSTD+ICV","GROUP*SEX+READSTD+ICV",
+    "GROUP+READSTD+AGE+ICV","GROUP+READSTD+SEX+AGE+ICV"
+    )
+#models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
+pvaluesmatrix=mkpvalmtx(datax,items,models)
+#pvaluesmatrix=t(mkpvalmtx(datax,items,models))
+knitr::kable(pvaluesmatrix)
+
+# extract significant data
+sigmtx <- function(mtx) {
+    mask.mtx=(mtx < 0.05)                          # mask for under 0.05
+    sig.mtx=mtx
+    sig.mtx[!mask.mtx]=NA
+    sig.mtx
+}
+sig.mtx=sigmtx(pvaluesmatrix)
+
+# allNAmaskvec=(apply(is.na(sig.mtx),1,sum)==0)    # this is no use
+
+extractsig <- function(sig.mtx) {
+    d=data.frame(sig.mtx)
+    subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05) | d[3]<0.05)
+    subset
+}
+subset=extractsig(sig.mtx)
+
+# heat map needs to change the structure of the matrix
+jun.heatmap <- function(sig.mtx) {
+    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame
+    pvalues=as.numeric(sig.mtx)
+    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
+    yaxis=c()
+    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
+    forplot=data.frame(xaxis,yaxis,pvalues)
+    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=pvalues)) 
+    p + geom_tile() +
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+}
+jun.heatmap(sig.mtx)
 
 # ----------------------------------
 # summary
 # ----------------------------------
-
 
 # ----------------------------------
 # contents 

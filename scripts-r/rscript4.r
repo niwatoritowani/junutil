@@ -1555,7 +1555,7 @@ jun.heatmap <- function(arr.p.sig.mtx){
     p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=volumes)) 
     p + geom_tile() +
         theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
-    #p + goem_raster() +
+    #p + goem_raster() +    # does not work, why? 
     #    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
 }
 jun.heatmap(arr.p.sig.mtx)
@@ -1567,14 +1567,10 @@ exportfile <- function(arr){
     cat("\n# -------------------------------------\n")
     cat("# correlation analyses: \n")
     cat("# -------------------------------------\n\n")
-    cat(dimnames(arr)[[3]][2])
-    cat("\n")
-    print(knitr::kable(arr[,,2]))     # translocate matrix for display
-    cat("\n")
-    cat(dimnames(arr)[[3]][1])
-    cat("\n")
-    print(knitr::kable(arr[,,1]))     # translocate matrix for display
-    cat("\n")
+    cat(dimnames(arr)[[3]][2], "\n")
+    print(knitr::kable(arr[,,2])); cat("\n")
+    cat(dimnames(arr)[[3]][1], "\n")
+    print(knitr::kable(arr[,,1])); cat("\n")
     sink()
 }
 exportfile(arr)
@@ -1628,7 +1624,7 @@ models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
     "GROUP+WASIIQ+ICV","GROUP+WASIIQ",
     "GROUP+READSTD","GROUP+READSTD+SEX+ICV","GROUP+SEX+READSTD+ICV","GROUP*SEX+READSTD+ICV",
     "GROUP+READSTD+AGE+ICV","GROUP+READSTD+SEX+AGE+ICV"
-    )
+)
 #models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 pvaluesmatrix=mkpvalmtx(datax,items,models)
 #pvaluesmatrix=t(mkpvalmtx(datax,items,models))
@@ -1665,6 +1661,19 @@ jun.heatmap <- function(sig.mtx) {
         theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
 }
 jun.heatmap(sig.mtx)
+
+# relative to total CC
+
+datax=datay
+datax[["CC_Total"]]=apply(datax[regions],1,sum)
+cc.r.vol.names=paste("cc.r.",vol.names,sep="")
+n=length(rvol.names)
+for (i in 1:n) {
+    datax[[cc.r.vol.names[i]]]=datax[[vol.names[i]]]/datax[["CC_Total"]]
+}
+datay=datax    # output is datay
+    # results: rt and lt caudate
+
 
 # ----------------------------------
 # summary

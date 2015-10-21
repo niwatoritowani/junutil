@@ -7,7 +7,7 @@ author: Jun Konishi
 # set up data
 # =============
 
-# directory: /projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/
+# setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/")
 fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aseg_stats.txt"
 demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
 
@@ -58,18 +58,21 @@ data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
 # set cerebral volumes
 
 datax=data6
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aparc_stats_rh_volume.txt"
+#rh
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+fsstatfile="edited.aparc_stats_rh_volume.txt"
 data4=read.table(fsstatfile,header=TRUE)
 data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
 rhnames=names(data4)
-datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-
-datax=datay
-fsstatfile="/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer/edited.aparc_stats_lh_volume.txt"
+datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+#lh
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+fsstatfile="edited.aparc_stats_lh_volume.txt"
 data4=read.table(fsstatfile,header=TRUE)
 data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work even in fs-edited file
 lhnames=names(data4)
 datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+#data.vol=datay    # after calculating relative volumes
 
 # set other data
 
@@ -1415,15 +1418,28 @@ t3=knitr::kable(tx);print(t3)
 # ANCOVA or ANOVA: p-values of main effect of GROUP
 # --------------------------------------------------
 
-library(car) # for Anova()
-options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
-funclm <- function(arg1,arg2,arg3){
-    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    Anova(r,type=3)["GROUP","Pr(>F)"]   # output
+mkpvalmtx <- function(datax,items,models) {
+    library(car) # for Anova()
+    options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
+    funclm <- function(arg1,arg2,arg3){
+        # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+        txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+        txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+        eval(parse(text=txt0)); s=summary(r)
+        Anova(r,type=3)["GROUP","Pr(>F)"]   # output
+    }
+    pvaluesmatrix=matrix(0,length(models),length(items))
+    rownames(pvaluesmatrix)=c(1:length(models))   # need to initializing the rownames
+    colnames(pvaluesmatrix)=items
+    for ( j in ( 1:length(models) ) ) {
+        rownames(pvaluesmatrix)[j]=paste("Volume ~",models[j])
+        for ( i in ( 1 : length(items) ) ) {
+            pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
+        }
+    }
+    pvaluesmatrix
 }
+
 datax=data6
 items=c(regions,regions2)
 models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
@@ -1433,33 +1449,30 @@ models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
     "GROUP+WASIIQ+ICV","GROUP+WASIIQ",
     "GROUP+READSTD","GROUP+READSTD+ICV","GROUP+READSTD+SEX+ICV","GROUP+SEX+READSTD+ICV","GROUP*SEX+READSTD+ICV",
     "GROUP+READSTD+AGE+ICV","GROUP+READSTD+SEX+AGE+ICV"
-    )
-pvaluesmatrix=matrix(0,length(models),length(items))
-rownames(pvaluesmatrix)=c(1:length(models))   # need to initializing the rownames
-colnames(pvaluesmatrix)=items
-for ( j in ( 1:length(models) ) ) {
-    rownames(pvaluesmatrix)[j]=paste("Volume ~",models[j])
-    for ( i in ( 1 : length(items) ) ) {
-        pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
-    }
-}
+)
+pvaluesmatrix=mkpvalmtx(datax,items,models)
 knitr::kable(pvaluesmatrix)
 
 # settings for the analyses in other regions
+
 #datax=data6
 datax=datay
 models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 #items=names(data4)[c(2:35,38,41:66)]   # exclude c(1,36,37,39,40,68) which leads errors
 items=c(asegnames[c(2:35,38,41:66)],rhnames[c(2:35)],lhnames[c(2:35)])
-## here, run the funclum and the for-roop
+# function mkpvalmatx
+pvaluesmatrix=mkvalmtx(datax,items,models)
 knitr::kable(t(pvaluesmatrix))     # translocate matrix for display
 
 # output text file
-cat(file="tmp","\n# -------------------------------------\n",append=TRUE)
-cat(file="tmp","# ANCOVA or ANOVA: p-values of main effect of GROUP\n",append=TRUE)
-cat(file="tmp","# -------------------------------------\n\n",append=TRUE)
-#sink(file="tmp",append=TRUE);knitr::kable(pvaluesmatrix);sink()
-sink(file="tmp",append=TRUE);knitr::kable(t(pvaluesmatrix));sink()    # translocate matrix for display
+
+sink(file="tmp",append=TRUE)
+    cat("\n# -------------------------------------\n")
+    cat("# ANCOVA or ANOVA: p-values of main effect of GROUP\n")
+    cat("# -------------------------------------\n\n")
+    print(knitr::kable(pvaluesmatrix));cat("\n")
+#    print(knitr::kable(t(pvaluesmatrix)));cat("\n")
+sink()    # translocate matrix for display
 
 # ANOVA in caudata and amygdala which were significant
 Anova(lm(Right.Caudate~GROUP+READSTD+ICV,data=datax),type=3)
@@ -1475,7 +1488,7 @@ by(datax$Left.Amygdala,datax$GROUP,summary)
 # correlation analyses, 2015/10/19
 # -----------------------------------------
 
-# set data-label
+# set data-label for relative volumes
 
 datax=datay    # input as datax, datay already include ?h volume data, 
 asegvol.names=asegnames[c(2:35,38,41:66)]
@@ -1486,7 +1499,6 @@ lhvol.names=lhnames[c(2:35)]
 rlhvol.names=paste("r.",lhvol.names,sep="")
 
 # calculate relative volumes
-
 vol.names=c(asegvol.names,rhvol.names,lhvol.names)
 rvol.names=c(rasegvol.names,rrhvol.names,rlhvol.names)
 n=length(rvol.names)
@@ -1494,6 +1506,7 @@ for (i in 1:n) {
     datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
 }
 datay=datax    # output is datay
+data.vol=datay    # save a object as data.vol
 
 # set data
 
@@ -1579,19 +1592,6 @@ exportfile(arr)
 # working other table
 # -------------------------------
 
-datax=datay
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
-fsstatfile="edited.aparc.a2005_stats_rh_volume.txt"
-data4=read.table(fsstatfile,header=TRUE)
-data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
-aparc.a2005s.rh.volume.names=names(data4)
-aparc.a2005s.rh.volume.numeric.names=aparc.a2005s.rh.volume.names[c(2:35)] # the coordinate is an example
-aparc.a2005s.rh.rvolume.numeric.names=paste("r.",aparc.a2005s.rh.volume.numeric.names,sep="")
-datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-
-# lh is the same as rh
-# aparc; area, thickness are the same as above 
-
 mkpvalmtx <- function(datax,items,models) {
     library(car) # for Anova()
     options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
@@ -1641,16 +1641,26 @@ sig.mtx=sigmtx(pvaluesmatrix)
 
 # allNAmaskvec=(apply(is.na(sig.mtx),1,sum)==0)    # this is no use
 
+# extractsig <- function(sig.mtx) {
+#     d=data.frame(sig.mtx)
+#     subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05) | d[3]<0.05)
+# #    subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05))
+#     subset
+# }
+# subset=extractsig(sig.mtx)
+
 extractsig <- function(sig.mtx) {
-    d=data.frame(sig.mtx)
-    subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05) | d[3]<0.05)
+    mask.mtx=!is.na(sig.mtx)
+    mask.vec.num=apply(mask.mtx,1,sum)
+    mask.vec=as.logical(mask.vec.num)
+    subset=sig.mtx[mask.vec,]
     subset
 }
 subset=extractsig(sig.mtx)
 
 # heat map needs to change the structure of the matrix
 jun.heatmap <- function(sig.mtx) {
-    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame
+    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
     pvalues=as.numeric(sig.mtx)
     xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
     yaxis=c()
@@ -1658,7 +1668,10 @@ jun.heatmap <- function(sig.mtx) {
     forplot=data.frame(xaxis,yaxis,pvalues)
     p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=pvalues)) 
     p + geom_tile() +
-        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
+        scale_fill_gradient(low="green",high="white") + 
+        theme(axis.title.x=element_blank()) +
+        theme(axis.title.y=element_blank())
 }
 jun.heatmap(sig.mtx)
 
@@ -1672,7 +1685,176 @@ for (i in 1:n) {
     datax[[cc.r.vol.names[i]]]=datax[[vol.names[i]]]/datax[["CC_Total"]]
 }
 datay=datax    # output is datay
-    # results: rt and lt caudate
+data.vol=datay    # output a object as data.vol
+
+# function mkpvalmtx
+datax=data.vol
+items=cc.r.vol.names
+models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
+pvaluesmatrix=t(mkpvalmtx(datax,items,models))
+knitr::kable(pvaluesmatrix)
+# function sigmtx
+sig.mtx=sigmtx(pvaluesmatrix)
+knitr::kable(sig.mtx)
+# function extractsigsig
+subset=extractsig(sig.mtx)
+knitr::kable(subset)
+# function jun.jeatmap
+jun.heatmap(t(sig.mtx))
+jun.heatmap(t(subset))
+    # results: rt and lt caudate, Left.Inf.Lat.Vent
+
+# function mkpvalmtx
+datax=data.vol
+items=cc.r.vol.names
+models=c("GROUP","GROUP+SEX","GROUP+READSTD")
+pvaluesmatrix=t(mkpvalmtx(datax,items,models))
+knitr::kable(pvaluesmatrix)
+# function sigmtx
+sig.mtx=sigmtx(pvaluesmatrix)
+knitr::kable(sig.mtx)
+# function extractsigsig arranged
+subset=extractsig(sig.mtx)
+knitr::kable(subset)
+# function jun.heatmap
+jun.heatmap(t(sig.mtx))
+jun.heatmap(t(subset))
+    # results: rt and lt caudate, Left.Inf.Lat.Vent
+
+# compare the numbers of regions related to CC between PRO and HC, 2015/10/21
+
+datax=data.vol
+data.vol.pro=subset(datax,GROUP=="PRO")
+data.vol.hc=subset(datax,GROUP=="HVPRO")
+#items.row=c(rvol.names)     # relative volumes
+items.row=c(vol.names)       # absolute volumes
+#items.col=c(regions4)             # relative volumes
+items.col=c(regions,regions2)      # absolute volumes
+items.ana=c("estimate","p.value") 
+# function corelation
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.vol.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.vol.hc)
+mtx.p.pro=arr.pro[,,2]
+mtx.p.hc=arr.hc[,,2]
+#knitr::kable(mtx.p.pro)
+#knitr::kable(mtx.p.hc)
+pvaluesmatrix=data.frame(PRO=mtx.p.pro[,4],HC=mtx.p.hc[,4])    # extrac  CC_Mid_Posteiro
+#knitr::kable(pvaluesmatrix)
+# function sigmtx
+sig.mtx=sigmtx(pvaluesmatrix)
+knitr::kable(sig.mtx)
+# function jun.heatmap
+jun.heatmap(t(sig.mtx))
+# function extractsigsig
+subset.p=extractsig(sig.mtx)
+knitr::kable(subset.p)
+# funftion jun.heatmap
+jun.heatmap(t(subset.p))
+# edit subset
+knitr::kable(cbind(subset,c(1:nrow(subset.p))))
+knitr::kable(cbind(subset,c(1:nrow(subset.p)))[c(-3,-5,-13,-14,-19,-20,-21),])
+#pdf("tmp.pdf")
+p.subset.p=jun.heatmap(t(subset.p[c(-3,-5,-13,-14,-19,-20,-21),]))
+#dev.off()
+
+# rho
+mtx.rho.pro=arr.pro[,,1]
+mtx.rho.hc=arr.pro[,,1]
+#knitr::kable(mtx.rho.pro)
+#knitr::kable(mtx.rho.hc)
+rho.mtx=data.frame(PRO=mtx.rho.pro[,4],HC=mtx.rho.hc[,4])    # extrac  CC_Mid_Posteiro
+#knitr::kable(pvaluesmatrix)
+# function sigmtx.rho
+sigmtx.rho <- function(p.mtx,rho.mtx) {
+    mask.p.mtx=(p.mtx < 0.05)                          # mask for under 0.05
+    sig.rho.mtx=rho.mtx
+    sig.rho.mtx[!mask.p.mtx]=NA
+    sig.rho.mtx
+}
+sig.rho.mtx=sigmtx.rho(pvaluesmatrix,rho.mtx)
+# function jun.heatmap.rho
+jun.heatmap.rho <- function(sig.mtx) {
+    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
+    rho=as.numeric(sig.mtx)
+    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
+    yaxis=c()
+    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
+    forplot=data.frame(xaxis,yaxis,rho)
+    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=rho))
+    p + geom_tile() +
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
+        scale_fill_gradient(low="blue",high="red") + 
+        theme(axis.title.x=element_blank()) +
+        theme(axis.title.y=element_blank())
+}
+jun.heatmap.rho(t(sig.rho.mtx))
+# function extractsigsig.rho
+extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {
+    mask.p.mtx=!is.na(sig.p.mtx)
+    mask.p.vec.num=apply(mask.p.mtx,1,sum)
+    mask.p.vec=as.logical(mask.p.vec.num)
+    subset.rho=sig.rho.mtx[mask.p.vec,]
+    subset.rho
+}
+subset.rho=extractsig.rho(sig.mtx,sig.rho.mtx)
+knitr::kable(subset.rho)
+# funftion jun.heatmap.rho
+jun.heatmap.rho(t(subset.rho))
+# edit subset
+knitr::kable(cbind(subset,c(1:nrow(subset.rho))))
+knitr::kable(cbind(subset,c(1:nrow(subset.rho)))[c(-3,-5,-13,-14,-19,-20,-21),])
+p.subset.rho=jun.heatmap.rho(t(subset.rho[c(-3,-5,-13,-14,-19,-20,-21),]))
+pdf("tmp.pdf",width=8)
+library(gridExtra)
+grid.arrange(p.subset.p,p.subset.rho, nrow=1,ncol=2,top="Regions significantly correlated to middle posterior corpus callosum")
+dev.off()
+
+# ------------------
+# set up other data
+# -----------------
+# 2015/10/21
+
+#datax=data6
+#setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+#fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
+#data4=read.table(fsstatfile,header=TRUE)
+#data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
+#aparc.a2009s.rh.volume.names=names(data4)
+#aparc.a2009s.rh.volume.numeric.names=aparc.a2009s.rh.volume.names[c(2:35)] # the coordinate is an example
+#aparc.a2009s.rh.rvolume.numeric.names=paste("r.",aparc.a2009s.rh.volume.numeric.names,sep="")
+#datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+
+datax=data6    # substitute input-data into datax
+# rh
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
+data4=read.table(fsstatfile,header=TRUE)
+data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
+rh.vol.names=names(data4)
+rh.vol.num.names=rh.vol.names[c(2:35)] # the coordinate is an example
+rh.rvol.num.names=paste("r.",rh.vol.num.names,sep="")
+datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+# lh 
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+fsstatfile="edited.aparc.a2009s_stats_lh_volume.txt"
+data4=read.table(fsstatfile,header=TRUE)
+data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work even in fs-edited file
+lh.vol.names=names(data4)
+lh.vol.num.names=lh.vol.names[c(2:35)] # the coordinate is an example
+lh.rvol.num.names=paste("r.",lh.vol.num.names,sep="")
+datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+# calculate relative volumes
+vol.names=c(asegvol.names,rh.vol.num.names,lh.vol.num.names)
+rvol.names=c(rasegvol.names,rh.rvol.num.names,lh.rvol.num.names)
+n=length(rvol.names)
+for (i in 1:n) {
+    datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
+}
+datay=datax    # output-data is as datay
+data.a2009s.vol=datay    # as with new name
+
+# lh is the same as rh
+# aparc; area, thickness are the same as above 
 
 
 # ----------------------------------

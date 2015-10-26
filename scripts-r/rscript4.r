@@ -1870,12 +1870,13 @@ merge.tbl <- function(fsstatfile,datax){
     data4=read.table(fsstatfile,header=TRUE)
     data4[["caseid2"]]=substring(data4[[1]],1,9)     # column 1 shoud be freesurfer subject ID
     names.field=names(data4)
-    names.field.num=names(sata4)[sapply(data4,is.numeric)] # the coordinate is an example
+    names.field.num=names(data4)[sapply(data4,is.numeric)] # the coordinate is an example
     names.field.num.r=paste("r.",names.field.num,sep="")
     datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+    datay$ICV=datay$EstimatedTotalIntraCranialVol    # change field name to be handled more easily, shoud be in other place
     n=length(names.field.num.r)
     for ( i in 1:n) {
-        datay[[names.field.num.r[[i]]=datay[[names.field.num[i]]]/datay[["ICV"]]
+        datay[[names.field.num.r[i]]]=datay[[names.field.num[i]]]/datay[["ICV"]]
     }
     list(datay,names.field.num,names.field.num.r)  # we need to output field name
 }
@@ -1895,7 +1896,6 @@ datax=data1    # substitute input-data into datax
 fsstatfile="edited.aseg_stats.txt"
 list.aseg=merge.tbl(fsstatfile,datax)
 datay=list.aseg[[1]]
-datay$ICV=datay$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
 datay$Bil.Lateral.Ventricle=
     datay$Right.Lateral.Ventricle+datay$Left.Lateral.Ventricle    # summarize lt rt into bilateral
 datay$r.Bil.Lateral.Ventricle=
@@ -1915,8 +1915,8 @@ names.field=c(list.aseg[[2]],list.rh[[2]],list.lh[[2]])
 names.field.r=c(list.aseg[[3]],list.rh[[3]],list.lh[[3]])
 
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
-regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
-regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","Bil.Lateral.Ventricle","X3rd.Ventricle")
+#regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
 regions4=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior", "r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle","r.Bil.Lateral.Ventricle","r.X3rd.Ventricle")
 demographics1=c("GROUP","AGE","SEX")
 parameters1=c("SOCFXC","ROLEFX")
@@ -1937,9 +1937,24 @@ items.row=c(names.field)       # absolute volumes
 #items.col=c(regions4)             # relative volumes
 items.col=c(regions,regions2)      # absolute volumes
 items.ana=c("estimate","p.value") 
-# function corelation
-arr.pro=jun.cor.test(items.row,items.col,items.ana,data.vol.pro)
-arr.hc=jun.cor.test(items.row,items.col,items.ana,data.vol.hc)
+# function jun.cor.test
+jun.cor.test <-function (items.row,items.col,items.ana,datax) {
+    n=length(items.row)    # i
+    m=length(items.col)   # j
+    o=length(items.ana)   # k
+    arr=array(0,dim=c(n,m,o))
+    dimnames(arr)=list(items.row,items.col,items.ana)
+    for (k in 1:o) {
+        for (j in 1:m) {
+            for (i in 1:n) {
+                arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
+            }
+        }
+    }
+    arr
+}
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
 mtx.p.pro=arr.pro[,,2]
 mtx.p.hc=arr.hc[,,2]
 #knitr::kable(mtx.p.pro)

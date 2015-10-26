@@ -2057,6 +2057,108 @@ library(gridExtra)
 #grid.arrange(p.subset.p,p.subset.rho, nrow=1,ncol=2,top="Regions significantly correlated to middle posterior corpus callosum")
 #dev.off()
 
+# function mtx.adjust
+mtx.adjust <- function(pvaluesmatrix,meth){
+    mtx.adjusted=matrix(p.adjust(as.matrix(pvaluesmatrix),meth),,2)
+    rownames(mtx.adjusted)=rownames(pvaluesmatrix)
+    colnames(mtx.adjusted)=colnames(pvaluesmatrix)
+    mtx.adjusted
+}
+mtx.adjust(pvaluemtrix,"fdr")
+
+# select region where temporal and parietal
+
+names.temporal=c(
+    "rh_superiortemporal",  "lh_superiortemporal", 
+    "rh_middletemporal",    "lh_middletemporal", 
+    "rh_inferiortemporal",  "lh_inferiortemporal", 
+    "rh_bankssts",          "lh_bankssts",
+    "rh_fusiform",          "lh_fusiform",          
+    "rh_transversetemporal","lh_transversetemporal",
+    "rh_entorhinal",        "lh_entorhinal",        
+    "rh_temporalpole",      "lh_temporalpole",      
+    "rh_parahippocampal",   "lh_parahippocampal"  
+)
+
+names.parietal=c(
+    "rh_postcentral",     "lh_postcentral",
+    "rh_supramarginal",   "lh_supramarginal",
+    "rh_superiorparietal","lh_superiorparietal",
+    "rh_inferiorparietal","lh_inferiorparietal",
+    "rh_precuneus",       "lh_precuneus"
+)
+
+names.temporal=paste(names.temporal,"_volumes",sep="")
+names.parietal=paste(names.parietal,"_volumes",sep="")
+pvaluesmatrix[c(names.temporal,names.parietal),]
+
+names.temporal.r=paste("r.",names.temporal,sep="")
+names.parietal.r=paste("r.",names.parietal,sep="")
+pvaluesmatrix[c(names.temporal.r,names.parietal.r),]
+
+# investigating about thickness
+
+fsstatfile="edited.aparc_stats_rh_thickness.txt"
+fsstatfile="edited.aparc_stats_lh_thickness.txt"
+
+names.temporal=paste(names.temporal,"_thickness",sep="")
+names.parietal=paste(names.parietal,"_thickness",sep="")
+pvaluesmatrix[c(names.temporal,names.parietal),]
+
+# investigating about area
+
+fsstatfile="edited.aparc_stats_rh_area.txt"
+fsstatfile="edited.aparc_stats_lh_area.txt"
+
+# investigating about Destriaux atlas (aparc.a2009s)
+
+fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
+fsstatfile="edited.aparc.a2009s_stats_lh_volume.txt"
+
+names.parietal=c(
+    "rh_G_parietal_sup_volume",        "lh_G_parietal_sup_volume",       
+    "rh_G_pariet_inf.Angular_volume",  "lh_G_pariet_inf.Angular_volume", 
+    "rh_G_pariet_inf.Supramar_volume", "lh_G_pariet_inf.Supramar_volume", 
+    "rh_G_postcentral_volume",         "lh_G_postcentral_volume",        
+    "rh_S_postcentral_volume",         "lh_S_postcentral_volume",        
+    "rh_G_precuneus_volume",           "lh_G_precuneus_volume"          
+)
+
+names.temporal=c(
+    "rh_G_temp_sup.G_T_transv_volume", "lh_G_temp_sup.G_T_transv_volume", 
+    "rh_G_temp_sup.Lateral_volume",    "lh_G_temp_sup.Lateral_volume",    
+    "rh_G_temp_sup.Plan_polar_volume", "lh_G_temp_sup.Plan_polar_volume", 
+    "rh_G_temp_sup.Plan_tempo_volume", "lh_G_temp_sup.Plan_tempo_volume", 
+    "rh_G_temporal_inf_volume",        "lh_G_temporal_inf_volume",        
+    "rh_G_temporal_middle_volume",     "lh_G_temporal_middle_volume",     
+    "rh_S_temporal_inf_volume",        "lh_S_temporal_inf_volume",        
+    "rh_S_temporal_sup_volume",        "lh_S_temporal_sup_volume",        
+    "rh_S_temporal_transverse_volume", "lh_S_temporal_transverse_volume", 
+    "rh_Pole_temporal_volume",         "lh_Pole_temporal_volume"         
+)
+
+pvaluesmatrix[c(names.temporal,names.parietal),]
+
+
+names.temporal.r=paste("r.",names.temporal,sep="")
+names.parietal.r=paste("r.",names.parietal,sep="")
+pvaluesmatrix[c(names.temporal.r,names.parietal.r),]
+
+
+# investigating about thickness
+
+fsstatfile="edited.aparc_stats_rh_thickness.txt"
+fsstatfile="edited.aparc_stats_lh_thickness.txt"
+
+names.temporal=paste(names.temporal,"_thickness",sep="")
+names.parietal=paste(names.parietal,"_thickness",sep="")
+pvaluesmatrix[c(names.temporal,names.parietal),]
+
+# investigating about area
+
+fsstatfile="edited.aparc_stats_rh_area.txt"
+fsstatfile="edited.aparc_stats_lh_area.txt"
+
 
 
 

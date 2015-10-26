@@ -1857,6 +1857,197 @@ data.a2009s.vol=datay    # as with new name
 # aparc; area, thickness are the same as above 
 
 
+# ------------------
+# set up other data
+# -----------------
+# 2015/10/26
+
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
+demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"
+#demographictable="Caselist_CC_prodromes.xlsx""
+
+merge.tbl <- function(fsstatfile,datax){
+    data4=read.table(fsstatfile,header=TRUE)
+    data4[["caseid2"]]=substring(data4[[1]],1,9)     # column 1 shoud be freesurfer subject ID
+    names.field=names(data4)
+    names.field.num=names(sata4)[sapply(data4,is.numeric)] # the coordinate is an example
+    names.field.num.r=paste("r.",names.field.num,sep="")
+    datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
+    n=length(names.field.num.r)
+    for ( i in 1:n) {
+        datay[[names.field.num.r[[i]]=datay[[names.field.num[i]]]/datay[["ICV"]]
+    }
+    list(datay,names.field.num,names.field.num.r)  # we need to output field name
+}
+
+# demographic table
+library(xlsx)
+data1=read.xlsx(demographictable,sheetName="Full",header=TRUE)
+data1=subset(data1,! is.na(Case..))
+data1[["caseid2"]]=substring(data1[["Case.."]],1,9)
+data1$SEX=as.factor(data1$SEX)    # change into class:factor
+#data1=subset(data1,! is.na(SEX))    # exclude rows which don't have SEX data
+data1$SEX2=as.character(data1$SEX);mask=(data1$SEX2=="0");data1$SEX2[mask]="M";data1$SEX2[!mask]="F";data1$SEX2=as.factor(data1$SEX2)
+data1$GROUPSEX=as.factor(paste(data1$GROUP,as.character(data1$SEX2),sep=""))
+
+# aseg
+datax=data1    # substitute input-data into datax
+fsstatfile="edited.aseg_stats.txt"
+list.aseg=merge.tbl(fsstatfile,datax)
+datay=list.aseg[[1]]
+datay$ICV=datay$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
+datay$Bil.Lateral.Ventricle=
+    datay$Right.Lateral.Ventricle+datay$Left.Lateral.Ventricle    # summarize lt rt into bilateral
+datay$r.Bil.Lateral.Ventricle=
+    datay$r.Right.Lateral.Ventricle+datay$r.Left.Lateral.Ventricle    # summarize lt rt into bilateral
+
+# rh
+datax=datay
+fsstatfile="edited.aparc_stats_rh_volume.txt"
+list.rh=merge.tbl(fsstatfile,datax)
+# lh
+datax=list.rh[[1]]
+fsstatfile="edited.aparc_stats_lh_volume.txt"
+list.lh=merge.tbl(fsstatfile,datax)
+
+datay=list.lh[[1]]
+names.field=c(list.aseg[[2]],list.rh[[2]],list.lh[[2]])
+names.field.r=c(list.aseg[[3]],list.rh[[3]],list.lh[[3]])
+
+regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
+regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","X3rd.Ventricle")
+regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+regions4=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior", "r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle","r.Bil.Lateral.Ventricle","r.X3rd.Ventricle")
+demographics1=c("GROUP","AGE","SEX")
+parameters1=c("SOCFXC","ROLEFX")
+parameters2=c("READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
+parameters_sip=c("SIP1SEV","SIP1SEV","SIP1SEV","SIP1SEV","SIP5SEV")
+parameters_sin=c("SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN6SEV")
+parameters_sid=c("SID1SEV","SID1SEV","SID1SEV","SID4SEV")
+parameters_sig=c("SIG1SEV","SIG1SEV","SIG1SEV","SIG4SEV")
+parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
+
+# compare the numbers of regions related to CC between PRO and HC, 2015/10/21
+
+datax=datay
+data.pro=subset(datax,GROUP=="PRO")
+data.hc=subset(datax,GROUP=="HVPRO")
+#items.row=c(names.field.r)     # relative volumes
+items.row=c(names.field)       # absolute volumes
+#items.col=c(regions4)             # relative volumes
+items.col=c(regions,regions2)      # absolute volumes
+items.ana=c("estimate","p.value") 
+# function corelation
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.vol.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.vol.hc)
+mtx.p.pro=arr.pro[,,2]
+mtx.p.hc=arr.hc[,,2]
+#knitr::kable(mtx.p.pro)
+#knitr::kable(mtx.p.hc)
+pvaluesmatrix=data.frame(PRO=mtx.p.pro[,4],HC=mtx.p.hc[,4])    # extrac  CC_Mid_Posteiro
+#knitr::kable(pvaluesmatrix)
+# function sigmtx
+sigmtx <- function(mtx) {
+    mask.mtx=(mtx < 0.05)                          # mask for under 0.05
+    sig.mtx=mtx
+    sig.mtx[!mask.mtx]=NA
+    sig.mtx
+}
+sig.mtx=sigmtx(pvaluesmatrix)
+knitr::kable(sig.mtx)
+# function jun.heatmap
+jun.heatmap <- function(sig.mtx) {
+    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
+    pvalues=as.numeric(sig.mtx)
+    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
+    yaxis=c()
+    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
+    forplot=data.frame(xaxis,yaxis,pvalues)
+    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=pvalues)) 
+    p + geom_tile() +
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
+        scale_fill_gradient(low="green",high="white") + 
+        theme(axis.title.x=element_blank()) +
+        theme(axis.title.y=element_blank())
+}
+jun.heatmap(t(sig.mtx))
+# function extractsigsig
+extractsig <- function(sig.mtx) {
+    mask.mtx=!is.na(sig.mtx)
+    mask.vec.num=apply(mask.mtx,1,sum)
+    mask.vec=as.logical(mask.vec.num)
+    subset=sig.mtx[mask.vec,]
+    subset
+}
+subset.p=extractsig(sig.mtx)
+knitr::kable(subset.p)
+# funftion jun.heatmap
+jun.heatmap(t(subset.p))
+# edit subset
+knitr::kable(cbind(subset,c(1:nrow(subset.p))))
+#knitr::kable(cbind(subset,c(1:nrow(subset.p)))[c(-3,-5,-13,-14,-19,-20,-21),])
+#pdf("tmp.pdf")
+#p.subset.p=jun.heatmap(t(subset.p[c(-3,-5,-13,-14,-19,-20,-21),]))
+#dev.off()
+
+# rho
+mtx.rho.pro=arr.pro[,,1]
+mtx.rho.hc=arr.pro[,,1]
+#knitr::kable(mtx.rho.pro)
+#knitr::kable(mtx.rho.hc)
+rho.mtx=data.frame(PRO=mtx.rho.pro[,4],HC=mtx.rho.hc[,4])    # extrac  CC_Mid_Posteiro
+#knitr::kable(pvaluesmatrix)
+# function sigmtx.rho
+sigmtx.rho <- function(p.mtx,rho.mtx) {
+    mask.p.mtx=(p.mtx < 0.05)                          # mask for under 0.05
+    sig.rho.mtx=rho.mtx
+    sig.rho.mtx[!mask.p.mtx]=NA
+    sig.rho.mtx
+}
+sig.rho.mtx=sigmtx.rho(pvaluesmatrix,rho.mtx)
+# function jun.heatmap.rho
+jun.heatmap.rho <- function(sig.mtx) {
+    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
+    rho=as.numeric(sig.mtx)
+    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
+    yaxis=c()
+    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
+    forplot=data.frame(xaxis,yaxis,rho)
+    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=rho))
+    p + geom_tile() +
+        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
+        scale_fill_gradient(low="blue",high="red") + 
+        theme(axis.title.x=element_blank()) +
+        theme(axis.title.y=element_blank())
+}
+jun.heatmap.rho(t(sig.rho.mtx))
+# function extractsigsig.rho
+extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {
+    mask.p.mtx=!is.na(sig.p.mtx)
+    mask.p.vec.num=apply(mask.p.mtx,1,sum)
+    mask.p.vec=as.logical(mask.p.vec.num)
+    subset.rho=sig.rho.mtx[mask.p.vec,]
+    subset.rho
+}
+subset.rho=extractsig.rho(sig.mtx,sig.rho.mtx)
+knitr::kable(subset.rho)
+# funftion jun.heatmap.rho
+jun.heatmap.rho(t(subset.rho))
+# edit subset
+knitr::kable(cbind(subset,c(1:nrow(subset.rho))))
+#knitr::kable(cbind(subset,c(1:nrow(subset.rho)))[c(-3,-5,-13,-14,-19,-20,-21),])
+#p.subset.rho=jun.heatmap.rho(t(subset.rho[c(-3,-5,-13,-14,-19,-20,-21),]))
+#pdf("tmp.pdf",width=8)
+library(gridExtra)
+#grid.arrange(p.subset.p,p.subset.rho, nrow=1,ncol=2,top="Regions significantly correlated to middle posterior corpus callosum")
+#dev.off()
+
+
+
+
+
+
+
 # ----------------------------------
 # summary
 # ----------------------------------

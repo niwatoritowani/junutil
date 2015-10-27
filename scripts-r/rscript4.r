@@ -57,16 +57,15 @@ data6$GROUPSEX=as.factor(paste(data6$GROUP,as.character(data6$SEX2),sep=""))
 
 # set cerebral volumes
 
+setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
 datax=data6
 #rh
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
 fsstatfile="edited.aparc_stats_rh_volume.txt"
 data4=read.table(fsstatfile,header=TRUE)
 data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
 rhnames=names(data4)
 datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
 #lh
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
 fsstatfile="edited.aparc_stats_lh_volume.txt"
 data4=read.table(fsstatfile,header=TRUE)
 data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work even in fs-edited file
@@ -677,8 +676,10 @@ demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist
 
 # # set data in vaio, home PC
 # setwd("C:/Users/jun/Documents/test")
-# setwd("02")  # 2015/10/27
 # fsstatfile="aseg_stats.txt"
+# demographictable="Caselist_CC_prodromes.xlsx"
+# setwd("C:/Users/jun/Documents/test/02")  # 2015/10/27
+# fsstatfile="edited.aseg_stats.txt"
 # demographictable="Caselist_CC_prodromes.xlsx"
 
 library(xlsx)
@@ -1352,25 +1353,6 @@ parameters_sin=c("SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN1SEV","SIN6SEV")
 parameters_sid=c("SID1SEV","SID1SEV","SID1SEV","SID4SEV")
 parameters_sig=c("SIG1SEV","SIG1SEV","SIG1SEV","SIG4SEV")
 parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
-names.temporal=c(
-    "rh_superiortemporal",  "lh_superiortemporal", 
-    "rh_middletemporal",    "lh_middletemporal", 
-    "rh_inferiortemporal",  "lh_inferiortemporal", 
-    "rh_bankssts",          "lh_bankssts",
-    "rh_fusiform",          "lh_fusiform",          
-    "rh_transversetemporal","lh_transversetemporal",
-    "rh_entorhinal",        "lh_entorhinal",        
-    "rh_temporalpole",      "lh_temporalpole",      
-    "rh_parahippocampal",   "lh_parahippocampal"  
-)
-names.parietal=c(
-    "rh_postcentral",     "lh_postcentral",
-    "rh_supramarginal",   "lh_supramarginal",
-    "rh_superiorparietal","lh_superiorparietal",
-    "rh_inferiorparietal","lh_inferiorparietal",
-    "rh_precuneus",       "lh_precuneus"
-)
-
 
 # compare the numbers of regions related to CC between PRO and HC, 2015/10/21
 
@@ -1511,6 +1493,24 @@ mtx.adjust(pvaluemtrix,"fdr")
 
 # select region where temporal and parietal
 
+names.temporal=c(
+    "rh_superiortemporal",  "lh_superiortemporal", 
+    "rh_middletemporal",    "lh_middletemporal", 
+    "rh_inferiortemporal",  "lh_inferiortemporal", 
+    "rh_bankssts",          "lh_bankssts",
+    "rh_fusiform",          "lh_fusiform",          
+    "rh_transversetemporal","lh_transversetemporal",
+    "rh_entorhinal",        "lh_entorhinal",        
+    "rh_temporalpole",      "lh_temporalpole",      
+    "rh_parahippocampal",   "lh_parahippocampal"  
+)
+names.parietal=c(
+    "rh_postcentral",     "lh_postcentral",
+    "rh_supramarginal",   "lh_supramarginal",
+    "rh_superiorparietal","lh_superiorparietal",
+    "rh_inferiorparietal","lh_inferiorparietal",
+    "rh_precuneus",       "lh_precuneus"
+)
 names.temporal.vol=paste(names.temporal,"_volume",sep="")
 names.parietal.vol=paste(names.parietal,"_volume",sep="")
 pvaluesmatrix[c(names.temporal.vol,names.parietal.vol),]
@@ -1520,24 +1520,24 @@ pvaluesmatrix[c(names.temporal.vol.r,names.parietal.vol.r),]
 
 # investigating about thickness
 
-fsstatfile="edited.aparc_stats_rh_thickness.txt"
-fsstatfile="edited.aparc_stats_lh_thickness.txt"
+fsstatfile.rh="edited.aparc_stats_rh_thickness.txt"
+fsstatfile.lh="edited.aparc_stats_lh_thickness.txt"
 names.temporal.th=paste(names.temporal,"_thickness",sep="")
 names.parietal.th=paste(names.parietal,"_thickness",sep="")
 pvaluesmatrix[c(names.temporal.th,names.parietal.th),]
 
 # investigating about area
 
-fsstatfile="edited.aparc_stats_rh_area.txt"
-fsstatfile="edited.aparc_stats_lh_area.txt"
+fsstatfile.rh="edited.aparc_stats_rh_area.txt"
+fsstatfile.lh="edited.aparc_stats_lh_area.txt"
 names.temporal.ar=paste(names.temporal,"_area",sep="")
 names.parietal.ar=paste(names.parietal,"_area",sep="")
 pvaluesmatrix[c(names.temporal.ar,names.parietal.ar),]
 
 # investigating about Destriaux atlas (aparc.a2009s)
 
-fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
-fsstatfile="edited.aparc.a2009s_stats_lh_volume.txt"
+fsstatfile.rh="edited.aparc.a2009s_stats_rh_volume.txt"
+fsstatfile.lh="edited.aparc.a2009s_stats_lh_volume.txt"
 
 names.parietal=c(
     "rh_G_parietal_sup_volume",        "lh_G_parietal_sup_volume",       
@@ -1569,8 +1569,8 @@ pvaluesmatrix[c(names.temporal.vol.r,names.parietal.vol.r),]
 
 # investigating about thickness
 
-fsstatfile="edited.aparc.a2009s_stats_rh_thickness.txt"
-fsstatfile="edited.aparc.a2009s_stats_lh_thickness.txt"
+fsstatfile.rh="edited.aparc.a2009s_stats_rh_thickness.txt"
+fsstatfile.lh="edited.aparc.a2009s_stats_lh_thickness.txt"
 
 names.temporal=paste(names.temporal,"_thickness",sep="")
 names.parietal=paste(names.parietal,"_thickness",sep="")
@@ -1578,8 +1578,8 @@ pvaluesmatrix[c(names.temporal,names.parietal),]
 
 # investigating about area
 
-fsstatfile="edited.aparc.a2009s_stats_rh_area.txt"
-fsstatfile="edited.aparc.a2009s_stats_lh_area.txt"
+fsstatfile.rh="edited.aparc.a2009s_stats_rh_area.txt"
+fsstatfile.lh="edited.aparc.a2009s_stats_lh_area.txt"
 
 names.temporal=paste(names.temporal,"_area",sep="")
 names.parietal=paste(names.parietal,"_area",sep="")

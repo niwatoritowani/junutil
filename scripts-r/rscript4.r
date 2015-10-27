@@ -91,19 +91,6 @@ parameters_sid=c("SID1SEV","SID1SEV","SID1SEV","SID4SEV")
 parameters_sig=c("SIG1SEV","SIG1SEV","SIG1SEV","SIG4SEV")
 parameters_si=c(parameters_sip,parameters_sin,parameters_sid,parameters_sig)
 
-# =======================
-# data setting in home PC
-# =======================
-
-setwd("C:/Users/jun/Documents/test")
-#fsstatfile="output20150911.csv"
-fsstatfile="aseg_stats.txt"
-fsstatfile="edited.aseg_stats.txt"
-fsstatfile="edited.aparc_stats_rh_volume.txt"
-fsstatfile="edited.aparc_stats_lh_volume.txt"
-
-demographictable="Caselist_CC_prodromes.xlsx"
-
 # ====================
 # statistical analysis
 # ===================
@@ -187,35 +174,64 @@ myfunc=function(item,datacol,arg3){
     m=length(item); n=length(datacol)
     for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
 }
-# sink(file="tmp",append=FALSE);myfunc(item,datacol,"+ICV");sink()
 
-
-# General linear model with factors: GROUP, SEX, GROUP*SEX, ICV
+# General linear model with various factors: GROUP, SEX, GROUP*SEX, ICV
 
 datax=data6
 item=c(regions,regions2);myfunc(item,"","GROUP*SEX+ICV")    # CC, ventricles
 item=c(regions3);        myfunc(item,"","GROUP*SEX+ICV")    # ventricles, bil.LV
-
-# General linear model with factors: GROUP, ICV
-
-datax=data6
 item=c(regions,regions2);myfunc(item,"","GROUP+ICV")  # CC, ventricles
 item=c(regions3);        myfunc(item,"","GROUP+ICV")  # ventricles, bil.LV
-
-# General linear model with factors: GROUP, ICV, by SEX
-
 datax=subset(data6,SEX==0); item=c(regions); myfunc(item,"","GROUP+ICV")
 datax=subset(data6,SEX==1); item=c(regions); myfunc(item,"","GROUP+ICV")
-
-# General linear model with factors: GROUP, SEX; relative volume
-
 datax=data6; item=c(regions4); myfunc(item,"","GROUP*SEX")
-
-# General linear model with factors: GROUP, AGE, SEX, ICV
-
 datax=data6; item=c(regions); myfunc(item,"","GROUP*SEX+AGE+ICV")
 
+# General linear model with factors: [SEX,] [:SEX,] [AGE,] ICV in subgroup (PRO/HVPRO or Male/Female)
+
+#item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
+item=c(regions,regions2)
+#datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
+#datacol=c(parameters_si)
+datacol=c(parameters1)
+#datacol=c(regions,regions2)
+
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+ICV")
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+ICV")
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+AGE+ICV")
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"*SEX+AGE+ICV")
+
+datax=subset(data6,SEX==0);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
+datax=subset(data6,SEX==1);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
+datax=subset(data6,GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
+datax=subset(data6,!GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
+
+# General linear model with factors:SEX in PRO, relative volume
+
+item=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle")
+datacol=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
+datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX")
+
+# ---------------------
+# analyses of venricles
+# ---------------------
+
+# make data.frame for the analyses with hemisphere as factor
+
+dlvrt=data.frame(GROUP=data6$GROUP, volume=data6$Right.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="rt")
+dlvlt=data.frame(GROUP=data6$GROUP, volume=data6$Left.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="lt")
+dlv=rbind(dlvrt,dlvlt)
+
+# General linear model with factors: GROUP, hemi, [SEX,] ICV
+
+r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv); s=summary(r); print(s[[1]]); print(s[[4]][,c(1,4)])
+r=lm(volume~GROUP*hemi+ICV,data=dlv);     s=summary(r); print(s[[1]]); print(s[[4]][,c(1,4)])
+# General linear model with factors: GROUP, SEX, ICV  --> above
+# General linear model with factors: GROUP, ICV       --> above
+
+# ------------------------------------------
 # t-test on "CC_Mid_Posterior" by GROUP, SEX
+# ------------------------------------------
 
 datax=data6; t.test(subset(datax,GROUP=="PRO")["CC_Mid_Posterior"],subset(datax,GROUP=="HVPRO")["CC_Mid_Posterior"])
 datax=subset(data6,SEX==0); t.test(subset(datax,GROUP=="PRO")["CC_Mid_Posterior"],subset(datax,GROUP=="HVPRO")["CC_Mid_Posterior"])
@@ -233,83 +249,6 @@ datax=subset(data6,GROUP=="PRO");t.test(subset(datax,SEX==0)["rCC_Mid_Posterior"
 datax=subset(data6,GROUP=="HVPRO");t.test(subset(datax,SEX==0)["rCC_Mid_Posterior"],subset(datax,SEX==1)["rCC_Mid_Posterior"])
     # results: PRO  < HC  in all    (PRO  << HC     in male, PRO  > HC     in female)
     # results: male < female in all (male <  female in PRO,  male > female in HC)
-
-# ---------------------
-# analyses of venricles
-# ---------------------
-
-# make data.frame for the analyses with hemisphere as factor
-
-dlvrt=data.frame(GROUP=data6$GROUP, volume=data6$Right.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="rt")
-dlvlt=data.frame(GROUP=data6$GROUP, volume=data6$Left.Lateral.Ventricle, ICV=data6$ICV, SEX=data6$SEX, hemi="lt")
-dlv=rbind(dlvrt,dlvlt)
-
-# General linear model with factors: GROUP, hemi, SEX, ICV
-
-r=lm(volume~GROUP*hemi*SEX+ICV,data=dlv); s=summary(r)
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-
-# General linear model with factors: GROUP, hemi, ICV
-
-r=lm(volume~GROUP*hemi+ICV,data=dlv); s=summary(r)
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-
-# General linear model with factors: GROUP, SEX, ICV  --> above
-# General linear model with factors: GROUP, ICV       --> above
-
-# -----------------------------------------------
-# correlation analysis - output correlation matrix
-# -----------------------------------------------
-
-datax=cbind(data6[c(regions,regions2)])  # set datax
-mcor=cor(datax,use="complete.obs")    # correlation matrix with correlation coefficients but not p-values
-# you may use "datax=na.omit(datax)"    # omit rows including NA for correlation analysis
-plot(datax)    # plot of correlation matrix
-library(corrplot);corrplot(mcor)
-
-# ------------------------------------------------------
-# correlation analysis - output p-values of the analyses
-# ------------------------------------------------------
-
-n=length(datax);mcorp=matrix(0,n,n)
-for (j in 1:n) {    # matrix of correlation p-value
-    for (i in 1:n) {
-        mcorp[i,j]=cor.test(datax[[j]],datax[[i]])[["p.value"]]
-    }
-}
-rownames(mcorp)=names(datax)
-colnames(mcorp)=names(datax)
-mask=(mcorp < 0.05)                          # mask for under 0.05
-mcorp.sig=mcorp
-mcorp.sig[!mask]=NA
-mcorp.sig.round=sprintf("%.2f",mcorp.sig)    # turn into vector, why?
-mcorp.sig.round=as.numeric(mcorp.sig.round)
-dim(mcorp.sig.round)=c(n,n)                  # intend to turn into matrix
-rownames(mcorp.sig.round)=names(datax)
-colnames(mcorp.sig.round)=names(datax)
-
-# ------------------------------------------
-# correlation analysis in PRO and HVPRO data
-# ------------------------------------------
-
-datax=cbind(
-    data6[c(1:15)],
-#    data6[c(44:344)],
-    data6[c("READSTD","WASIIQ","GAFC","GAFH")],
-    data6[c("SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")],
-    data6[c(regions,regions3)]
-)
-mask=sapply(datax,is.numeric)    # apply is.numeric to each column, output nuber is same as the number of columns,
-datax=subset(datax,select=mask)    # select only data which are numeric
-
-n=length(datax);mcorp=c(1:n)
-for (i in 1:n) {    # cor test between CC and each-column-indatax
-    mcorp[i]=cor.test(datax[["CC_Mid_Posterior"]],datax[[i]],method="spearman")[["p.value"]]
-}
-mcorp.round=sprintf("%.5f",mcorp)    # round the values
-mcorp.round=as.numeric(mcorp.round)    # change character to numecit
-mcorp.names=names(datax)    # set names
-cbind(mcorp.names,mcorp.round)    # output table
 
 # -------------------------------------------
 # more simple script for correlation analysis
@@ -345,76 +284,6 @@ for (k in 1:o) {                  # process of each item
     colnames(lst[[item[k]]])=col
 }
 print(lst)
-
-# ---------------------------------------
-# use linear model, analyses in subgroups
-# ---------------------------------------
-
-# General linear model with factors: ICV in PRO (or in Male/Female)
-
-#item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
-item=c(regions,regions2)
-#datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-#datacol=c(parameters_si)
-datacol=c(parameters1)
-#datacol=c(regions,regions2)
-
-datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+ICV")
-
-datax=subset(data6,SEX==0);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
-datax=subset(data6,SEX==1);myfunc("Left.Lateral.Ventricle","","GROUP+ICV")
-datax=subset(data6,GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
-datax=subset(data6,!GROUP=="PRO");myfunc("Left.Lateral.Ventricle","","SEX+ICV")
-
-# General linear model with factors:SEX, ICV in PRO
-
-item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
-#datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-#datacol=c(parameters_si)
-datacol=c(parameters1)
-
-datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+ICV")
-
-# General linear model with factors:SEX in PRO, relative volume
-
-item=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle")
-datacol=c("rCC_Mid_Posterior","rBil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX")
-
-# General linear model with factors:SEX, AGE, ICV in PRO
-
-item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle")
-datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"+SEX+AGE+ICV")
-
-# General linear model with factors:SEX, :SEX, ICV in PRO
-
-item=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","Left.Lateral.Ventricle")
-datacol=c("CC_Mid_Posterior","Bil.Lateral.Ventricle","READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-#datacol=c(parameters_si)
-#datacol=c(parameters1)
-datax=subset(data6,GROUP=="PRO"); myfunc(item,datacol,"*SEX+AGE+ICV")
-
-datax=subset(data6,GROUP=="PRO")
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE + ICV, data = datax))   # 0.0590
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + SEX + ICV, data = datax))         # 0.0519
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax))         # 0.00692
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + ICV, data = datax))               # 0.0666
-summary(lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE + ICV, data = datax))  # 0.0549
-summary(lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV + SEX + ICV, data = datax))        # 0.0483
-summary(lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV + SEX + AGE, data = datax))        # 0.0919
-summary(lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV + SEX, data = datax))              # 0.0818
-summary(lm(formula = rBil.Lateral.Ventricle ~ SINTOTEV, data = datax))                    # 0.0583
-#summary(lm(formula = Bil.Lateral.Ventricle ~ GROUP * SEX + SINTOTEV + ICV, data = data6))    # 0.00938
-#summary(lm(formula = Bil.Lateral.Ventricle ~ GROUP * SINTOTEV + SEX + ICV, data = data6))    # 0.950
-#summary(lm(formula = Bil.Lateral.Ventricle ~ GROUP * SINTOTEV * SEX + ICV, data = data6))    # 0.268347
-datax0=subset(datax,SEX==0);summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + ICV, data = datax0)) # 0.0192
-datax1=subset(datax,SEX==1);summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV + ICV, data = datax1)) # 0.895
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax))         # 0.00692
-summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Mid_Posterior * SEX + ICV, data = datax)) # <.05 
-summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Central * SEX + ICV, data = datax))       # <.05 
-summary(lm(formula = CC_Mid_Posterior ~ Bil.Lateral.Ventricle * SEX + ICV, data = datax)) # <.05
-summary(lm(formula = CC_Mid_Posterior ~ CC_Central * SEX + ICV, data = datax))            # <.05
 
 # ====
 # plot
@@ -581,7 +450,6 @@ p9=ggplot(datax, aes(x=GROUP,y=Left.Lateral.Ventricle,fill=SEX)) +
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Volumes of corpus callosum")
 #dev.off()
 
-
 # ---------------------------
 # plot for correlation in PRO 
 # ---------------------------
@@ -675,8 +543,6 @@ p15=ggplot(datax, aes(x=ROLEFX,y=ICV,colour=SEX)) +
     geom_point(size=4)
 grid.arrange(p10,p11,p12,p13,p14,p15,nrow=2)
 
-# install.packages("rgl") # for 3D plot
-library(rgl)
 
 # plot with mark which explain where difference exist
 library(ggplot2); library(gridExtra)
@@ -1130,149 +996,14 @@ p19=ggplot(datax, aes(x=ROLEFX,y=rLeft.Lateral.Ventricle,colour=SEX2)) +
 grid.arrange(p11,p12,p13,p14,p15,p16,p17,p18,p19)
 dev.off()
 
-# ==================================
-# old records of important abalyses
-# ==================================
-
-# --------------------------------------------------
-# General linear model with factors: GROUP, SEX, ICV
-# --------------------------------------------------
-
-# significant volume difference between groups
-
-funclm1 <- function(arg1){
-    # arg1: characters; r=lm(arg1~GROUP*SEX+ICV,data=data6)
-    txt1="r=lm("; txt2=arg1; txt3="~GROUP*SEX+ICV,data=data6)"
-    txt0=paste(txt1,txt2,txt3,sep="")
-    eval(parse(text=txt0)); s=summary(r)
-    cat("----------------\n")
-    print(s[[1]]); print(s[[4]][,c(1,4)])
-}
-funclm1("CC_Mid_Posterior")
-funclm1("Left.Lateral.Ventricle")
-funclm1("Bil.Lateral.Ventricle")
-
-# association in prodromes
-# between Bil.Lateral.Ventricle and 
-#     ("CC_Anterior","CC_Mid_Anterior","CC_Central","CC_Mid_Posterior","CC_Posterior","Bil.Lateral.Ventricle",
-#     "READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-# between CC_Mid_Posterior and
-#     ("CC_Anterior","CC_Mid_Anterior","CC_Central","CC_Mid_Posterior","CC_Posterior","Bil.Lateral.Ventricle",
-#     "READSTD","WASIIQ","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
-# significant main effects about clinical values is only SINTOTEV on Bil.Lateral.Ventricle
-
-# -----------------------------------
-# general linear model
-# -----------------------------------
-
-datax=subset(data6,GROUP=="PRO")
-summary(lm(formula = Bil.Lateral.Ventricle ~ SINTOTEV * SEX + ICV, data = datax))            # 0.00692
-summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Mid_Posterior * SEX + ICV, data = datax))    # <.05 
-summary(lm(formula = Bil.Lateral.Ventricle ~ CC_Central * SEX + ICV, data = datax))          # <.05 
-summary(lm(formula = CC_Mid_Posterior ~ Bil.Lateral.Ventricle * SEX + ICV, data = datax))    # <.05
-summary(lm(formula = CC_Mid_Posterior ~ CC_Central * SEX + ICV, data = datax))               # <.05
-
-# -----------------------------------
-# plots: volumes, correlation
-# -----------------------------------
-
-library(ggplot2); library(gridExtra)
-pdf("plot_volumes.pdf")    # use if you want to ouput plot as a pdf file and finish with "dev.off()"
-p1=ggplot(data6, aes(x=GROUP,y=CC_Anterior,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p2=ggplot(data6, aes(x=GROUP,y=CC_Mid_Anterior,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p3=ggplot(data6, aes(x=GROUP,y=CC_Central,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p4=ggplot(data6, aes(x=GROUP,y=CC_Mid_Posterior,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p5=ggplot(data6, aes(x=GROUP,y=CC_Posterior,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=20,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p6=ggplot(data6, aes(x=GROUP,y=Bil.Lateral.Ventricle,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p7=ggplot(data6, aes(x=GROUP,y=X3rd.Ventricle,fill=GROUP)) +
-    geom_dotplot(binaxis="y",binwidth=40,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p8=ggplot(data6, aes(x=SEX,y=Bil.Lateral.Ventricle,fill=SEX)) +
-    geom_dotplot(binaxis="y",binwidth=2000,stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    guides(fill=FALSE)     # don't display guide
-grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, nrow=4,ncol=2,top="Volumes of corpus callosum")
-dev.off()    # use if you want to output plot. 
-
-# pdf("plot_CC_Mid_Posterior.pdf");p4;dev.off()
-# pdf("plot_Bil.Lateral.Ventricle.pdf");p6;dev.off()
-
-# pdf("plot_scatter.pdf")
-ggplot(datax, aes(x=SINTOTEV, y=Bil.Lateral.Ventricle,colour=SEX)) + geom_point()
-# dev.off()
-
 # ===============================
 # new description
 # ===============================
 
-# -------------------------------------------
-# output data table, edit at home, 2015/09/28
-# -------------------------------------------
-
-write.csv(data6,file="caselist_prodromes_jun.csv",na="")
-write.xlsx(data6,file="caselist_prodromes_jun.xlsx",showNA=FALSE)
-# The right-bttom of the xlsx table isZQ44
-
-# -----------------------------------
-# flexible function for linear model
-# -----------------------------------
-
-funclm <- function(arg1,arg2){
-    # arg1: character;arg2:character; r=lm(arg1~arg2,data=datax)
-    txt1="r=lm("; txt2=arg1; txt3="~";txt4=arg2;txt5=",data=datax)"
-    txt0=paste(txt1,txt2,txt3,txt4,txt5,sep="")
-    eval(parse(text=txt0));s=summary(r);a=anova(r)
-    cat("----------------------------------------\n")
-    print(s[["call"]]);print(a)
-}
-datax=data6;for (region in regions ) { funclm(region,"GROUP*SEX+ICV") } # CC
-datax=data6;for (region in regions2 ) {funclm(region,"GROUP*SEX+ICV")} # ventricles
-datax=data6;for (region in regions ) { funclm(region,"GROUP+SEX+ICV") } # CC
-datax=data6;for (region in regions2 ) {funclm(region,"GROUP+SEX+ICV")} # ventricles
-datax=data6;for (region in regions ) { funclm(region,"GROUP+ICV") } # CC
-datax=data6;for (region in regions2 ) {funclm(region,"GROUP+ICV")} # ventricles
-datax=data6;funclm("CC_Mid_Posterior","GROUP*SEX+ICV")
-datax=data6;funclm("CC_Mid_Posterior","+ICV+GROUP*SEX")
-datax=data6;for (region in regions ) { funclm(region,"+ICV+GROUP*SEX") } # CC
-
-# ------------------------------
-# ANOVA, same as in SPSS default
-# ------------------------------
-
-datax=data6;library(car) # set data and library
-options(contrasts = c("contr.sum", "contr.sum")) # necessary for Anova()
-r2=lm( CC_Mid_Posterior ~ ICV + GROUP * SEX , data = datax)
-Anova(r2,type=3) # SPSS use type 3 sum of squares
-
-# -------------------------------------------------
+# --------------------------------------------------
 # more flexible functions for linear model and ANOVA
-# -------------------------------------------------
+# --------------------------------------------------
+# if you want to create p-value table, refer to mkpvalmtx function
 
 options(contrasts =c("contr.treatment","contr.poly")) # default contrast
 funclm <- function(arg1,arg2,arg3){
@@ -1485,135 +1216,10 @@ by(datax$Right.Amygdala,datax$GROUP,summary)
 Anova(lm(Left.Amygdala~GROUP+READSTD+ICV,data=datax),type=3)
 by(datax$Left.Amygdala,datax$GROUP,summary)
 
+
 # -----------------------------------------
-# correlation analyses, 2015/10/19
+# working other table: relative to whole CC
 # -----------------------------------------
-
-# set data-label for relative volumes
-
-datax=datay    # input as datax, datay already include ?h volume data, 
-asegvol.names=asegnames[c(2:35,38,41:66)]
-rasegvol.names=paste("r.",asegvol.names,sep="")
-rhvol.names=rhnames[c(2:35)]
-rrhvol.names=paste("r.",rhvol.names,sep="")
-lhvol.names=lhnames[c(2:35)]
-rlhvol.names=paste("r.",lhvol.names,sep="")
-
-# calculate relative volumes
-vol.names=c(asegvol.names,rhvol.names,lhvol.names)
-rvol.names=c(rasegvol.names,rrhvol.names,rlhvol.names)
-n=length(rvol.names)
-for (i in 1:n) {
-    datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
-}
-datay=datax    # output is datay
-data.vol=datay    # save a object as data.vol
-
-# set data
-
-#datax=datay
-datax=subset(datay,GROUP=="PRO")
-#datax=subset(datay,GROUP=="HVPRO")
-#items.row=c(regions4,parameters1) 
-#items.row=c(regions,regions2,parameters1)  # relative volumes
-#items.row=c(rvol.names)     # relative volumes
-items.row=c(vol.names)       # absolute volumes
-#items.col=c(regions4)             # relative volumes
-items.col=c(regions,regions2)      # absolute volumes
-items.ana=c("estimate","p.value") 
-
-# calculate correlation
-
-jun.cor.test <-function (items.row,items.col,items.ana,datax) {
-    n=length(items.row)    # i
-    m=length(items.col)   # j
-    o=length(items.ana)   # k
-    arr=array(0,dim=c(n,m,o))
-    dimnames(arr)=list(items.row,items.col,items.ana)
-    for (k in 1:o) {
-        for (j in 1:m) {
-            for (i in 1:n) {
-                arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="spearman")[[items.ana[k]]]
-#                print(c(dimnames(arr)[[1]][i],length(datax[[items.row[i]]]),dimnames(arr)[[2]][j],length(datax[[items.col[j]]])))    # to show the names for debug
-#                d=na.omit(data.frame(datax[[items.row[i]]],datax[[items.col[j]]]))      # a way to ommit NA line1
-#                arr[i,j,k]=cor.test(d[[1]],d[[2]],method="spearman")[[items.ana[k]]]    # a way to ommit NA line2
-            }
-        }
-    }
-    arr
-}
-arr=jun.cor.test(items.row,items.col,items.ana,datax)
-
-# show table
-dimnames(arr)[[3]][2]
-knitr::kable(arr[,,2])     # translocate matrix for display
-dimnames(arr)[[3]][1]
-knitr::kable(arr[,,1])     # translocate matrix for display
-
-# extract significant data
-mask.mtx=(arr[,,2] < 0.05)                          # mask for under 0.05
-arr.p.sig.mtx=arr[,,2]
-arr.p.sig.mtx[!mask.mtx]=NA
-knitr::kable(arr.p.sig.mtx)
-arr.rho.sig.mtx=arr[,,1]
-arr.rho.sig.mtx[!mask.mtx]=NA
-knitr::kable(arr.rho.sig.mtx)
-
-# heat map needs to change the structure of the matrix
-jun.heatmap <- function(arr.p.sig.mtx){
-    volumes=as.numeric(arr.p.sig.mtx)
-    xaxis=rep(rownames(arr.p.sig.mtx),length(colnames(arr.p.sig.mtx)))
-    yaxis=c()
-    for ( arg in colnames(arr.p.sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(arr.p.sig.mtx))))}
-    forplot=data.frame(xaxis,yaxis,volumes)
-    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=volumes)) 
-    p + geom_tile() +
-        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
-    #p + goem_raster() +    # does not work, why? 
-    #    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5))
-}
-jun.heatmap(arr.p.sig.mtx)
-
-# export to a file
-
-exportfile <- function(arr,title){
-    sink(file="tmp",append=TRUE)
-    cat("\n# -------------------------------------\n")
-    cat("#",tilte,"\n")
-    cat("# -------------------------------------\n\n")
-    cat(dimnames(arr)[[3]][2], "\n")
-    print(knitr::kable(arr[,,2])); cat("\n")
-    cat(dimnames(arr)[[3]][1], "\n")
-    print(knitr::kable(arr[,,1])); cat("\n")
-    sink()
-}
-exportfile(arr,"correlation analyses")
-
-# -------------------------------
-# working other table
-# -------------------------------
-
-mkpvalmtx <- function(datax,items,models) {
-    library(car) # for Anova()
-    options(contrasts = c("contr.sum", "contr.sum")) # for Anova(), or interaction 
-    funclm <- function(arg1,arg2,arg3){
-        # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
-        txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
-        txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
-        eval(parse(text=txt0)); s=summary(r)
-        Anova(r,type=3)["GROUP","Pr(>F)"]   # output
-    }
-    pvaluesmatrix=matrix(0,length(models),length(items))
-    rownames(pvaluesmatrix)=c(1:length(models))   # need to initializing the rownames
-    colnames(pvaluesmatrix)=items
-    for ( j in ( 1:length(models) ) ) {
-        rownames(pvaluesmatrix)[j]=paste("Volume ~",models[j])
-        for ( i in ( 1 : length(items) ) ) {
-            pvaluesmatrix[j,i]=funclm(items[i],"",models[j])
-        }
-    }
-    pvaluesmatrix
-}
 
 datax=datay
 items=c(regions,regions2)
@@ -1629,56 +1235,14 @@ models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV",
 #models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 pvaluesmatrix=mkpvalmtx(datax,items,models)
 #pvaluesmatrix=t(mkpvalmtx(datax,items,models))
-knitr::kable(pvaluesmatrix)
 
-# extract significant data
-sigmtx <- function(mtx) {
-    mask.mtx=(mtx < 0.05)                          # mask for under 0.05
-    sig.mtx=mtx
-    sig.mtx[!mask.mtx]=NA
-    sig.mtx
-}
 sig.mtx=sigmtx(pvaluesmatrix)
-
-# allNAmaskvec=(apply(is.na(sig.mtx),1,sum)==0)    # this is no use
-
-# extractsig <- function(sig.mtx) {
-#     d=data.frame(sig.mtx)
-#     subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05) | d[3]<0.05)
-# #    subset=subset(d,subset=(d[1]<0.05 | d[2]<0.05))
-#     subset
-# }
-# subset=extractsig(sig.mtx)
-
-extractsig <- function(sig.mtx) {
-    mask.mtx=!is.na(sig.mtx)
-    mask.vec.num=apply(mask.mtx,1,sum)
-    mask.vec=as.logical(mask.vec.num)
-    subset=sig.mtx[mask.vec,]
-    subset
-}
 subset=extractsig(sig.mtx)
-
-# heat map needs to change the structure of the matrix
-jun.heatmap <- function(sig.mtx) {
-    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
-    pvalues=as.numeric(sig.mtx)
-    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
-    yaxis=c()
-    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
-    forplot=data.frame(xaxis,yaxis,pvalues)
-    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=pvalues)) 
-    p + geom_tile() +
-        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
-        scale_fill_gradient(low="green",high="white") + 
-        theme(axis.title.x=element_blank()) +
-        theme(axis.title.y=element_blank())
-}
 jun.heatmap(sig.mtx)
 
 # relative to total CC
 
-datax=datay
+datax=datay    # input data is set as datax
 datax[["CC_Total"]]=apply(datax[regions],1,sum)
 cc.r.vol.names=paste("cc.r.",vol.names,sep="")
 n=length(rvol.names)
@@ -1693,14 +1257,8 @@ datax=data.vol
 items=cc.r.vol.names
 models=c("GROUP+ICV","GROUP+SEX+ICV","GROUP+READSTD+ICV")
 pvaluesmatrix=t(mkpvalmtx(datax,items,models))
-knitr::kable(pvaluesmatrix)
-# function sigmtx
 sig.mtx=sigmtx(pvaluesmatrix)
-knitr::kable(sig.mtx)
-# function extractsigsig
 subset=extractsig(sig.mtx)
-knitr::kable(subset)
-# function jun.jeatmap
 jun.heatmap(t(sig.mtx))
 jun.heatmap(t(subset))
     # results: rt and lt caudate, Left.Inf.Lat.Vent
@@ -1710,153 +1268,11 @@ datax=data.vol
 items=cc.r.vol.names
 models=c("GROUP","GROUP+SEX","GROUP+READSTD")
 pvaluesmatrix=t(mkpvalmtx(datax,items,models))
-knitr::kable(pvaluesmatrix)
-# function sigmtx
 sig.mtx=sigmtx(pvaluesmatrix)
-knitr::kable(sig.mtx)
-# function extractsigsig arranged
 subset=extractsig(sig.mtx)
-knitr::kable(subset)
-# function jun.heatmap
 jun.heatmap(t(sig.mtx))
 jun.heatmap(t(subset))
     # results: rt and lt caudate, Left.Inf.Lat.Vent
-
-# compare the numbers of regions related to CC between PRO and HC, 2015/10/21
-
-datax=data.vol
-data.vol.pro=subset(datax,GROUP=="PRO")
-data.vol.hc=subset(datax,GROUP=="HVPRO")
-#items.row=c(rvol.names)     # relative volumes
-items.row=c(vol.names)       # absolute volumes
-#items.col=c(regions4)             # relative volumes
-items.col=c(regions,regions2)      # absolute volumes
-items.ana=c("estimate","p.value") 
-# function corelation
-arr.pro=jun.cor.test(items.row,items.col,items.ana,data.vol.pro)
-arr.hc=jun.cor.test(items.row,items.col,items.ana,data.vol.hc)
-mtx.p.pro=arr.pro[,,2]
-mtx.p.hc=arr.hc[,,2]
-#knitr::kable(mtx.p.pro)
-#knitr::kable(mtx.p.hc)
-pvaluesmatrix=data.frame(PRO=mtx.p.pro[,4],HC=mtx.p.hc[,4])    # extrac  CC_Mid_Posteiro
-#knitr::kable(pvaluesmatrix)
-# function sigmtx
-sig.mtx=sigmtx(pvaluesmatrix)
-knitr::kable(sig.mtx)
-# function jun.heatmap
-jun.heatmap(t(sig.mtx))
-# function extractsigsig
-subset.p=extractsig(sig.mtx)
-knitr::kable(subset.p)
-# funftion jun.heatmap
-jun.heatmap(t(subset.p))
-# edit subset
-knitr::kable(cbind(subset,c(1:nrow(subset.p))))
-knitr::kable(cbind(subset,c(1:nrow(subset.p)))[c(-3,-5,-13,-14,-19,-20,-21),])
-#pdf("tmp.pdf")
-p.subset.p=jun.heatmap(t(subset.p[c(-3,-5,-13,-14,-19,-20,-21),]))
-#dev.off()
-
-# rho
-mtx.rho.pro=arr.pro[,,1]
-mtx.rho.hc=arr.pro[,,1]
-#knitr::kable(mtx.rho.pro)
-#knitr::kable(mtx.rho.hc)
-rho.mtx=data.frame(PRO=mtx.rho.pro[,4],HC=mtx.rho.hc[,4])    # extrac  CC_Mid_Posteiro
-#knitr::kable(pvaluesmatrix)
-# function sigmtx.rho
-sigmtx.rho <- function(p.mtx,rho.mtx) {
-    mask.p.mtx=(p.mtx < 0.05)                          # mask for under 0.05
-    sig.rho.mtx=rho.mtx
-    sig.rho.mtx[!mask.p.mtx]=NA
-    sig.rho.mtx
-}
-sig.rho.mtx=sigmtx.rho(pvaluesmatrix,rho.mtx)
-# function jun.heatmap.rho
-jun.heatmap.rho <- function(sig.mtx) {
-    sig.mtx=as.matrix(sig.mtx)    # in case sig.mtx is a data.frame, This does not work why?
-    rho=as.numeric(sig.mtx)
-    xaxis=rep(rownames(sig.mtx),length(colnames(sig.mtx)))
-    yaxis=c()
-    for ( arg in colnames(sig.mtx) ) {yaxis=c(yaxis,rep(arg,length(rownames(sig.mtx))))}
-    forplot=data.frame(xaxis,yaxis,rho)
-    p=ggplot(forplot, aes(x=xaxis,y=yaxis,fill=rho))
-    p + geom_tile() +
-        theme(axis.text.x=element_text(angle=90,hjust=1,vjust=.5)) +
-        scale_fill_gradient(low="blue",high="red") + 
-        theme(axis.title.x=element_blank()) +
-        theme(axis.title.y=element_blank())
-}
-jun.heatmap.rho(t(sig.rho.mtx))
-# function extractsigsig.rho
-extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {
-    mask.p.mtx=!is.na(sig.p.mtx)
-    mask.p.vec.num=apply(mask.p.mtx,1,sum)
-    mask.p.vec=as.logical(mask.p.vec.num)
-    subset.rho=sig.rho.mtx[mask.p.vec,]
-    subset.rho
-}
-subset.rho=extractsig.rho(sig.mtx,sig.rho.mtx)
-knitr::kable(subset.rho)
-# funftion jun.heatmap.rho
-jun.heatmap.rho(t(subset.rho))
-# edit subset
-knitr::kable(cbind(subset,c(1:nrow(subset.rho))))
-knitr::kable(cbind(subset,c(1:nrow(subset.rho)))[c(-3,-5,-13,-14,-19,-20,-21),])
-p.subset.rho=jun.heatmap.rho(t(subset.rho[c(-3,-5,-13,-14,-19,-20,-21),]))
-pdf("tmp.pdf",width=8)
-library(gridExtra)
-grid.arrange(p.subset.p,p.subset.rho, nrow=1,ncol=2,top="Regions significantly correlated to middle posterior corpus callosum")
-dev.off()
-
-# ------------------
-# set up other data
-# -----------------
-# 2015/10/21
-
-#datax=data6
-#setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
-#fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
-#data4=read.table(fsstatfile,header=TRUE)
-#data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
-#aparc.a2009s.rh.volume.names=names(data4)
-#aparc.a2009s.rh.volume.numeric.names=aparc.a2009s.rh.volume.names[c(2:35)] # the coordinate is an example
-#aparc.a2009s.rh.rvolume.numeric.names=paste("r.",aparc.a2009s.rh.volume.numeric.names,sep="")
-#datay=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-
-datax=data6    # substitute input-data into datax
-# rh
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
-fsstatfile="edited.aparc.a2009s_stats_rh_volume.txt"
-data4=read.table(fsstatfile,header=TRUE)
-data4[["caseid2"]]=substring(data4[["rh.aparc.volume"]],1,9)     # this work even in fs-edited file
-rh.vol.names=names(data4)
-rh.vol.num.names=rh.vol.names[c(2:35)] # the coordinate is an example
-rh.rvol.num.names=paste("r.",rh.vol.num.names,sep="")
-datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-# lh 
-setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
-fsstatfile="edited.aparc.a2009s_stats_lh_volume.txt"
-data4=read.table(fsstatfile,header=TRUE)
-data4[["caseid2"]]=substring(data4[["lh.aparc.volume"]],1,9)     # this work even in fs-edited file
-lh.vol.names=names(data4)
-lh.vol.num.names=lh.vol.names[c(2:35)] # the coordinate is an example
-lh.rvol.num.names=paste("r.",lh.vol.num.names,sep="")
-datax=merge(datax,data4,by.x="caseid2",by.y="caseid2",all=TRUE)
-# calculate relative volumes
-vol.names=c(asegvol.names,rh.vol.num.names,lh.vol.num.names)
-rvol.names=c(rasegvol.names,rh.rvol.num.names,lh.rvol.num.names)
-n=length(rvol.names)
-for (i in 1:n) {
-    datax[[rvol.names[i]]]=datax[[vol.names[i]]]/datax[["ICV"]]
-}
-datay=datax    # output-data is as datay
-data.a2009s.vol=datay    # as with new name
-
-# lh is the same as rh
-# aparc; area, thickness are the same as above 
-
 
 # ------------------
 # set up other data
@@ -2168,8 +1584,6 @@ fsstatfile="edited.aparc.a2009s_stats_lh_area.txt"
 names.temporal=paste(names.temporal,"_area",sep="")
 names.parietal=paste(names.parietal,"_area",sep="")
 pvaluesmatrix[c(names.temporal,names.parietal),]
-
-
 
 
 # ----------------------------------

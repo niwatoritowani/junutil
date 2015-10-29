@@ -1,0 +1,71 @@
+# SPSS
+
+
+VECTOR v = LeftLateralVentricle to MaskVoltoeTIV.
+STRING names (A40).  
+COMPUTE names = LeftLateralVentricle to MaskVoltoeTIV.
+STRING names.r (A40). 
+COMPUTE names.r = concat("r.",names).
+
+
+DO REPEAT x = v / y = concat("r.",v)
+COMPUTE y = x / ICV.
+END REPEAT PRINT.
+EXE. 
+
+DO REPEAT x = LeftLateralVentricle to MaskVoltoeTIV / y = concat("r.",v)
+COMPUTE y = x / ICV.
+END REPEAT PRINT.
+EXE. 
+
+
+COMPUTE tCC_Mid_Posterior = CC_Mid_Posterior / ICV.
+EXE. 
+
+COMPUTE tCC_Mid_Anterior = CC_Mid_Anterior / ICV.
+EXE. 
+
+COMPUTE tCC_Anterior = CC_Anterior / ICV.
+EXE. 
+
+DELETE VARIABLES tCC_Mid_Posterior tCC_Mid_Anterior tCC_Anterior.
+EXE. 
+* above commands worked. 
+
+
+DO REPEAT x = tCC_Anterior tCC_Mid_Anterior / y = CC_Anterior CC_Mid_Anterior. 
+COMPUTE x = y / ICV.
+END REPEAT PRINT.
+EXE. 
+
+
+DO REPEAT x = r.LeftLateralVettricle	r.LeftItfLatVett	r.LeftCerebellumWhiteMatter	r.LeftCerebellumCortex	r.LeftThalamusProper	r.LeftCaudate	r.LeftPutamet
+    / y = LeftLateralVentricle	LeftInfLatVent	LeftCerebellumWhiteMatter	LeftCerebellumCortex	LeftThalamusProper	LeftCaudate	LeftPutamen	.
+COMPUTE x = y / ICV.
+END REPEAT PRINT.
+EXE. 
+
+DELETE VARIABLES r.LeftLateralVettricle	r.LeftItfLatVett	r.LeftCerebellumWhiteMatter	r.LeftCerebellumCortex	r.LeftThalamusProper	r.LeftCaudate	r.LeftPutamet. 
+EXE. 
+
+
+DO REPEAT x = r.LeftPallidum	r.3rdVettricle	r.4thVettricle	r.BraitStem	r.LeftHippocampus	r.LeftAmygdala	r.CSF	r.LeftAccumbetsarea	r.LeftVettralDC
+    / y = LeftPallidum	@3rdVentricle	@4thVentricle	BrainStem	LeftHippocampus	LeftAmygdala	CSF	LeftAccumbensarea	LeftVentralDC	.
+COMPUTE x = y / ICV.
+END REPEAT PRINT.
+EXE. 
+
+DELETE VARIABLES LeftPallidum	@3rdVentricle	@4thVentricle	BrainStem	LeftHippocampus	LeftAmygdala	CSF	LeftAccumbensarea	LeftVentralDC.
+EXE. 
+
+DO REPEAT x = r.LeftPallidum	r.3rdVettricle	r.4thVettricle	r.BraitStem	r.LeftHippocampus	r.LeftAmygdala	r.CSF	r.LeftAccumbetsarea	r.LeftVettralDC	r.Leftvessel	r.Leftchoroidplexus	r.RightLateralVettricle	r.RightItfLatVett	r.RightCerebellumWhiteMatter	r.RightCerebellumCortex	r.RightThalamusProper	r.RightCaudate	r.RightPutamet	r.RightPallidum	r.RightHippocampus	r.RightAmygdala	r.RightAccumbetsarea	r.RightVettralDC	r.Rightvessel	r.Rightchoroidplexus	r.5thVettricle	r.WMhypoittetsities	r.LeftWMhypoittetsities	r.RightWMhypoittetsities	r.totWMhypoittetsities	r.LefttotWMhypoittetsities	r.RighttotWMhypoittetsities	r.OpticChiasm	r.CC_Posterior	r.CC_Mid_Posterior	r.CC_Cettral	r.CC_Mid_Atterior	r.CC_Atterior	r.BraitSegVol	r.BraitSegVolNotVett	r.BraitSegVolNotVettSurf	r.lhCortexVol	r.rhCortexVol	r.CortexVol	r.lhCorticalWhiteMatterVol	r.rhCorticalWhiteMatterVol	r.CorticalWhiteMatterVol	r.SubCortGrayVol	r.TotalGrayVol	r.SupraTettorialVol	r.SupraTettorialVolNotVett	r.SupraTettorialVolNotVettVox	r.MaskVol	r.BraitSegVoltoeTIV	r.MaskVoltoeTIV
+    / y = LeftPallidum	3rdVentricle	4thVentricle	BrainStem	LeftHippocampus	LeftAmygdala	CSF	LeftAccumbensarea	LeftVentralDC	Leftvessel	Leftchoroidplexus	RightLateralVentricle	RightInfLatVent	RightCerebellumWhiteMatter	RightCerebellumCortex	RightThalamusProper	RightCaudate	RightPutamen	RightPallidum	RightHippocampus	RightAmygdala	RightAccumbensarea	RightVentralDC	Rightvessel	Rightchoroidplexus	5thVentricle	WMhypointensities	LeftWMhypointensities	RightWMhypointensities	nonWMhypointensities	LeftnonWMhypointensities	RightnonWMhypointensities	OpticChiasm	CC_Posterior	CC_Mid_Posterior	CC_Central	CC_Mid_Anterior	CC_Anterior	BrainSegVol	BrainSegVolNotVent	BrainSegVolNotVentSurf	lhCortexVol	rhCortexVol	CortexVol	lhCorticalWhiteMatterVol	rhCorticalWhiteMatterVol	CorticalWhiteMatterVol	SubCortGrayVol	TotalGrayVol	SupraTentorialVol	SupraTentorialVolNotVent	SupraTentorialVolNotVentVox	MaskVol	BrainSegVoltoeTIV	MaskVoltoeTIV.
+COMPUTE x = y / ICV.
+END REPEAT PRINT.
+EXE. 
+
+* when you want to activate other dataset
+
+DATASET ACTIVATE demographic.
+DATASET ACTIVATE aseg.
+DATASET ACTIVATE datax.

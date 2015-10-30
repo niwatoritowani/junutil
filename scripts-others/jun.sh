@@ -3,7 +3,7 @@
 # usage : 
 #    bash jun.sh [case ID] [&]
 #    cat [caselist] | while read line; do bash jun.sh $line [&]; done (bash)
-#    awk '{print $1}' | while read line; do bash jun.sh $line [&]; done (bash)
+#    awk '{print $1}' [caselist] | while read line; do bash jun.sh $line [&]; done (bash)
 
 # -----------------------------------------------
 # add ${case} to caselist if it is not yet listed
@@ -31,19 +31,7 @@ exec &> >(tee -a ${logfile}) # add output-1-and-2 into terminal and file
 case=$1
 out=${case}/${case}.file
 cmd="
-    mkdir $case
     echo \"hello\" > $out 
-    echo .  # comment
-    echo \*
-    foo=\"strings\"
-    echo \$foo
-    echo $(pwd)
-    touch file1
-    cp file1 \
-        file2
-    cp file1 \\
-        file34
-    touch ./file3
     ls >> ${logfile} 2>&1 # if output is long and you want to run background
         #  if without >> but >, overwrite logfile
 "
@@ -56,13 +44,15 @@ fi
 echo "$(date)"
 
 # --------------------------------------------------------------------------------------
-# in the cmd some special characters are expanded, then will be expanded again in eval
-# to be expanded     : $ " \ * 
-# to be not expanded : . (then eval expand it into directory-name)
+# in the cmd some special characters are expanded by shell, then will be expanded again in eval
+# if you want stronger supression on expansion, you can use '' quotation
+# supressed by ""    : [space] [linebreak] *
+# to be expanded     : $ " \  
+# to be not expanded : . (This is not expanded but the file name which means current directory)
 # \[linebreak] is expanded into [space], which means jointed lines in echo "$cmd"
 # \\ is expanded into \, 
-# *  is expanded into anyfiles
-# \* is expanded into \* and in eval expanded into * 
+# *  is expanded into * and in eval expanded into anyfiles (why in "" ?)
+# \* is expanded into \* and in eval expanded into * (why \ is not in "" ?) 
 # $variable  is expanded into the content of the $variable
 # \$variable is expanded into $variable and in eval expanded into the content of the $variable
 #

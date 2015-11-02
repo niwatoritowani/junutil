@@ -4,6 +4,7 @@
 # repeated-measures-ANCOVA
 # volume=hemisphere+GROUP+ICV
 # volume=division+GROUP+ICV
+# volume=division+Time+Group+ICV, within-subjects-factor: division, Time
 
 # If we take into account the Time, 
 # we shoud use mixed linear model. 

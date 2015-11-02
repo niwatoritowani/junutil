@@ -28,6 +28,11 @@ data1[["caseid2"]]=data1[["New.Case.#"]]    # no need to change
 #data1$SEX2=as.character(data1$SEX);mask=(data1$SEX2=="0");data1$SEX2[mask]="M";data1$SEX2[!mask]="F";data1$SEX2=as.factor(data1$SEX2)
 #data1$GROUPSEX=as.factor(paste(data1$GROUP,as.character(data1$SEX2),sep=""))
 
+# fiels:
+#     Diagnosis: SZ NC
+#     Time : 1 2 3 " " (within subject factor)
+#     Scan.Other.Sub.# : (subject number)
+
 # aseg
 datax=data1    # substitute input-data into datax
 list.aseg=merge.tbl(fsstatfile.aseg,datax)

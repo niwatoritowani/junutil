@@ -5,5 +5,8 @@
 # volume=hemisphere+GROUP+ICV
 # volume=division+GROUP+ICV
 
+# If we take into account the Time, 
+# we shoud use mixed linear model. 
+
 # I think I can ANCOVA. 
 

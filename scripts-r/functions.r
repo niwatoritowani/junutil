@@ -1,9 +1,8 @@
-# function lm.jun
-# under constraction
+# function jun.lm
 
-options(contrasts =c("contr.treatment","contr.poly")) # default contrast
-funclm <- function(arg1,arg2,arg3){
+jun.lm <- function(arg1,arg2,arg3){
     # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    options(contrasts =c("contr.treatment","contr.poly")) # default contrast
     txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
     txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
     eval(parse(text=txt0)); s=summary(r)
@@ -12,18 +11,17 @@ funclm <- function(arg1,arg2,arg3){
     print(s[["coefficients"]][,c(1,4)])
 #    print(anova(r))    # for anova
 }
-myfunc=function(item,datacol,arg3){
+jun.lms=function(item,datacol,arg3){
     m=length(item); n=length(datacol)
-    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+    for ( j in 1:m) {for ( i in 1:n ) {jun.lm(item[j],datacol[i],arg3)}}
 }
 
-# function anova.jun
-# under construction
 
-library(car) # for Anova()
-options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
-funclm <- function(arg1,arg2,arg3){
+# function jun.an, jun.ans
+
+jun.an <- function(arg1,arg2,arg3){
     # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
     txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
     txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
     eval(parse(text=txt0)); s=summary(r)
@@ -32,9 +30,9 @@ funclm <- function(arg1,arg2,arg3){
 #    print(s[["coefficients"]][,c(1,4)])
     print(Anova(r,type=3))    # show anova type3
 }
-myfunc=function(item,datacol,arg3){
+jun.ans=function(item,datacol,arg3){
     m=length(item); n=length(datacol)
-    for ( j in 1:m) {for ( i in 1:n ) {funclm(item[j],datacol[i],arg3)}}
+    for ( j in 1:m) {for ( i in 1:n ) {jun.an(item[j],datacol[i],arg3)}}
 }
 
 

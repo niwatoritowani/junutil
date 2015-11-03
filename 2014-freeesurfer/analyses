@@ -6,8 +6,44 @@
 # volume=division+GROUP+ICV
 # volume=division+Time+Group+ICV, within-subjects-factor: division, Time
 
+datax=datay
+field.names=regions
+no.fields=length(field.names)
+no.row=nrow(datax)
+Vol2=c(), Diagnosis2=c(),Time2=c(), Region2=c()
+for (i in 1:no.fields) {
+    Vol2=c(vol2,datax[[fieldsnames[[i]]])
+    Diagnosis2=c(Group2,datax[["Diagnosis"]])
+    Time2=c(Time2,datax[["Time"]]
+    Region2=c(Region2,rep(field.names[i],no.row))
+}
+datay2=data.frame(Vol2,Diagnosis2,time2,Region2)
+datax=datay2
+options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
+r=lm(Vol2~Diagnosis2*Time2*Region2+Error(subject/Time2*Reion2),data=datax)
+Anova(r,type=3)
+
+# subgroup analyses
+# separate group by region
+
+datax=datay
+item=regions
+datacol=c("Diagnosis*Time+ICV+Error(subject/Time)","Diagnosis+Time+ICV+ERROR(subject/Time)")
+jun.ans(item,datacol,"")
+
+# separeta group by region and time
+
+datax=datay
+datay.t1=subset(datax,Time==1)
+datay.t2=subset(datax,Time==2)
+item=regions
+datacol=c("Diagnosis+ICV")
+datax=jun.ans(item,datacol,"")
+datax=datay.t1;jun.ans(item,datacol,"")
+datax=datay.t2;jun.ans(item,datacol,"")
+
 # If we take into account the Time, 
 # we shoud use mixed linear model. 
+# Or if we use repeated-measures ANOCOVA. There maybe is no need to use mixed model. 
 
-# I think I can ANCOVA. 
 

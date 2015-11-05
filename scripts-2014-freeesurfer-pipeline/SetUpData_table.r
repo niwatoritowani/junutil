@@ -6,7 +6,10 @@
 
 merge.tbl <- function(fsstatfile,datax){
     data4=read.table(fsstatfile,header=TRUE)
-    data4[["caseid2"]]=striplit(data4[[1]],".")[1]     # column 1 shoud be freesurfer subject ID
+    #data4[["caseid2"]]=strsplit(data4[[1]],".")[1]     # column 1 shoud be freesurfer subject ID
+    func1=function(vec){vec[1]}
+    data4[["caseid2"]]=sapply(strsplit(as.character(data4[[1]]), ".",fixed=TRUE),func1)
+
     names.field=names(data4)
     names.field.num=names(data4)[sapply(data4,is.numeric)] # the coordinate is an example
     names.field.num.r=paste("r.",names.field.num,sep="")
@@ -21,17 +24,22 @@ merge.tbl <- function(fsstatfile,datax){
 
 # demographic table
 data1=read.xlsx(demographictable,sheetName="eli chronics",header=TRUE)
-data1=subset(data1,! is.na(New.Case.#))
-data1[["caseid2"]]=data1[["New.Case.#"]]    # no need to change
+data1=subset(data1,! is.na(New.Case..))     # no need of this line
+data1[["New.Case.."]]=as.character(data1[["New.Case.."]])
+data1[["caseid3"]]=data1[["New.Case.."]]    # no need to change
+data1[["caseid2"]]=substr(data1[["New.Case.."]],5,nchar(data1[["New.Case.."]]))    # no need to change
+data1[["subject"]]=as.factor(data1[["Scan.Other.Sub.."]])
+data1[["Time"]]=as.factor(data1[["Time"]])
 #data1$SEX=as.factor(data1$SEX)    # change into class:factor
 #data1=subset(data1,! is.na(SEX))    # exclude rows which don't have SEX data
 #data1$SEX2=as.character(data1$SEX);mask=(data1$SEX2=="0");data1$SEX2[mask]="M";data1$SEX2[!mask]="F";data1$SEX2=as.factor(data1$SEX2)
 #data1$GROUPSEX=as.factor(paste(data1$GROUP,as.character(data1$SEX2),sep=""))
 
 # fiels:
+#     New.Case..:
 #     Diagnosis: SZ NC
-#     Time : 1 2 3 " " (within subject factor)
-#     Scan.Other.Sub.# : (subject number)
+#     Time : 1 2 3 " " (within subject factor) - class:numeric
+#     Scan.Other.Sub.. : (subject number)
 
 # aseg
 datax=data1    # substitute input-data into datax

@@ -97,14 +97,20 @@ summary(aov(Vol3~Diagnosis3*Time3*Region3+Error(Subject3/(Time3*Region3)),data=d
 summary(aov(Vol3~Diagnosis3*Time3*Region3+ICV3+Error(Subject3/(Time3*Region3)),data=datax))
 
 # Time2 are only 4 cases
-datax=subset(datay,Time2==1)
+datax=subset(datay,Time3==1)
+summary(aov(Vol3~Diagnosis3*Region3+Error(Subject3/(Region3)),data=datax))
+summary(aov(Vol3~Diagnosis3*Region3+ICV3+Error(Subject3/(Region3)),data=datax))
+
+datax=subset(datay,Time3!=2)
 summary(aov(Vol3~Diagnosis3*Region3+Error(Subject3/(Region3)),data=datax))
 summary(aov(Vol3~Diagnosis3*Region3+ICV3+Error(Subject3/(Region3)),data=datax))
 
 
+# 
 datax=datay
 datay.t1=subset(datax,Time==1)
 datay.t2=subset(datax,Time==2)
+datay.nt2=subset(datax,Time!=2)
 item=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle")
 datacol=c("Diagnosis+ICV")
 datax=datay.t1;jun.ans(item,datacol,"")

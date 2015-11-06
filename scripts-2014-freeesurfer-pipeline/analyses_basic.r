@@ -1,27 +1,39 @@
 # analyses_basic
 
-# -----------------------
-# demographics
-# -----------------------
-
 datax=datay
-summary(datax[,c("Diagnosis","Time",regions,regions2)])
-by(datax[,c("Time",regions,regions2)],datax$Diagnosis,summary)
+summary(datax[,c("Diagnosis","Time",regions,regions2)])        # summary: NC:133,SZ:165,NA:149
+by(datax[,c("Time",regions,regions2)],datax$Diagnosis,summary) # by diagnosis
 datax.subset=datax[,c("Diagnosis","Time",regions,regions2)]
-datax.subset1=na.omit(datax.subset)
-by(datax.subset1,datax.subset1$Diagnosis,summary)
+datax.subset1=na.omit(datax.subset)                            # NC:25, SZ:26
+by(datax.subset1,datax.subset1$Diagnosis,summary)              # by diagnosis NC1:23,NC2:2,SZ1:25,SZ2:26
+
+# select cases which have CC volume data
 
 datax.subset2=subset(datax,! is.na(datax$CC_Anterior))
-summary(datax.subset2[,c("Time","Diagnosis","Sample",regions,regions2)]) 
-by(datax.subset2[,c("Time",regions,regions2)],datax.subset2$Diagnosis,summary)
+summary(datax.subset2[,c("Time","Diagnosis","Sample",regions,regions2)])       # summary:NC:27,SZ:33,AN:149
+by(datax.subset2[,c("Time",regions,regions2)],datax.subset2$Diagnosis,summary)  # by diagnosis NC1:23,NC2:2,NCNA:2,SZ1:25,SZ2:1,SZNA:7
+datax.subset2c=subset(datax.subset2,Sample=="chronic")
+summary(datax.subset2c[,c("Time","Diagnosis","Sample",regions,regions2)])       # summary:NC:27,SZ:33;TimeNA:9
+by(datax.subset2c[,c("Time",regions,regions2)],datax.subset2c$Diagnosis,summary)  # by diagnosis NC1:23,NC2:2,NCNA:2,SZ1:25,SZ2:1,SZNA:7
+
 
 # with-CC-volume and not-CSZ are 149, in addition 9 cases have not Time
 
+# select cases which are listed on chronic SZ table
+
 datax.subset3=subset(datax,Sample=="chronic")
-summary(datax.subset3[,c("Time","Diagnosis","Sample",regions,regions3)]) 
+summary(datax.subset3[,c("Time","Diagnosis","Sample",regions,regions3)]) # NC:133,SZ:165;CCNA:132
 by(datax.subset3[,c("Time",regions,regions2)],datax.subset3$Diagnosis,summary)
 
-# chronic and without-CC-volume are 132 cases
+datax.subset3woD=datax.subset3[-grep("D",datax.subset3[["caseid2"]]),]
+summary(datax.subset3woD[,c("Time","Diagnosis","Sample",regions,regions3)]) # NC:73,SZ:82;CCNA:95
+by(datax.subset3woD[,c("Time",regions,regions2)],datax.subset3woD$Diagnosis,summary)
+
+datax.subset3woDwo4=datax.subset3woD[grep(".....",datax.subset3woD[["caseid2"]]),]
+summary(datax.subset3woDwo4[,c("Time","Diagnosis","Sample",regions,regions3)]) # NC:64,SZ:71;CCNA:75
+datax.subset3woDwo4wo0=datax.subset3woDwo4[-grep("00...",datax.subset3woDwo4[["caseid2"]]),]
+summary(datax.subset3woDwo4wo0[,c("Time","Diagnosis","Sample",regions,regions3)]) # NC:46,SZ:57;CCNA:43
+by(datax.subset3woDwo4wo0[,c("Time",regions,regions2)],datax.subset3woDwo4wo0$Diagnosis,summary)
 
 
 

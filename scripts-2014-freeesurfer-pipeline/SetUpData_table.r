@@ -63,7 +63,7 @@ names.field.r=c(list.aseg[[3]],list.rh[[3]],list.lh[[3]])
 
 regions=c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")
 regions2=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle","Bil.Lateral.Ventricle","X3rd.Ventricle")
-#regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
+regions3=c("Bil.Lateral.Ventricle","X3rd.Ventricle")
 regions4=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior", "r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle","r.Bil.Lateral.Ventricle","r.X3rd.Ventricle")
 demographics1=c("GROUP","AGE","SEX")
 parameters1=c("SOCFXC","ROLEFX")

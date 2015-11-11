@@ -54,9 +54,10 @@ add2list
 startlog ${case}
 out=${case}/${case}.file
 cmd="
-    echo \"hello\" > $out 
-    ls >> ${logfile} 2>&1 # if output is long and you want to run background
-        #  if without >> but >, overwrite logfile
+    echo \"hello\" 
+    echo \"aaa\" \\
+ \"bbb\" 
+    echo \"hello\" 
 "
 check_out "${out}"
 echoeval "$cmd"

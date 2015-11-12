@@ -1,0 +1,46 @@
+
+# exclude some cases
+
+cases=c("321100112","321100125","321400280","321400081")
+
+datax=subset(datax,subset=(caseid2!="321100112" && caseid2="321100125" && caseid2="321400280" && caseid2="321400081")
+
+# include chorioid plexus into ventricle
+
+datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+Dataex$Right.chorioidplexus
+datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+Dataex$Left.chorioidplexus
+
+regions2x=c("xRight.Lateral.Ventricle","xLeft.Lateral.Ventricle")
+
+# wilcox_text(variable1~factor1),distribution="exact")
+
+jun.wilcox_test = functio(variable1,factor){
+	wilcox_text(datax[[variable1]]~datax[[factor]]),distribution="exact")
+}
+jun.wilcox_tests = function(variables1,factors){
+	n=length(variables1);m=length(factors)
+    for(j in 1:n){for(i in 1:m){jun.wilcox_test(variables1[j],factors[i])}}
+}
+
+# run
+items=c(reginos)
+factors="GROUP"
+jun.wilcox_tests(items,factors)
+
+# brunner.munzel.test(subset(datax,GROUP=="PRO")$volume, subset(datax,GROUP=="HVPRO")$volume)
+
+jun.brunner.munzel.test = function(item){
+    x=subset(datax,GROUP=="PRO")[[item]]
+    y=subset(datax,GROUP=="HVPRO")[[item]]
+	brunner.munzel.test(x,y)
+}
+jun.prunner.munzel.tests = function(items){
+    n=length(items)
+	for (i in 1:n){jun.brunner.munzel.test(items[i])}
+}
+
+# run
+items=c(regions)
+jun.prunner.munzel.tests(items)
+
+

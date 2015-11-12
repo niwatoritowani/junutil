@@ -54,6 +54,6 @@ datamerge3=merge(datamerged2,data4,by.x="caseid4",by.y="caseid4",all=TRUE)
 datamerge3.subset=datamerge3[,c(1,2,3,4,6,8)]
 
 write.csv(datamerge3.subset,file="caselist/datamerged3.subset.csv",quote=FALSE,na="")
-# correct mistakes by vim: CHecked and Chenked were to be Checked
+# correct mistakes by vim,  CHecked and Chenked were to be Checked
 
 

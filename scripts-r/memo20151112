@@ -1,34 +1,43 @@
-
 # exclude some cases
 
-cases=c("321100112","321100125","321400280","321400081")
-
-datax=subset(datax,subset=(caseid2!="321100112" && caseid2="321100125" && caseid2="321400280" && caseid2="321400081")
+datax=subset(datax,caseid2!="321100112" & caseid2!="321100125" & caseid2!="321400280" & caseid2!="321400081")
+data.ex4=datax
 
 # include chorioid plexus into ventricle
 
-datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+Dataex$Right.chorioidplexus
-datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+Dataex$Left.chorioidplexus
+datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+Dataex$Right.chorioid.plexus
+datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+Dataex$Left.chorioid.plexus
+datax[["r.xRight.Lateral.Ventricle"]]=datax$xRight.Lateral.Ventricle/datax$ICV
+datax[["r.xLeft.Lateral.Ventricle"]]=datax$xLeft.Latrelal.Ventricle/datax$ICV
+datax[["xBil.Lateral.Ventricle"]]=datax$xRight.Lateral.Ventricle+datax$xLeft.Lateral.Ventricle
+datax[["r.xBil.Lateral.Ventricle"]]=datax$r.xRight.Lateral.Ventricle+datax$r.xLeft.Lateral.Ventricle
 
 regions2x=c("xRight.Lateral.Ventricle","xLeft.Lateral.Ventricle")
 
 # wilcox_text(variable1~factor1),distribution="exact")
 
-jun.wilcox_test = functio(variable1,factor){
-	wilcox_text(datax[[variable1]]~datax[[factor]]),distribution="exact")
+library(coin) # for wilcox_text
+jun.wilcox_test <- function(variable1,factor){
+	wilcox_test(datax[[variable1]]~datax[[factor]],distribution="exact")
 }
-jun.wilcox_tests = function(variables1,factors){
+jun.wilcox_tests <- function(variables1,factors){
 	n=length(variables1);m=length(factors)
-    for(j in 1:n){for(i in 1:m){jun.wilcox_test(variables1[j],factors[i])}}
+    for(j in 1:n){for(i in 1:m){
+        cat("------------\n")
+        cat(variables1[j],"-",factors[i],"\n")
+        r=jun.wilcox_test(variables1[j],factors[i])}
+        print(r)
+    }
 }
 
 # run
-items=c(reginos)
+items=c(regions2,regions2x)
 factors="GROUP"
 jun.wilcox_tests(items,factors)
 
 # brunner.munzel.test(subset(datax,GROUP=="PRO")$volume, subset(datax,GROUP=="HVPRO")$volume)
 
+library(lawstat) # for brunner.munze.test
 jun.brunner.munzel.test = function(item){
     x=subset(datax,GROUP=="PRO")[[item]]
     y=subset(datax,GROUP=="HVPRO")[[item]]
@@ -36,11 +45,30 @@ jun.brunner.munzel.test = function(item){
 }
 jun.prunner.munzel.tests = function(items){
     n=length(items)
-	for (i in 1:n){jun.brunner.munzel.test(items[i])}
+    for (i in 1:n){
+        cat("------------\n")
+        cat(items[i],"\n")
+        r=jun.brunner.munzel.test(items[i])
+        print(r)
+    }
 }
 
 # run
-items=c(regions)
+items=c(regions2,regions2x)
 jun.prunner.munzel.tests(items)
+
+# ------------------------
+# for figures
+# ------------------------
+
+kable(data.ex3.exna[,c("caseid2",regions2)])
+kable(data.ex3.exna[,c("caseid2","GROUP",regions2,regions5)])
+5 Left-Inf-Lat-Vent
+44 Right-Inf-Lat-Vent
+
+
+
+
+
 
 

@@ -1,3 +1,7 @@
+# ----------------
+# statistics
+# ----------------
+
 # function jun.lm
 
 jun.lm <- function(arg1,arg2,arg3){
@@ -158,3 +162,54 @@ mtx.adjust <- function(pvaluesmatrix,meth){
     colnames(mtx.adjusted)=colnames(pvaluesmatrix)
     mtx.adjusted
 }
+
+# wilcox_text(variable1~factor1),distribution="exact")
+
+library(coin) # for wilcox_text
+jun.wilcox_test <- function(variable1,factor){
+        wilcox_test(datax[[variable1]]~datax[[factor]],distribution="exact")
+}
+jun.wilcox_tests <- function(variables1,factors){
+        n=length(variables1);m=length(factors)
+    for(j in 1:n){for(i in 1:m){
+        cat("------------\n")
+        cat(variables1[j],"-",factors[i],"\n")
+        r=jun.wilcox_test(variables1[j],factors[i])}
+        print(r)
+    }
+}
+
+# example
+# items=c(regions2,regions2x); factors="GROUP"; jun.wilcox_tests(items,factors)
+
+# brunner.munzel.test(subset(datax,GROUP=="PRO")$volume, subset(datax,GROUP=="HVPRO")$volume)
+
+library(lawstat) # for brunner.munze.test
+jun.brunner.munzel.test = function(item){
+    x=subset(datax,GROUP=="PRO")[[item]]
+    y=subset(datax,GROUP=="HVPRO")[[item]]
+        brunner.munzel.test(x,y)
+}
+jun.prunner.munzel.tests = function(items){
+    n=length(items)
+    for (i in 1:n){
+        cat("------------\n")
+        cat(items[i],"\n")
+        r=jun.brunner.munzel.test(items[i])
+        print(r)
+    }
+}
+
+# example
+# items=c(regions2,regions2x); jun.prunner.munzel.tests(items)
+
+
+
+
+
+
+
+
+
+
+

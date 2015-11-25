@@ -3,6 +3,7 @@
 # -----------------------
 
 datax=data.ex3.exna
+kable(datax[,c("caseid2","GROUP",regions2,regions5,"Left.Amygdala","Right.Amygdala")]) # show table
 summary(datax[,c(demographics1,parameters2,parameters1)]) # summary
 #by(data6[demographics1],data6$SEX,summary) # grouped by sex
 by(datax[,c(demographics1,parameters2)],datax$GROUP,summary)  # groupd by GROUP (PRO and control)

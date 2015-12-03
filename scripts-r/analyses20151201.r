@@ -70,12 +70,27 @@ options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
 summary(aov(Vol2~Diagnosis2*Region2+ICV2+Error(Subject2/(Region2)),data=datax))
 
 
+# 
+
+datax=data.ex3.exna
+dep.vars=c(regions,"Right.Lateral.Ventricle","Left.Lateral.Ventricle",
+    "X3rd.Ventricle",
+    "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent","Right.Amygdala","Left.Amygdala")
+
+exp.vars="GROUP+ICV"
+jun.ans(dep.vars,exp.vars,"")
+
+exp.vars="GROUP*SEX2+ICV"
+jun.ans(dep.vars,exp.vars,"")
+
+
+
+
 # ------------------------------------
 # rANCOVA - plot
 # ------------------------------------
 
 # CCs, LV, LVThorn
-# todo: add amygdala
 
 # change the order of the levels in factor
 data.cc$Regions2=factor(data.cc$Region2,regions)    # the order of the levels to be the same as in regions
@@ -110,7 +125,7 @@ jun.plot <- function(data.cc) {
         scale_fill_manual(values=c("red","blue")) +
         geom_dotplot(binaxis="y",stackdir="center") +
         stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-    #    guides(fill=FALSE) +    # don't display guide
+        guides(fill=FALSE) +    # don't display guide
         theme(axis.title.x=element_blank())    # don't display x-axis-label
     p1
 }
@@ -142,8 +157,8 @@ datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
-items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent") # relative volume
-items.col=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent") # relative volume
+items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
+items.col=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
@@ -153,7 +168,7 @@ sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 sig.mtx
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
-items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent") # relative volume
+items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
 items.col=c("SOCFXC","ROLEFX","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)

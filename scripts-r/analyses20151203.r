@@ -6,7 +6,7 @@
 options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
 
 # functions
-stack.jun <- function(fieldnames1,fieldnames2){
+jun.stack <- function(fieldnames1,fieldnames2){
     datax.stack=stack(datax[fieldnames1])
     datax.stack[fieldnames2]=datax[fieldnames2]
     datax.stack
@@ -15,20 +15,40 @@ stack.jun <- function(fieldnames1,fieldnames2){
 # analyses
 datax=data.ex3.exna
 fieldnames=regions
-data.cc=stack.jun(fieldnames,c("caseid2","GROUP","ICV"))
-summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind,data=data.cc))
+data.cc=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.cc))
 
 field.names=c("Right.Lateral.Ventricle","Left.Lateral.Ventricle")  
-data.lv=stack.jun(fieldnames,c("caseid2","GROUP","ICV"))
-summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind,data=data.lv))
+data.lv=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.lv))
 
 field.names=c("Right.Inf.Lat.Vent","Left.Inf.Lat.Vent") 
-data.lvt=stack.jun(fieldnames,c("caseid2","GROUP","ICV"))
-summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind,data=data.lvt))
+data.lvt=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.lvt))
 
 field.names=c("Right.Amygdala","Left.Amygdala")   
-data.amy=stack.jun(fieldnames,c("caseid2","GROUP","ICV"))
-summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind,data=data.amy))
+data.amy=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.amy))
+
+# analyses in subgroup
+
+datax=data.ex3.exna
+dep.vars=
+    c(regions,
+    "Right.Lateral.Ventricle","Left.Lateral.Ventricle",
+    "X3rd.Venricle",
+    "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent",
+    "Right.Amygdala","Left.Amygdala")
+
+exp.vars="GROUP+ICV"
+jun.ans(dep.vars,exp.vars,"")
+
+exp.vars="GROUP*SEX2+ICV"
+jun.ans(dep.vars,exp.vars,"")
+
+
+
+
 
 # --------------------------------------------
 # rANCOVA - plots

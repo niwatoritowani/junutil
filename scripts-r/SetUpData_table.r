@@ -32,7 +32,7 @@ datax[["Bil.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Left.Latera
 datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Right.choroid.plexus
 datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+datax$Left.choroid.plexus
 datax[["xBil.Lateral.Ventricle"]]=datax$xRight.Lateral.Ventricle+datax$xLeft.Lateral.Ventricle
-datax[["CC_Total"]]=apply(datax[,c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior"],1,sum)
+datax[["CC_Total"]]=apply(datax[,c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")],1,sum)
 data.aseg=datax
 list.aseg=merge.tbl(data.aseg,data1)
 

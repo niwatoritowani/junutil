@@ -2,7 +2,6 @@
 # rANCOVA
 # ------------------------------------
 
-
 datax=data.ex3.exna
 field.names=regions    # corpus callosum
 no.fields=length(field.names)
@@ -76,12 +75,10 @@ summary(aov(Vol2~Diagnosis2*Region2+ICV2+Error(Subject2/(Region2)),data=datax))
 # ------------------------------------
 
 # CCs, LV, LVThorn
-# todo: the order of Region2Diagnosis2, handling factor-character during paste()
 # todo: add amygdala
-# todo: display plots in different sizes in one screen
 
 # change the order of the levels in factor
-data.cc$Regions2=factor(data.cc$Region2,regions)
+data.cc$Regions2=factor(data.cc$Region2,regions)    # the order of the levels to be the same as in regions
 data.cc$Diagnosis2=factor(data.cc$Diagnosis2,rev(levels(data.cc$Diagnosis2)))
 n=length(levels(data.cc$Regions2));m=length(levels(data.cc$Diagnosis2))
 data.cc$R2D2=factor(
@@ -100,8 +97,8 @@ p1=ggplot(datax, aes(x=R2D2,y=Vol2,fill=Diagnosis2)) +
 
 jun.plot <- function(data.cc) {
     # change the order of the levels in factor
-    data.cc$Regions2=factor(data.cc$Region2)
-    data.cc$Diagnosis2=factor(data.cc$Diagnosis2,rev(levels(data.cc$Diagnosis2)))
+    data.cc$Regions2=factor(data.cc$Region2)     # the order of the leves are not changed
+    data.cc$Diagnosis2=factor(data.cc$Diagnosis2,rev(levels(data.cc$Diagnosis2)))    # lever order to be PRO, HVPRO
     n=length(levels(data.cc$Regions2));m=length(levels(data.cc$Diagnosis2))
     data.cc$R2D2=factor(
         paste(data.cc$Region2,data.cc$Diagnosis2,sep="."),
@@ -123,8 +120,7 @@ p4=jun.plot(data.amy)
 
 # Move to a new page
 grid.newpage()
-
-# Create layout : nrow = 2, ncol = 2
+# Create layout : nrow = 2, ncol = 3
 pushViewport(viewport(layout = grid.layout(2, 3)))
 # A helper function to define a region on the layout
 define_region <- function(row, col){
@@ -134,36 +130,6 @@ print(p1,vp=define_region(1,1:3))
 print(p2,vp=define_region(2,1))
 print(p3,vp=define_region(2,2))
 print(p4,vp=define_region(2,3))
-
-
-
-
-
-
-
-grid.arrange(p1,p2,p3,p4,nrow=2)
-
-
-p5=ggplot(data6, aes(x=GROUP,y=rLeft.Lateral.Ventricle,fill=SEX2)) +
-    scale_fill_manual(values=c("red","blue")) +
-    geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p6=ggplot(data6, aes(x=SEX2,y=rRight.Lateral.Ventricle,fill=GROUP)) +
-    scale_fill_manual(values=c("#E69F00","#009E73")) +
-    geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-p7=ggplot(data6, aes(x=SEX2,y=rLeft.Lateral.Ventricle,fill=GROUP)) +
-    scale_fill_manual(values=c("#E69F00","#009E73")) +
-    geom_dotplot(binaxis="y",stackdir="center") +
-    stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +
-#    guides(fill=FALSE) +    # don't display guide
-    theme(axis.title.x=element_blank())    # don't display x-axis-label
-grid.arrange(p4,p5,p6,p7,nrow=2)
-
 
 
 # ------------------------------------

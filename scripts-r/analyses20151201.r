@@ -157,8 +157,10 @@ datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
-items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
-items.col=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
+items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippoaumpus","r.Left.Hippocampus") # relative volume
+items.col=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
@@ -168,7 +170,8 @@ sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 sig.mtx
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
-items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala") # relative volume
+items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
 items.col=c("SOCFXC","ROLEFX","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)

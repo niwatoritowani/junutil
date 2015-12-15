@@ -30,6 +30,10 @@ field.names=c("Right.Amygdala","Left.Amygdala")
 data.amy=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
 summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.amy))
 
+field.names=c("Right.Hippocampus","Left.Hippocampus")   
+data.amy=jun.stack(fieldnames,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.amy))
+
 # analyses in subgroup
 
 datax=data.ex3.exna
@@ -38,7 +42,8 @@ dep.vars=
     "Right.Lateral.Ventricle","Left.Lateral.Ventricle",
     "X3rd.Venricle",
     "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent",
-    "Right.Amygdala","Left.Amygdala")
+    "Right.Amygdala","Left.Amygdala",
+    "Right.Hippocampus","Left.Hippocampus")
 
 exp.vars="GROUP+ICV"
 jun.ans(dep.vars,exp.vars,"")

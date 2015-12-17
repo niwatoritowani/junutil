@@ -166,10 +166,11 @@ items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
 mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
-mtx.p.hc=arr.hc[,,2]
+mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 #sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
-sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume

@@ -40,7 +40,7 @@ datax=data.ex3.exna
 dep.vars=
     c(regions,
     "Right.Lateral.Ventricle","Left.Lateral.Ventricle",
-    "X3rd.Venricle",
+    "X3rd.Ventricle",
     "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent",
     "Right.Amygdala","Left.Amygdala",
     "Right.Hippocampus","Left.Hippocampus")

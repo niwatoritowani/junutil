@@ -75,7 +75,8 @@ summary(aov(Vol2~Diagnosis2*Region2+ICV2+Error(Subject2/(Region2)),data=datax))
 datax=data.ex3.exna
 dep.vars=c(regions,"Right.Lateral.Ventricle","Left.Lateral.Ventricle",
     "X3rd.Ventricle",
-    "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent","Right.Amygdala","Left.Amygdala")
+    "Right.Inf.Lat.Vent","Left.Inf.Lat.Vent","Right.Amygdala","Left.Amygdala",
+    "Right.Hippocampus","Left.Hippocampus")
 
 exp.vars="GROUP+ICV"
 jun.ans(dep.vars,exp.vars,"")
@@ -158,16 +159,16 @@ data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
-    "r.Right.Hippoaumpus","r.Left.Hippocampus") # relative volume
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
 items.col=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
-mtx.p.pro=arr.pro[,,2]
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]
-sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
-sig.mtx
+#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",

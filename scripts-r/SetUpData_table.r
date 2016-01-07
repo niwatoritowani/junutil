@@ -29,6 +29,9 @@ datax=read.table(fsstatfile.aseg,header=TRUE)
 datax[["caseid2"]]=substring(datax[[1]],1,9)     # column 1 shoud be freesurfer subject ID
 datax[["ICV"]]=datax$EstimatedTotalIntraCranialVol    # change field name to be handled more easily
 datax[["Bil.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Left.Lateral.Ventricle    # summarize lt rt into bilateral
+datax[["Bil.Inf.Lat.Vent"]]=datax$Right.Inf.Lat.Vent+datax$Left.Inf.Lat.Vent
+datax[["Bil.Amygdala"]]=datax$Right.Amygdala+datax$Left.Amygdala
+datax[["Bil.Hippocampus"]]=datax$Right.Hippocampus+datax$Left.Hippocampus
 datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Right.choroid.plexus
 datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+datax$Left.choroid.plexus
 datax[["xBil.Lateral.Ventricle"]]=datax$xRight.Lateral.Ventricle+datax$xLeft.Lateral.Ventricle

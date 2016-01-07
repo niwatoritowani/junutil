@@ -1,3 +1,11 @@
+# ---------------------
+# to do
+# ---------------------
+
+- reedit the script for plot, deleting regions in corpus callosum exept for Central.
+- ANCOVA plot script was made based on the old script of ANCOVA. 
+
+
 # ------------------------------------
 # rANCOVA
 # ------------------------------------
@@ -70,7 +78,7 @@ options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
 summary(aov(Vol2~Diagnosis2*Region2+ICV2+Error(Subject2/(Region2)),data=datax))
 
 
-# 
+# ANCOVA in subgroups
 
 datax=data.ex3.exna
 dep.vars=c(regions,"Right.Lateral.Ventricle","Left.Lateral.Ventricle",
@@ -152,11 +160,11 @@ print(p4,vp=define_region(2,3))
 # correlation
 # ------------------------------------
 
-# todo add amygdala
-
 datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
+
+# correlatinon between volumes
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
@@ -172,6 +180,43 @@ mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
+# correlatinon between volumes, selected items, 2016/01/06
+
+items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
+#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
+# correlatinon between volumes, selected items, bilateral, 2016/01/06
+
+items.row=c("r.CC_Central","r.Bil.Lateral.Ventricle",
+    "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
+items.col=c("r.CC_Central","r.Bil.Lateral.Ventricle",
+    "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
+#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
+
+# correlation between volumes and clinical scores
+
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
 items.col=c("SOCFXC","ROLEFX","GAFC","GAFH","SIPTOTEV","SINTOTEV","SIDTOTEV","SIGTOTEV")
@@ -184,6 +229,36 @@ mtx.p.hc=arr.hc[,,2]
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
+# correlation between volumes and clinical scores, selected items, 2016/01/06
+
+items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("GAFC","SIPTOTEV","SINTOTEV")
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]
+#sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+
+# correlation between volumes and clinical scores, selected items, bilateral, 2016/01/06
+
+items.row=c("r.CC_Central","r.Bil.Lateral.Ventricle",
+    "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
+items.col=c("GAFC","SIPTOTEV","SINTOTEV")
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]
+#sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+
+
 # output table: combine rho and p
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab=matrix(NA,n,2*m)
@@ -195,6 +270,12 @@ rownames(mtx.pro.outtab)=rownames(mtx.p.pro)
 colnames(mtx.pro.outtab)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
 kable(mtx.pro.outtab)
 
+# output to file
+
+sink(file="tmp",append=TRUE)    # start output
+print(kable(mtx.pro.outtab))
+sink()    # stop output
+
 # output table: combine rho and p (remain only significant p)
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
@@ -205,6 +286,12 @@ for (p in 1:m) {
 rownames(mtx.pro.outtab.sig)=rownames(mtx.p.pro)
 colnames(mtx.pro.outtab.sig)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
 kable(mtx.pro.outtab.sig)
+
+# output to file
+
+sink(file="tmp",append=TRUE)    # start output
+print(kable(mtx.pro.outtab.sig))
+sink()    # stop output
 
 # ------------------------------------
 # correlation - plot
@@ -230,4 +317,25 @@ p8=ggplot(datax, aes(x=SIDTOTEV, y=r.CC_Posterior)) +
 p9=ggplot(datax, aes(x=SIDTOTEV, y=r.X3rd.Ventricle)) + 
     geom_point() + stat_smooth(method=lm, se=FALSE)
 grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, main = "Correlation")
+
+
+# correlateion plot, selected, 2016/01/06, 
+
+datax=data.pro
+p1=ggplot(datax, aes(x=SINTOTEV, y=r.Right.Lateral.Ventricle)) + 
+    geom_point() + stat_smooth(method=lm, se=FALSE)
+p2=ggplot(datax, aes(x=SINTOTEV, y=r.Left.Lateral.Ventricle)) + 
+    geom_point() + stat_smooth(method=lm, se=FALSE)
+p3=ggplot(datax, aes(x=SIPTOTEV, y=r.Left.Hippocampus)) + 
+    geom_point() + stat_smooth(method=lm, se=FALSE)
+grid.arrange(p1, p2, p3, main = "Correlation")
+
+
+
+
+
+
+
+
+
 

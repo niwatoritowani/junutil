@@ -1,3 +1,11 @@
+# ------------------------------
+# summary
+# ------------------------------
+
+- rANCOVA include hemisphere in addition to group and ICV as factors. 
+- jun.an2, jun.ans2 were created which display F value in addition to p value.
+- analysis in bilateral volume with group and ICV as factors.
+
 # -----------------------------------------------
 # to do
 # -----------------------------------------------
@@ -92,6 +100,7 @@ jun.ans=function(item,datacol,arg3){
 }
 
 # edit function. This is not described in functions.r. 
+#     - corrected to display also F value in addition to p value.
 
 jun.an2 <- function(arg1,arg2,arg3){
     # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)

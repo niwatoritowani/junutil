@@ -1,3 +1,16 @@
+# -------------------
+# summary
+# -------------------
+
+- rANCOVA with hemi, group, ICV as factors. This scripts were revised into analyses20151203.r. 
+- rANCOVA plot
+- correlation unilateral
+- correlation bilateral
+- table for correlation
+- plot for correlation
+- output data for prism
+
+
 # ---------------------
 # to do
 # ---------------------
@@ -331,10 +344,84 @@ p3=ggplot(datax, aes(x=SIPTOTEV, y=r.Left.Hippocampus)) +
 grid.arrange(p1, p2, p3, main = "Correlation")
 
 
+# --------------------------------
+# output data for prism 2016/02/01
+# --------------------------------
+
+- I would like to extract data for prism.
+- One problem is it is difficult to handle different record number in each field.
 
 
+# using list and write.csv
+
+datax=data.ex3.exna
+data.pro=subset(datax,GROUP=="PRO")
+data.hc=subset(datax,GROUP=="HVPRO")
+
+data4prism=list(
+    data.pro[["r.CC_Central"]],data.hc[["r.CC_Central"]],
+    data.pro[["r.Right.Lateral.Ventricle"]],data.hc[["r.Right.Lateral.Ventricle"]]
+)
+
+write.csv(matrix(data4prism),file="tmp")
+
+# write.csv can not use col.names and append.
+# This output a file ... "name", c(233, 455, 324, ...) in each line
+# But matrix() deletes field names. ... 
+# We can delete "c(" and ")" then output to a csv file by shell commands. 
+# cat tmp | tr -d 'c(' | tr -d ')' > tmpto.csv
+# We can transpose row-column by OpenOfficeCalc
 
 
+# using write.table for exapmles (the below is with for-loop)
+
+datax=data.ex3.exna
+data.pro=subset(datax,GROUP=="PRO")
+data.hc=subset(datax,GROUP=="HVPRO")
+
+cat("pro.r.CC_Central",file="tmp.csv.rownames",append=TRUE)
+cat("\n",file="tmp.csv.rownames",append=TRUE)
+write.table(t(data.pro[["r.CC_Central"]]),file="tmp.csv",col.names=FALSE,append=TRUE,sep=",")
+cat("hc.r.CC_Central",file="tmp.csv.rownames",append=TRUE)
+cat("\n",file="tmp.csv.rownames",append=TRUE)
+write.table(t(data.hc[["r.CC_Central"]]),file="tmp.csv",col.names=FALSE,append=TRUE,sep=",")
+cat("pro.r.Right.Lateral.Ventricle",file="tmp.csv.rownames",append=TRUE)
+cat("\n",file="tmp.csv.rownames",append=TRUE)
+write.table(t(data.pro[["r.Right.Lateral.Ventricle"]]),file="tmp.csv",col.names=FALSE,append=TRUE,sep=",")
+cat("hc.r.Right.Lateral.Ventricle",file="tmp.csv.rownames",append=TRUE)
+cat("\n",file="tmp.csv.rownames",append=TRUE)
+write.table(t(data.hc[["r.Right.Lateral.Ventricle"]]),file="tmp.csv",col.names=FALSE,append=TRUE,sep=",")
+
+# In terminlal, these files are combined. 
+# paste -d"," tmp.csv.rownames tmp.csv > tmp2.csv
+# We can transpose row-column by OpenOfficeCalc
+
+
+# using write.table with for-loop
+
+datax=data.ex3.exna
+data.pro=subset(datax,GROUP=="PRO")
+data.hc=subset(datax,GROUP=="HVPRO")
+
+rownamesfile="tmp.csv.rownames"
+csvfile="tmp.csv"
+items=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus","GAFC","SIPTOTEV","SINTOTEV")
+for (arg in items) {
+    cat("pro.",file=rownamesfile,append=TRUE)
+    cat(arg,file=rownamesfile,append=TRUE)
+    cat("\n",file=rownamesfile,append=TRUE)
+    write.table(t(data.pro[[arg]]),file=csvfile,col.names=FALSE,append=TRUE,sep=",")
+    cat("hc.",file=rownamesfile,append=TRUE)
+    cat(arg,file=rownamesfile,append=TRUE)
+    cat("\n",file=rownamesfile,append=TRUE)
+    write.table(t(data.hc[[arg]]),file=csvfile,col.names=FALSE,append=TRUE,sep=",")
+}
+
+# In terminlal, these files are combined. 
+# paste -d"," tmp.csv.rownames tmp.csv > tmp2.csv
+# We can transpose row-column by OpenOfficeCalc
 
 
 

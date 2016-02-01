@@ -1,3 +1,11 @@
+# --------------------------
+# summary
+# --------------------------
+
+- correlation
+- FDR correction
+- general linear model
+
 # ----------------------------
 # correlation
 # ----------------------------

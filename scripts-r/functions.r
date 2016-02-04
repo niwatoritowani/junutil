@@ -66,7 +66,7 @@ mkpvalmtx <- function(datax,items,models) {
 
 # function jun.cor.test
 
-jun.cor.test <-function (items.row,items.col,items.ana,datax) {
+jun.cor.test <- function (items.row,items.col,items.ana,datax) {
     n=length(items.row)    # i
     m=length(items.col)   # j
     o=length(items.ana)   # k

@@ -1,0 +1,57 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+define_region	analyses20151201.r	/^define_region <- function(row, col){$/;"	f
+delna	SetUpData_table.r	/^delna <- function(datax){$/;"	f
+extractsig	functions.r	/^extractsig <- function(sig.mtx) {$/;"	f
+extractsig	rscript4.r	/^extractsig <- function(sig.mtx) {$/;"	f
+extractsig.rho	functions.r	/^extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {$/;"	f
+extractsig.rho	rscript4.r	/^extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {$/;"	f
+funclm	functions.r	/^    funclm <- function(arg1,arg2,arg3){$/;"	f
+funclm	rscript3.r	/^funclm <- function(arg1){$/;"	f
+funclm	rscript3.r	/^funclm <- function(arg1,arg2){$/;"	f
+funclm	rscript3.r	/^funclm <- function(arg1,arg2,arg3){$/;"	f
+funclm	rscript4.r	/^    funclm <- function(arg1,arg2,arg3){$/;"	f
+funclm	rscript4.r	/^funclm <- function(arg1,arg2,arg3){$/;"	f
+funclm1	rscript3.r	/^funclm1 <- function(arg1){$/;"	f
+funclm1	rscript4.r	/^funclm1 <- function(arg1){$/;"	f
+funclm2	rscript3.r	/^funclm2 <- function(arg1){$/;"	f
+funclm3	rscript3.r	/^funclm3 <- function(arg1){$/;"	f
+funclm4	rscript3.r	/^funclm4 <- function(arg1,arg2){$/;"	f
+funclm4	rscript4.r	/^funclm4 <- function(arg1,arg2){$/;"	f
+funclm5	rscript3.r	/^funclm5 <- function(arg1,arg2){$/;"	f
+jun.an	analyses20151203.r	/^jun.an <- function(arg1,arg2,arg3){$/;"	f
+jun.an	functions.r	/^jun.an <- function(arg1,arg2,arg3){$/;"	f
+jun.an2	analyses20151203.r	/^jun.an2 <- function(arg1,arg2,arg3){$/;"	f
+jun.brunner.munzel.test	functions.r	/^jun.brunner.munzel.test = function(item){$/;"	f
+jun.cor.test	functions.r	/^jun.cor.test <- function (items.row,items.col,items.ana,datax) {$/;"	f
+jun.heatmap	functions.r	/^jun.heatmap <- function(sig.mtx) {$/;"	f
+jun.heatmap	rscript4.r	/^jun.heatmap <- function(sig.mtx) {$/;"	f
+jun.heatmap.rho	functions.r	/^jun.heatmap.rho <- function(sig.mtx) {$/;"	f
+jun.heatmap.rho	rscript4.r	/^jun.heatmap.rho <- function(sig.mtx) {$/;"	f
+jun.lm	analyses20151117.r	/^jun.lm <- function(arg1,arg2,arg3){$/;"	f
+jun.lm	functions.r	/^jun.lm <- function(arg1,arg2,arg3){$/;"	f
+jun.lmp	analyses20151117.r	/^jun.lmp <- function(arg1,arg2,arg3){$/;"	f
+jun.plot	analyses20151201.r	/^jun.plot <- function(data.cc) {$/;"	f
+jun.prunner.munzel.tests	functions.r	/^jun.prunner.munzel.tests = function(items){$/;"	f
+jun.stack	analyses20151203.r	/^jun.stack <- function(fieldnames1,fieldnames2){$/;"	f
+jun.wilcox_test	functions.r	/^jun.wilcox_test <- function(variable1,factor){$/;"	f
+jun.wilcox_tests	functions.r	/^jun.wilcox_tests <- function(variables1,factors){$/;"	f
+merge.tbl	SetUpData_table.r	/^merge.tbl <- function(data4,datax){$/;"	f
+merge.tbl	rscript4.r	/^merge.tbl <- function(fsstatfile,datax){$/;"	f
+mkcmd	rscript3.r	/^mkcmd <- function(arg1){$/;"	f
+mkpvalmtx	functions.r	/^mkpvalmtx <- function(datax,items,models) {$/;"	f
+mkpvalmtx	rscript4.r	/^mkpvalmtx <- function(datax,items,models) {$/;"	f
+mtx.adjust	functions.r	/^mtx.adjust <- function(pvaluesmatrix,meth){$/;"	f
+mtx.adjust	rscript4.r	/^mtx.adjust <- function(pvaluesmatrix,meth){$/;"	f
+myfunc	rscript2.r	/^myfunc <- function(input,column,output){$/;"	f
+myfunc2	rscript2.r	/^myfunc2 <- function(input,column,output){$/;"	f
+myfunc3	rscript2.r	/^myfunc3 <- function(input,column,output){$/;"	f
+run	rscript3.r	/^run <- function(arg1){$/;"	f
+sigmtx	functions.r	/^sigmtx <- function(mtx) {$/;"	f
+sigmtx	rscript4.r	/^sigmtx <- function(mtx) {$/;"	f
+sigmtx.rho	functions.r	/^sigmtx.rho <- function(p.mtx,rho.mtx) {$/;"	f
+sigmtx.rho	rscript4.r	/^sigmtx.rho <- function(p.mtx,rho.mtx) {$/;"	f

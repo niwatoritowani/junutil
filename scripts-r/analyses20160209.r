@@ -32,11 +32,11 @@ summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.lv))
 
 field.names=c("r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent") 
 data.lvt=jun.stack(field.names,c("caseid2","GROUP"))
-summary(aov(values~ind*GROUPError(caseid2/ind),data=data.lvt))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.lvt))
 
 field.names=c("r.Right.Amygdala","r.Left.Amygdala")   
 data.amy=jun.stack(field.names,c("caseid2","GROUP"))
-summary(aov(values~ind*GROUPError(caseid2/ind),data=data.amy))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")   
 data.amy=jun.stack(field.names,c("caseid2","GROUP"))
@@ -44,7 +44,7 @@ summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 
 # ---------------------------------------------------------
-# ANOVA with r.bil.volume ~ group (ISFactor)
+# ANOVA with r.bil.volume ~ group
 # ---------------------------------------------------------
 
 datax=data.ex3.exna
@@ -58,3 +58,17 @@ exp.vars="GROUP"
 output=jun.ans2(dep.vars,exp.vars,"")
 output
 
+
+# ---------------------------------------------------------
+# ANOVA with r.hemi.volume ~ group
+# ---------------------------------------------------------
+
+datax=data.ex3.exna
+dep.vars=
+    c("r.CC_Central",
+    "r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent",
+    "r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus")
+exp.vars="GROUP"
+jun.ans2(dep.vars,exp.vars,"")

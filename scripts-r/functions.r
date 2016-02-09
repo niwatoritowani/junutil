@@ -40,6 +40,32 @@ jun.ans=function(item,datacol,arg3){
 }
 
 
+# jun.an2
+#     - corrected to display also F value in addition to p value.
+#     - This was copied from analyses20151203.r 2016/02/09. 
+
+jun.an2 <- function(arg1,arg2,arg3){
+    # arg1:character; arg2:character;arg3:character; r=lm(arg1~arg2arg3,data=datax)
+    options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
+    txt1="r=lm("; txt2=arg1; txt3="~"; txt4=arg2; txt5=arg3;txt6=",data=datax)"
+    txt0=paste(txt1,txt2,txt3,txt4,txt5,txt6,sep="")
+    eval(parse(text=txt0)); s=summary(r)
+#    cat("---------------------------\n")
+#    print(s[["call"]]);    # show model
+#    print(s[["coefficients"]][,c(1,4)])
+    an=Anova(r,type=3)    # substitute anova type3
+    F.p=data.frame(region=arg1,F=an["F value"][2,],p=an["Pr(>F)"][2,])
+    F.p
+}
+jun.ans2=function(item,datacol,arg3){
+    m=length(item); n=length(datacol); output=data.frame();
+    for ( j in 1:m) {for ( i in 1:n ) {
+        output=rbind(output,jun.an2(item[j],datacol[i],arg3))}
+    }
+    output
+}
+
+
 # function mkpvalmtx
 
 mkpvalmtx <- function(datax,items,models) {
@@ -91,6 +117,7 @@ sigmtx <- function(mtx) {
     sig.mtx
 }
 
+
 # function jun.heatmap
 
 jun.heatmap <- function(sig.mtx) {
@@ -108,6 +135,7 @@ jun.heatmap <- function(sig.mtx) {
         theme(axis.title.y=element_blank())
 }
 
+
 # function extractsigsig
 
 extractsig <- function(sig.mtx) {
@@ -118,6 +146,7 @@ extractsig <- function(sig.mtx) {
     subset
 }
 
+
 # function sigmtx.rho
 
 sigmtx.rho <- function(p.mtx,rho.mtx) {
@@ -126,6 +155,7 @@ sigmtx.rho <- function(p.mtx,rho.mtx) {
     sig.rho.mtx[!mask.p.mtx]=NA
     sig.rho.mtx
 }
+
 
 # function jun.heatmap.rho
 
@@ -144,6 +174,7 @@ jun.heatmap.rho <- function(sig.mtx) {
         theme(axis.title.y=element_blank())
 }
 
+
 # function extractsigsig.rho
 
 extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {
@@ -154,6 +185,7 @@ extractsig.rho <- function(sig.p.mtx,sig.rho.mtx) {
     subset.rho
 }
 
+
 # function mtx.adjust
 
 mtx.adjust <- function(pvaluesmatrix,meth){
@@ -162,6 +194,7 @@ mtx.adjust <- function(pvaluesmatrix,meth){
     colnames(mtx.adjusted)=colnames(pvaluesmatrix)
     mtx.adjusted
 }
+
 
 # wilcox_text(variable1~factor1),distribution="exact")
 
@@ -181,6 +214,7 @@ jun.wilcox_tests <- function(variables1,factors){
 
 # example
 # items=c(regions2,regions2x); factors="GROUP"; jun.wilcox_tests(items,factors)
+
 
 # brunner.munzel.test(subset(datax,GROUP=="PRO")$volume, subset(datax,GROUP=="HVPRO")$volume)
 
@@ -204,6 +238,15 @@ jun.prunner.munzel.tests = function(items){
 # items=c(regions2,regions2x); jun.prunner.munzel.tests(items)
 
 
+# jun.stack
+#     - for rANOVA
+#     - from analyses20151203.r
+
+jun.stack <- function(fieldnames1,fieldnames2){
+    datax.stack=stack(datax[fieldnames1])
+    datax.stack[fieldnames2]=datax[fieldnames2]
+    datax.stack
+}
 
 
 

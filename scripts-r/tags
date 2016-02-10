@@ -23,9 +23,8 @@ funclm3	rscript3.r	/^funclm3 <- function(arg1){$/;"	f
 funclm4	rscript3.r	/^funclm4 <- function(arg1,arg2){$/;"	f
 funclm4	rscript4.r	/^funclm4 <- function(arg1,arg2){$/;"	f
 funclm5	rscript3.r	/^funclm5 <- function(arg1,arg2){$/;"	f
-jun.an	analyses20151203.r	/^jun.an <- function(arg1,arg2,arg3){$/;"	f
 jun.an	functions.r	/^jun.an <- function(arg1,arg2,arg3){$/;"	f
-jun.an2	analyses20151203.r	/^jun.an2 <- function(arg1,arg2,arg3){$/;"	f
+jun.an2	functions.r	/^jun.an2 <- function(arg1,arg2,arg3){$/;"	f
 jun.brunner.munzel.test	functions.r	/^jun.brunner.munzel.test = function(item){$/;"	f
 jun.cor.test	functions.r	/^jun.cor.test <- function (items.row,items.col,items.ana,datax) {$/;"	f
 jun.heatmap	functions.r	/^jun.heatmap <- function(sig.mtx) {$/;"	f
@@ -37,7 +36,7 @@ jun.lm	functions.r	/^jun.lm <- function(arg1,arg2,arg3){$/;"	f
 jun.lmp	analyses20151117.r	/^jun.lmp <- function(arg1,arg2,arg3){$/;"	f
 jun.plot	analyses20151201.r	/^jun.plot <- function(data.cc) {$/;"	f
 jun.prunner.munzel.tests	functions.r	/^jun.prunner.munzel.tests = function(items){$/;"	f
-jun.stack	analyses20151203.r	/^jun.stack <- function(fieldnames1,fieldnames2){$/;"	f
+jun.stack	functions.r	/^jun.stack <- function(fieldnames1,fieldnames2){$/;"	f
 jun.wilcox_test	functions.r	/^jun.wilcox_test <- function(variable1,factor){$/;"	f
 jun.wilcox_tests	functions.r	/^jun.wilcox_tests <- function(variables1,factors){$/;"	f
 merge.tbl	SetUpData_table.r	/^merge.tbl <- function(data4,datax){$/;"	f

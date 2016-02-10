@@ -2,6 +2,7 @@
 # statistics
 # ----------------
 
+
 # function jun.lm
 
 jun.lm <- function(arg1,arg2,arg3){
@@ -90,6 +91,7 @@ mkpvalmtx <- function(datax,items,models) {
     pvaluesmatrix
 }
 
+
 # function jun.cor.test
 
 jun.cor.test <- function (items.row,items.col,items.ana,datax) {
@@ -107,6 +109,29 @@ jun.cor.test <- function (items.row,items.col,items.ana,datax) {
     }
     arr
 }
+
+
+# function jun.cor.test.ps
+#     - 2016/02/10
+#     - created from jun.cor.test
+#     - change method from spearman to pearson
+
+jun.cor.test.ps <- function (items.row,items.col,items.ana,datax) {
+    n=length(items.row)    # i
+    m=length(items.col)   # j
+    o=length(items.ana)   # k
+    arr=array(0,dim=c(n,m,o))
+    dimnames(arr)=list(items.row,items.col,items.ana)
+    for (k in 1:o) {
+        for (j in 1:m) {
+            for (i in 1:n) {
+                arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method="pearson")[[items.ana[k]]]
+            }
+        }
+    }
+    arr
+}
+
 
 # function sigmtx
 

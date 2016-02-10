@@ -106,8 +106,6 @@ exp.vars="GROUP*SEX2+ICV"
 jun.ans(dep.vars,exp.vars,"")
 
 
-
-
 # ------------------------------------
 # rANCOVA - plot
 # ------------------------------------
@@ -177,6 +175,7 @@ datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
+
 # correlatinon between volumes
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
@@ -192,6 +191,7 @@ mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
 
 # correlatinon between volumes, selected items, 2016/01/06
 
@@ -210,6 +210,7 @@ mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
 
 # correlatinon between volumes, selected items, bilateral, 2016/01/06
 
@@ -242,6 +243,7 @@ mtx.p.hc=arr.hc[,,2]
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
+
 # correlation between volumes and clinical scores, selected items, 2016/01/06
 
 items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
@@ -256,6 +258,7 @@ mtx.p.hc=arr.hc[,,2]
 #sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+
 
 # correlation between volumes and clinical scores, selected items, bilateral, 2016/01/06
 
@@ -283,11 +286,13 @@ rownames(mtx.pro.outtab)=rownames(mtx.p.pro)
 colnames(mtx.pro.outtab)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
 kable(mtx.pro.outtab)
 
+
 # output to file
 
 sink(file="tmp",append=TRUE)    # start output
 print(kable(mtx.pro.outtab))
 sink()    # stop output
+
 
 # output table: combine rho and p (remain only significant p)
 
@@ -300,11 +305,13 @@ rownames(mtx.pro.outtab.sig)=rownames(mtx.p.pro)
 colnames(mtx.pro.outtab.sig)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
 kable(mtx.pro.outtab.sig)
 
+
 # output to file
 
 sink(file="tmp",append=TRUE)    # start output
 print(kable(mtx.pro.outtab.sig))
 sink()    # stop output
+
 
 # ------------------------------------
 # correlation - plot

@@ -52,8 +52,8 @@ data.amy=jun.stack(field.names,c("caseid2","GROUP","ICV"))
 summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.amy))
 
 field.names=c("Right.Hippocampus","Left.Hippocampus")   
-data.amy=jun.stack(field.names,c("caseid2","GROUP","ICV"))
-summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=data.amy))
+data.hip=jun.stack(field.names,c("caseid2","GROUP","ICV"))
+summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=hip.amy))
 
 
 # analyses in subgroup

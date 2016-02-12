@@ -2,21 +2,23 @@
 # summary
 # -------------------
 
-- rANCOVA with hemi, group, ICV as factors. This scripts were revised into analyses20151203.r. 
-- rANCOVA plot
-- correlation unilateral
-- correlation bilateral
-- table for correlation
-- plot for correlation
-- output data for prism
+# - rANCOVA with hemi, group, ICV as factors. This scripts were revised into analyses20151203.r. 
+# - rANCOVA plot
+# - correlation unilateral
+# - correlation bilateral
+# - correlation bilateral pearson
+# - table for correlation
+# - plot for correlation
+# - output data for prism
 
+# - This file is for correlation nalysis and plot of correlation analysis
 
 # ---------------------
 # to do
 # ---------------------
 
-- reedit the script for plot, deleting regions in corpus callosum exept for Central.
-- ANCOVA plot script was made based on the old script of ANCOVA. 
+# - reedit the script for plot, deleting regions in corpus callosum exept for Central.
+# - ANCOVA plot script was made based on the old script of ANCOVA. 
 
 
 # ------------------------------------
@@ -171,6 +173,9 @@ print(p4,vp=define_region(2,3))
 # correlation
 # ------------------------------------
 
+
+# set up data
+
 datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
@@ -229,6 +234,23 @@ mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
 
+# correlatinon between volumes, selected items, bilateral, pearson, 2016/02/12
+
+items.row=c("r.CC_Central","r.Bil.Lateral.Ventricle",
+    "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
+items.col=c("r.CC_Central","r.Bil.Lateral.Ventricle",
+    "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test.ps(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test.ps(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
+#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
+
 # correlation between volumes and clinical scores
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
@@ -273,6 +295,15 @@ mtx.p.hc=arr.hc[,,2]
 #sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+
+
+# --------------------
+# output table
+# --------------------
+
+# - input are supposed to be the results of above correlation analyses
+# - output table
+# - output table to file
 
 
 # output table: combine rho and p
@@ -429,7 +460,3 @@ for (arg in items) {
 # In terminlal, these files are combined. 
 # paste -d"," tmp.csv.rownames tmp.csv > tmp2.csv
 # We can transpose row-column by OpenOfficeCalc
-
-
-
-

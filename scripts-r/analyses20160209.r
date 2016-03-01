@@ -15,16 +15,10 @@
 options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
 
 
-# # functions
-# jun.stack <- function(fieldnames1,fieldnames2){
-#     datax.stack=stack(datax[fieldnames1])
-#     datax.stack[fieldnames2]=datax[fieldnames2]
-#     datax.stack
-# }
-
-
 # analyses
 datax=data.ex3.exna
+
+summary(aov(r.CC_Central~GROUP,data=datax))
 
 field.names=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle")  
 data.lv=jun.stack(field.names,c("caseid2","GROUP"))
@@ -55,8 +49,7 @@ dep.vars=
     "r.Bil.Amygdala",
     "r.Bil.Hippocampus")
 exp.vars="GROUP"
-output=jun.ans2(dep.vars,exp.vars,"")
-output
+jun.ans2(dep.vars,exp.vars,"")    # output table
 
 
 # ---------------------------------------------------------
@@ -71,4 +64,5 @@ dep.vars=
     "r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus")
 exp.vars="GROUP"
-jun.ans2(dep.vars,exp.vars,"")
+jun.ans2(dep.vars,exp.vars,"")    # output table
+

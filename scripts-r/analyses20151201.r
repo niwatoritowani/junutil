@@ -2,11 +2,9 @@
 # summary
 # -------------------
 
-# - rANCOVA with hemi, group, ICV as factors. This scripts were revised into analyses20151203.r. 
-# - rANCOVA plot
-# - correlation unilateral
-# - correlation bilateral
-# - correlation bilateral pearson
+# - rANCOVA ~hemi*group+ICV. This scripts were revised into analyses20151203.r. 
+# - rANCOVA plot, jun.plot()
+# - correlation vol~vol, vol~cli; hemi, bil; spearman, pearson;
 # - table for correlation
 # - plot for correlation
 # - output data for prism

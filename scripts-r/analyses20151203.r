@@ -3,9 +3,10 @@
 # ------------------------------
 
 # - rANCOVA volumes ~ hemi * group + ICV (hemi as WSFactor) 
+# - ANCOVA hemi.volumes ~ group [*sex] + ICV, This was revised into the below. 
 # - jun.an2, jun.ans2 were created which display F value in addition to p value.
-# - ANCOVA volumes ~ group + ICV. output F values and p values. 
-# - ANCOVA bol.volumes ~ group + ICV
+# - ANCOVA hemi.volumes ~ group [*sex] + ICV : table with F and p
+# - ANCOVA bil.volumes ~ group [*sex] + ICV  : table with F and p
 
 
 # -----------------------------------------------
@@ -17,7 +18,7 @@
 
 
 # --------------------------------------------
-# rANCOVA
+# rANCOVA vol~hemi*group+ICV
 # --------------------------------------------
 
 
@@ -34,6 +35,7 @@ options(contrasts = c("contr.sum", "contr.sum")) # for Anova()
 
 
 # analyses
+
 datax=data.ex3.exna
 field.names=regions
 data.cc=jun.stack(field.names,c("caseid2","GROUP","ICV"))
@@ -56,7 +58,7 @@ data.hip=jun.stack(field.names,c("caseid2","GROUP","ICV"))
 summary(aov(values~ind*GROUP+ICV+Error(caseid2/ind),data=hip.amy))
 
 
-# analyses in subgroup
+# analyses in subgroup : hemi.vol~group+ICV
 
 datax=data.ex3.exna
 dep.vars=
@@ -171,7 +173,4 @@ output=jun.ans2(dep.vars,exp.vars,"")
 output
 
 
-# --------------------------------------------
-# rANCOVA - plots
-# --------------------------------------------
 

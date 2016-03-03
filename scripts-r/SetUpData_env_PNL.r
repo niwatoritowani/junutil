@@ -4,6 +4,7 @@ library(knitr)    # for kable
 library(ggplot2)
 library(gridExtra)
 library(car)    # for Anova()
+library(ppcor) # for pcor.test partial correlation analysis
 
 setwd("/projects/schiz/3Tprojects/2015-jun-prodrome/stats/02_editedfreesurfer")
 #demographictable="/projects/schiz/3Tprojects/2015-jun-prodrome/caselist/Caselist_CC_prodromes.xlsx"

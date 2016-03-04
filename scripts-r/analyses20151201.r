@@ -197,7 +197,7 @@ mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
 
-# correlatinon between volumes, selected items, 2016/01/06
+# correlatinon between volumes, selected items, spearman, 2016/01/06
 
 items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
     "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
@@ -212,11 +212,31 @@ mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 #sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
 
-# correlatinon between volumes, selected items, bilateral, 2016/01/06
+# correlatinon between volumes, selected items, pearson, 2016/03/03
+
+items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test.ps(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test.ps(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
+#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
+
+# correlatinon between volumes, selected items, bilateral, spearman, 2016/01/06
 
 items.row=c("r.CC_Central","r.Bil.Lateral.Ventricle",
     "r.Bil.Inf.Lat.Vent","r.Bil.Amygdala","r.Bil.Hippocampus") # relative volume
@@ -229,6 +249,7 @@ mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 #sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
@@ -265,7 +286,7 @@ mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
 
-# correlation between volumes and clinical scores, selected items, 2016/01/06
+# correlation between volumes and clinical scores, selected items, spearman, 2016/01/06
 
 items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
     "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
@@ -278,6 +299,24 @@ mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]
 #sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
+sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+
+
+# correlation between volumes and clinical scores, selected items, pearson, 2016/03/03
+
+items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("GAFC","SIPTOTEV","SINTOTEV")
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test.ps(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test.ps(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]
+#sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
 
@@ -293,6 +332,7 @@ mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]
 #sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
 sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 
 
@@ -328,7 +368,8 @@ sink()    # stop output
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
 for (p in 1:m) {
-    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
+#    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
+    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]
     mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.sig[,p]
 }
 rownames(mtx.pro.outtab.sig)=rownames(mtx.p.pro)

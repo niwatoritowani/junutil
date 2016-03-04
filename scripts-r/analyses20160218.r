@@ -129,9 +129,14 @@ jun.plot3 <- function(datax,ylabel1,xlabel1) {
 #    datax=data.cc
     ylabel=paste("Volumes of",ylabel1)    # combine tests for y label
     p1=ggplot(datax, aes(x=R2D2,y=values,fill=ind)) +
-        scale_fill_manual(values=c("red","blue")) +
+#        scale_fill_manual(values=c("red","blue")) +    # use default color if commented out
+        stat_summary(fun.ymin=function(x) mean(x), fun.ymax=function(x) mean(x), 
+            geom="errorbar", width=0.3) + # add mean as a error bar
+        stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
+            geom="errorbar", width=0.15) + # error bar
         geom_dotplot(binaxis="y",stackdir="center") +
 #        stat_summary(fun.y="mean",goem="point",shape=23,size=0.5,fill="black",ymin=0,ymax=0) +  # add mean
+#        geom_errorbar(aes(ymin=values-se,ymax=values+se), width=.3) +    # This did not work
         guides(fill=FALSE) +    # don't display guide
 #        theme(axis.title.x=element_blank()) +    # don't display x-axis-label : GROUP
         xlab("CHR                   HC") +    #  change x-axils-label
@@ -140,6 +145,10 @@ jun.plot3 <- function(datax,ylabel1,xlabel1) {
         ylab(ylabel)    # change the label of y axis
     p1
 }
+
+# geom: errorbar, point, bar, line, ... 2016/03/03. 
+#     - errorbar needs fun.y and fun.ymin and fun.ymax
+#     - bar needs fun.y and fun.ymin
 
 
 # make plot componets
@@ -176,7 +185,7 @@ print(p4,vp=define_region(3,1))
 # - 2016/02/24
 
 ppi=300    # 300 is better
-png("plot_vol_group_201602291915.png",width=4*ppi, height=12*ppi, res=ppi)
+png("plot_vol_group_201603031917.png",width=4*ppi, height=12*ppi, res=ppi)
 # plot
 dev.off()
 

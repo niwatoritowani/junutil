@@ -4,8 +4,10 @@
 
 # - plots of volumes between groups combining hemi, jun.plot2()
 # - plots of volumes between groups separating hemi, jun.plot3()
-# - plots of correlation
-# - plots of correlation relative
+# - output plot as a pmg
+# - plots of volumes between groups separating hemi, relative, jun.plot4()
+# - plots of correlation 1
+# - plots of correlation 2 relative
 
 
 # -----------------------------------------------
@@ -15,9 +17,9 @@
 # - change transparency of the dots in the plots
 
 
-# -----------------------------------------------
-# plots of volumes between grops combinig hemi
-# -----------------------------------------------
+# ----------------------------------------------------
+# plots of volumes between grops with hemi in one axis
+# ----------------------------------------------------
 
 
 # set up data
@@ -51,7 +53,7 @@ jun.plot2 <- function(data.cc,ylabel1) {
     )
 
     datax=data.cc
-    ylabel=paste("Volumes of",ylabel1)    # combine tests for y label
+    ylabel=paste("Volumes of",ylabel1)    # combine texts for y label
     p1=ggplot(datax, aes(x=GROUP,y=values,fill=ind)) +
         scale_fill_manual(values=c("red","blue")) +
         geom_dotplot(binaxis="y",stackdir="center") +
@@ -186,12 +188,67 @@ print(p4,vp=define_region(3,1))
 
 ppi=300    # 300 is better
 png("plot_vol_group_201603031917.png",width=4*ppi, height=12*ppi, res=ppi)
-# plot
+# something plot
 dev.off()
 
 
+# ---------------------------------------------------------------------------------
+# plots of volumes between grops separated by hemi 2 summarized relative 2016/03/04
+# ---------------------------------------------------------------------------------
+
+datax=data.ex3.exna
+items1=c("caseid2","GROUP","ICV")
+data.cc=jun.stack(c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior"), items1)
+data.cc.central=subset(data.cc,ind=="r.CC_Central")
+data.lvt=jun.stack(c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle"),items1)
+data.amy=jun.stack(c("r.Right.Amygdala","r.Left.Amygdala"),items1)
+
+jun.plot4 <- function(datax,ylabel1,xlabel1) {
+    datax$ind=factor(datax$ind)     # the order of the leves are not changed
+    datax$GROUP=factor(datax$GROUP,rev(levels(datax$GROUP)))    # lever order to be PRO, HVPRO
+    n=length(levels(datax$ind));m=length(levels(datax$GROUP))
+    datax$R2D2=factor(    # factor(vector,levels) can explicitly express the order of the levels
+        paste(datax$ind,datax$GROUP,sep="."),     # example r.lt.amygdala.PRO
+        paste(levels(datax$ind)[rep(1:n,m)],levels(datax$GROUP)[sort(rep(1:m,n))],sep=".")    # hemi.Gr
+    )
+    ggplot(datax, aes(x=R2D2,y=values,fill=ind)) +
+        geom_dotplot(binaxis="y",stackdir="center") +
+        stat_summary(fun.ymin=function(x) mean(x), fun.ymax=function(x) mean(x), 
+            geom="errorbar", width=0.3) + # add mean as a error bar
+        stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
+            geom="errorbar", width=0.15) + # error bar
+        guides(fill=FALSE) +    # don't display guide
+        xlab("CHR                   HC") +    #  change x-axils-label
+        scale_x_discrete(breaks=c(levels(datax$R2D2)), labels=c(xlabel1)) +   # change the x scale labels
+        ylab(paste("Relative volumes of", ylabel1))    # change the label of y axis
+}
+
+jun.print.plot <- function() {
+    p1=jun.plot4(data.cc.central,"\nthe CCC",c("",""))
+    xlabel1=c("left","right","left","right")
+    p3=jun.plot4(data.lvt,"\nthe temporal horns of the LV",xlabel1)
+    p4=jun.plot4(data.amy,"\nthe amygdala",xlabel1) 
+
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(3,1)))
+    define_region <- function(row, col) {
+      viewport(layout.pos.row = row, layout.pos.col = col)
+    }
+    print(p1,vp=define_region(1,1))
+    print(p3,vp=define_region(2,1))
+    print(p4,vp=define_region(3,1))
+}
+jun.print.plot()
+
+
+# output plot
+
+ppi=300; png("plot_vol_group_201603040000.png",width=4*ppi, height=12*ppi, res=ppi)
+jun.print.plot(); dev.off()
+
+
 # -----------------------------------------------
-# plots of correlation
+# plots of correlation 1
 # -----------------------------------------------
 
 
@@ -200,11 +257,11 @@ dev.off()
 datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
+datax=data.pro
 
 
 # plot
 
-datax=data.pro
 p1=ggplot(datax, aes(x=r.Bil.Lateral.Ventricle, y=r.Bil.Inf.Lat.Vent)) +
     geom_point() + stat_smooth(method=lm, se=FALSE) +
     xlab("Volumes of LV") +
@@ -220,9 +277,8 @@ p3=ggplot(datax, aes(x=SIPTOTEV, y=r.Bil.Hippocampus)) +
 grid.arrange(p1, p2, p3, main = "Correlation")
 
 
-
 # -----------------------------------------------
-# plots of correlation
+# plots of correlation 2 relative
 # -----------------------------------------------
 
 
@@ -269,6 +325,35 @@ grid.arrange(p2, p3)
 
 ppi=300    # 300 is better
 png("plot_correlation_201602291916.png",width=4*ppi, height=8*ppi, res=ppi)
-# plot
+grid.arrange(p2, p3) 
 dev.off()
+
+
+# ---------------------------------------------------
+# plots of correlation 2 relative 2 trial, 2016/03/04
+# ---------------------------------------------------
+
+datax=data.ex3.exna
+data.pro=subset(datax,GROUP=="PRO");    data.hc=subset(datax,GROUP=="HVPRO")
+datax=data.pro
+items1=c("caseid2","GROUP","ICV","SINTOTEV","SIPTOTEV")
+data.lv=jun.stack(c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle"),items1)
+data.hip=jun.stack(c("r.Right.Hippocampus","r.Left.Hippocampus"),items1)
+
+p2=ggplot(data.lv, aes(x=SINTOTEV, y=values,colour=ind)) +
+    geom_point() + stat_smooth(method=lm, se=FALSE) +
+    xlab("Negative symptom score") + 
+    ylab("Relative volumes of the LV") +
+    theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))    
+p3=ggplot(data.hip, aes(x=SIPTOTEV, y=values,colour=ind)) +
+    geom_point() + stat_smooth(method=lm, se=FALSE) +
+    xlab("Positive symptom score") +
+    ylab("Relative volumes of the hippocampus") +
+    theme(legend.position=c(0,0),legend.justification=c(0,0)) +    # this works 
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))    
+grid.arrange(p2, p3) 
+
 

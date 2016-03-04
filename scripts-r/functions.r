@@ -95,7 +95,7 @@ mkpvalmtx <- function(datax,items,models) {
 # function jun.cor.test
 
 jun.cor.test <- function (items.row,items.col,items.ana,datax) {
-    n=length(items.row)    # i
+    n=length(items.row)   # i
     m=length(items.col)   # j
     o=length(items.ana)   # k
     arr=array(0,dim=c(n,m,o))
@@ -117,7 +117,7 @@ jun.cor.test <- function (items.row,items.col,items.ana,datax) {
 #     - change method from spearman to pearson
 
 jun.cor.test.ps <- function (items.row,items.col,items.ana,datax) {
-    n=length(items.row)    # i
+    n=length(items.row)   # i
     m=length(items.col)   # j
     o=length(items.ana)   # k
     arr=array(0,dim=c(n,m,o))
@@ -131,6 +131,53 @@ jun.cor.test.ps <- function (items.row,items.col,items.ana,datax) {
     }
     arr
 }
+
+
+# partial correlation analysis
+#     - created in 2016/03/04 in analyses20160212.r 
+#     - for stacked data. This includes "values" and "ind" by default.
+#     - input  : x, y, covariate, method, output items (p, rho, ...)
+#     - output : 3dim-array with y ~ (p, rho, ...) ~ methods (pearson, spearman, ...)
+
+jun.pcor.test0 <- function(fieldx,fieldy,fieldcov,method1="pearson",datax=datax) {
+    datax1=datax[c(fieldx,fieldy,fieldcov)]    # extract necessary field for pcor.test
+    datax2=na.omit(datax1)        # missing values are not allowed for pcor.test
+    pcor.test(datax2[[fieldx]],datax2[[fieldy]],as.numeric(datax2[[fieldcov]]),method=method1)
+    # should be [[]] but not []
+}
+
+jun.pcor.test01 <- function(items1,items.ana,methods1, datax=datax, showresults=FALSE) {
+    l=length(items.ana);  # l-h
+    m=length(methods1);   # m-i
+    n=length(items1);     # m-j
+    arr=array(0,dim=c(n,l,m))
+    dimnames(arr)=list(items1, items.ana, methods1)  # the order is correspond to l, m, n
+    for (j in 1:n) {            # cat("for parameters, i is",i,"\n") # for debug
+        for (i in 1:m) {        # cat("for method, j is", j, "\n")   # for debug
+            if (showresults) {  # optional
+                cat("\n\npartial correlation between","values","and",items1[i],"with","ind","as a covariate\n\n")
+                result1=jun.pcor.test0("values",items1[j],"ind",methods1[i],datax)
+                print(result1)
+            }
+            for (h in 1:l) {
+                # cat("h,i,j is", h,i,j, "\n"); cat("items.ana[",h,"] is",items.ana[h], "\n\n")  # for debug
+                arr[j,h,i]=jun.pcor.test0("values",items1[j],"ind",methods1[i],datax)[[items.ana[h]]]
+                # shoud be [[]] but not []
+            }
+        }
+    }
+    arr
+}
+
+# examples
+#     field.names=c("Right.Hippocampus","Left.Hippocampus")
+#     data.hip=jun.stack(field.names,c("caseid2","GROUP","ICV","GAFC","SIPTOTEV","SINTOTEV"))
+#     items1=c("GAFC","SIPTOTEV","SINTOTEV")
+#     items.ana=c("estimate","p.value")
+#     methods1=c("pearson","spearman")
+#     jun.pcor.test01(items1,items.ana,methods1,data.lv, showresults=FALSE)
+
+
 
 
 # function sigmtx
@@ -266,17 +313,13 @@ jun.prunner.munzel.tests = function(items){
 # jun.stack
 #     - for rANOVA
 #     - from analyses20151203.r
+#     - "datax=datax" was added as a default argument. 2016/03/04
 
-jun.stack <- function(fieldnames1,fieldnames2){
+jun.stack <- function(fieldnames1, fieldnames2, datax=datax){
     datax.stack=stack(datax[fieldnames1])
     datax.stack[fieldnames2]=datax[fieldnames2]
     datax.stack
 }
-
-
-
-
-
 
 
 

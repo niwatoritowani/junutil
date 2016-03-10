@@ -314,8 +314,9 @@ jun.prunner.munzel.tests = function(items){
 #     - for rANOVA
 #     - from analyses20151203.r
 #     - "datax=datax" was added as a default argument. 2016/03/04
+#         - This did not work. So it was deleted. 2016/03/09
 
-jun.stack <- function(fieldnames1, fieldnames2, datax=datax){
+jun.stack <- function(fieldnames1, fieldnames2){
     datax.stack=stack(datax[fieldnames1])
     datax.stack[fieldnames2]=datax[fieldnames2]
     datax.stack

@@ -33,7 +33,7 @@ data.amy=jun.stack(field.names,c("caseid2","GROUP"))
 summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")   
-data.amy=jun.stack(field.names,c("caseid2","GROUP"))
+data.hip=jun.stack(field.names,c("caseid2","GROUP"))
 summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 

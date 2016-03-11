@@ -265,7 +265,7 @@ p3=jun.plot31(data.lvt,"\nthe temporal horns of the LV",xlabel1,"B",c(0.05,1.1),
 p4=jun.plot31(data.amy,"\nthe amygdala",xlabel1,"C",c(1.05,1.1),c(1,1)) 
 grid.arrange(p1, p3, p4)
 
-dev.copy2eps(file="plot_vol_group_20160310.eps",width=3.3, height=6)  # inches
+dev.copy2eps(file="plot_vol_group_20160311.eps",width=3.3, height=6)  # inches
 
 ppi=600    # 300 is better
 tiff("plot_vol_group_20160310.tif",width=3*ppi, height=6*ppi, res=ppi)

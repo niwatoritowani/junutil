@@ -180,7 +180,7 @@ data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
 
-# correlatinon between volumes
+# correlatinon between volumes, spearman
 
 items.row=c(regions4,"r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
@@ -232,6 +232,7 @@ mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
 #sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
 mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/09
 #sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 

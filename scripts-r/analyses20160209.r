@@ -37,6 +37,49 @@ data.amy=jun.stack(field.names,c("caseid2","GROUP"))
 summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 
+# ------------------------------------
+# effect size 2016/03/10
+# ------------------------------------
+
+
+datax=data.ex3.exna
+
+# CCC
+summary(aov(r.CC_Central~GROUP,data=datax))
+Anova(lm(r.CC_Central~GROUP,data=datax))
+Anova(lm(r.CC_Central~GROUP,data=datax, type=1))
+Anova(lm(r.CC_Central~GROUP,data=datax, type=2))
+Anova(lm(r.CC_Central~GROUP,data=datax, type=3))
+# partial eta square
+etasq(lm(r.CC_Central~GROUP,data=datax))
+etasq(Anova(lm(r.CC_Central~GROUP,data=datax)))                # does not work
+etasq(Anova(lm(r.CC_Central~GROUP,data=datax)), anova=TRUE)    # does not work
+
+# LV
+field.names=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle")  
+data.lv=jun.stack(field.names,c("caseid2","GROUP"))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.lv))
+anova.lv=aov(values~ind*GROUP+Error(caseid2/ind),data=data.lv)
+Anova(lm(values~ind*GROUP+Error(caseid2/ind),data=data.lv))            # does not work
+Anova(lm(values~ind*GROUP+Error(caseid2/ind),data=data.lv), type=1)    # does not work
+etasq(lm(values~ind*GROUP+Error(caseid2/ind),data=data.lv))            # does not work
+
+
+# TH
+field.names=c("r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent") 
+data.lvt=jun.stack(field.names,c("caseid2","GROUP"))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.lvt))
+
+field.names=c("r.Right.Amygdala","r.Left.Amygdala")   
+data.amy=jun.stack(field.names,c("caseid2","GROUP"))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
+
+field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")   
+data.amy=jun.stack(field.names,c("caseid2","GROUP"))
+summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
+
+
+
 # ---------------------------------------------------------
 # ANOVA with r.bil.volume ~ group
 # ---------------------------------------------------------

@@ -201,7 +201,7 @@ dev.off()
 # set up data
 
 datax=data.ex3.exna
-field.names=regions
+field.names=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior")
 data.cc=jun.stack(field.names,c("caseid2","GROUP","ICV"))
 data.cc.central=subset(data.cc,ind=="r.CC_Central")
 field.names=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle")
@@ -221,10 +221,10 @@ data.hip=jun.stack(field.names,c("caseid2","GROUP","ICV"))
 
 # function to plot 2016/02/24, 2016/03/09
 
-jun.plot31 <- function(datax,ylabel1,xlabel1) {
+jun.plot31 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
     datax$ind=factor(datax$ind)     # the order of the leves are not changed
     #datax$GROUP=factor(datax$GROUP,rev(levels(datax$GROUP)))    # lever order to be PRO, HVPRO
-    datax$GROUP=factor(datax$GROUP)    # lever order to be PRO, HVPRO
+    datax$GROUP=factor(datax$GROUP)    # lever order to be HVPRO, PRO
     n=length(levels(datax$ind));m=length(levels(datax$GROUP))
     datax$R2D2=factor(    # factor(vector,levels) can explicitly express the order of the levels
         paste(datax$ind,datax$GROUP,sep="."),     # example r.lt.amygdala.PRO
@@ -233,41 +233,59 @@ jun.plot31 <- function(datax,ylabel1,xlabel1) {
 
     ylabel=paste("Relative olumes of",ylabel1)    # combine tests for y label
     p1=ggplot(datax, aes(x=R2D2,y=values,fill=GROUP)) +
-        scale_fill_manual(values=c("grey","red")) +    # use default color if commented out
+        theme_bw() + # change the thema to brack and white
+        theme(text=element_text(size=7)) +
+        scale_fill_manual(values=c("grey","red"),labels=c("HC","CHR")) +    # use default color if commented out
         geom_dotplot(binaxis="y",stackdir="center") +
         stat_summary(fun.ymin=function(x) mean(x), fun.ymax=function(x) mean(x), 
             geom="errorbar", width=0.3) + # add mean as a error bar
         stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
             geom="errorbar", width=0.15) + # error bar
-        guides(fill=FALSE) +    # don't display guide
-#        theme(axis.title.x=element_blank()) +    # don't display x-axis-label : GROUP
-        xlab("HC                                     CHR") +    #  change x-axils-label
+        #guides(fill=FALSE) +    # don't display guide
+        theme(legend.position=posi1,legend.justification=posi2) +    # this works 
+        theme(legend.background=element_blank()) +
+        theme(legend.key=element_blank()) +
+        theme(legend.key.size=unit(0.2, "cm")) +
+        theme(legend.text=element_text(size=7)) +  # no effect? 
+        guides(fill=guide_legend(title=NULL)) +
+        theme(axis.title.x=element_blank()) +    # don't display x-axis-label : GROUP
+        #xlab("HC                                     CHR") +    #  change x-axils-label
         scale_x_discrete(breaks=c(levels(datax$R2D2)),
             labels=c(xlabel1)) +   # change the labels of the scale
-        ylab(ylabel)    # change the label of y axis
+        ylab(ylabel) +   # change the label of y axis
+        # scale_fill_discrete(labels=c("HC","CHR")) +   # This does not work 2016/03/10
+        annotate("text", x=-Inf, y=Inf, label=label1, hjust=-0.2, vjust=1.5)
     p1
 }
 
 xlabel1=c("","")
-p1=jun.plot4(data.cc.central,"the CCC",xlabel1)
+p1=jun.plot31(data.cc.central,"\nthe CCC",xlabel1,"A",c(1.05,1.1),c(1,1))
 xlabel1=c("left","right","left","right")
-p3=jun.plot31(data.lvt,"the temporal horns of the LV",xlabel1)
-p4=jun.plot31(data.amy,"the amygdala",xlabel1) 
+p3=jun.plot31(data.lvt,"\nthe temporal horns of the LV",xlabel1,"B",c(0.05,1.1),c(0,1))
+p4=jun.plot31(data.amy,"\nthe amygdala",xlabel1,"C",c(1.05,1.1),c(1,1)) 
+grid.arrange(p1, p3, p4)
 
-ppi=300    # 300 is better
-png("plot_vol_group_CCC_20160309.png",width=8*ppi, height=6*ppi, res=ppi)
-p1
+dev.copy2eps(file="plot_vol_group_20160310.eps",width=3.3, height=6)  # inches
+
+ppi=600    # 300 is better
+tiff("plot_vol_group_20160310.tif",width=3*ppi, height=6*ppi, res=ppi)
+grid.arrange(p1, p3, p4)
 dev.off()
 
-ppi=300    # 300 is better
-png("plot_vol_group_TH_20160309.png",width=8*ppi, height=6*ppi, res=ppi)
-p3
-dev.off()
-
-ppi=300    # 300 is better
-png("plot_vol_group_AMY_20160309.png",width=8*ppi, height=6*ppi, res=ppi)
-p4
-dev.off()
+# ppi=300    # 300 is better
+# png("plot_vol_group_CCC_20160309.png",width=3*ppi, height=2.5*ppi, res=ppi)
+# p1
+# dev.off()
+# 
+# ppi=300    # 300 is better
+# png("plot_vol_group_TH_20160309.png",width=3*ppi, height=2.5*ppi, res=ppi)
+# p3
+# dev.off()
+# 
+# ppi=300    # 300 is better
+# png("plot_vol_group_AMY_20160309.png",width=3*ppi, height=2.5*ppi, res=ppi)
+# p4
+# dev.off()
 
 
 # ---------------------------------------------------------------------------------
@@ -446,32 +464,46 @@ data.lv=jun.stack(c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle"),item
 data.hip=jun.stack(c("r.Right.Hippocampus","r.Left.Hippocampus"),items1)
 
 p2=ggplot(data.lv, aes(x=SINTOTEV, y=values,colour=ind)) +
-    geom_point(size=4) + 
-#    scale_colour_manual(values=c("grey","red")) +    # Thid does not work
+    theme_bw() + 
+    theme(text=element_text(size=10)) +
+    geom_point(size=2) + 
     stat_smooth(method=lm, se=FALSE) +
     xlab("Negative symptom score") + 
     ylab("Relative volumes of the LV") +
     theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
     guides(colour=guide_legend(title=NULL))  +
-    scale_colour_discrete(labels=c("left","right"))    
+    scale_colour_discrete(labels=c("left","right"))  +
+    annotate("text", x=-Inf, y=Inf, label="A", hjust=-0.2, vjust=1.5)  
 p3=ggplot(data.hip, aes(x=SIPTOTEV, y=values,colour=ind)) +
-    geom_point(size=4) + 
-#    scale_colour_manual(values=c("grey","red")) +    # Thid does not work
+    theme_bw() + 
+    theme(text=element_text(size=10)) +
+    geom_point(size=2) + 
     stat_smooth(method=lm, se=FALSE) +
     xlab("Positive symptom score") +
     ylab("Relative volumes of the hippocampus") +
     theme(legend.position=c(0,0),legend.justification=c(0,0)) +    # this works 
     guides(colour=guide_legend(title=NULL))  +
-    scale_colour_discrete(labels=c("left","right"))    
+    scale_colour_discrete(labels=c("left","right"))    +
+    annotate("text", x=-Inf, y=Inf, label="B", hjust=-0.2, vjust=1.5)  
+grid.arrange(p2,p3,nrow=2)
 
-ppi=300    # 300 is better
-png("plot_correlation_LV_20160309.png",width=8*ppi, height=8*ppi, res=ppi)
-p2
+
+dev.copy2eps(file="plot_correlation_20160310.eps",width=3.3, height=6)  # inches
+
+ppi=600    # 300 is better
+tiff("plot_correlation_20160310.tif",width=3*ppi, height=6*ppi, res=ppi)
+grid.arrange(p2,p3,nrow=2)
 dev.off()
 
-ppi=300    # 300 is better
-png("plot_correlation_HIP_20160309.png",width=8*ppi, height=8*ppi, res=ppi)
-p3
-dev.off()
+
+# ppi=300    # 300 is better
+# png("plot_correlation_LV_20160309.png",width=8*ppi, height=8*ppi, res=ppi)
+# p2
+# dev.off()
+# 
+# ppi=300    # 300 is better
+# png("plot_correlation_HIP_20160309.png",width=8*ppi, height=8*ppi, res=ppi)
+# p3
+# dev.off()
 
 

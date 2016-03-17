@@ -38,7 +38,7 @@ summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
 
 # ------------------------------------
-# effect size 2016/03/10
+# effect size 2016/03/10 failed
 # ------------------------------------
 
 
@@ -78,6 +78,31 @@ field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")
 data.amy=jun.stack(field.names,c("caseid2","GROUP"))
 summary(aov(values~ind*GROUP+Error(caseid2/ind),data=data.amy))
 
+
+# --------------------------------------
+# effect size 2016/03/10
+# --------------------------------------
+
+datax=data.ex3.exna
+field.names=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior")
+data.cc=jun.stack(field.names,c("caseid2","GROUP","ICV"))    # may be used
+data.cc.central=subset(data.cc,ind=="r.CC_Central")    # maybe be used
+field.names=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle")  
+data.lv=jun.stack(field.names,c("caseid2","GROUP"))
+field.names=c("r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent") 
+data.lvt=jun.stack(field.names,c("caseid2","GROUP"))
+field.names=c("r.Right.Amygdala","r.Left.Amygdala")   
+data.amy=jun.stack(field.names,c("caseid2","GROUP"))
+field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")   
+data.hip=jun.stack(field.names,c("caseid2","GROUP"))
+
+#library(ez)
+#ezANOVA(data.lvt,dv=values,wid=caseid2,within=ind,between=GROUP,type=3,detailed=TRUE,return_aov=TRUE)
+ezANOVA(datax, dv=r.CC_Central,wid=caseid2,between=GROUP,type=3)
+ezANOVA(data.lv, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+ezANOVA(data.lvt, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+ezANOVA(data.amy, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+ezANOVA(data.hip, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
 
 
 # ---------------------------------------------------------

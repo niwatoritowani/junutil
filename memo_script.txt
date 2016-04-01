@@ -62,4 +62,10 @@ echo '$2'"$3"
 # util.sh
 ```
 
+2016/04/01
+
+CRIPT=$(readlink -m "$(type -p $0)")
+SCRIPTDIR=$(dirname "$SCRIPT")
+
+
 

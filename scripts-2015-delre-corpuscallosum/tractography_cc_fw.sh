@@ -2,7 +2,7 @@
 
 usage() {
     echo "output tracts and measure them"
-    echo "Usage: $0 [case ID] [output directory name under case project directory]"
+    echo "Usage: $0 [case ID]"
     exit 0
 }
 
@@ -12,6 +12,12 @@ while getopts h OPTION; do
     esac
 done
 
+# start logging
+_tmplog=$(mktemp).log
+#echo "_tmplog $_tmplog"
+exec &> >(tee "$_tmplog")  # pipe stderr and stdout to logfile as well as console
+#echo 'exec &> >(tee "$_tmplog")'  # pipe stderr and stdout to logfile as well as console
+
 # set variables
 caseid=$1
 casedir=/projects/schiz/3Tdata/case${caseid}
@@ -19,6 +25,8 @@ caseprojdir=${casedir}/projects/2015-delre-corpuscallosum
 ccdivroi=${caseprojdir}/${caseid}-cc-div-roi.nrrd
 ccroi=${caseprojdir}/${caseid}-cc-roi.nrrd
 outputdir=${caseprojdir}/${caseid}.cc_FW
+logdir=${caseprojdir}/log
+logfile=${logdir}/${caseid}.cc_FW.log
 
 if [[ ! -d ${casedir} ]]; then echo "${casedir} does not exist"; exit 1; fi
 if [[ ! -d ${caseprojdir} ]]; then echo "${caseprojdir} does not exist"; exit 1; fi
@@ -50,10 +58,17 @@ echo "set maskfile ${maskfile}"
 if [[ ! -e ${ccroi} ]]; then
     unu 2op gt ${ccdivroi} 0 | unu save -e gzip -f nrrd -o ${ccroi}
     echo "create ${ccroi}"
+else
+    echo "${ccroi} already exists"
 fi
 
 # create output directory if it does not exist and move to the directory
-[ -d ${outputdir} ] || mkdir ${outputdir}
+if [ -d ${outputdir} ]; then
+    echo "${outputdir} already exists."; exit 1
+else
+    mkdir ${outputdir}
+fi
+
 pushd ${outputdir}
 echo "move to ${outputdir}"
 
@@ -69,12 +84,12 @@ functractography() {
     if [[ -e $3 ]]; then 
         echo "$3 already exists" 
     else
-        cmdtractography="UKFTractography \
-            --dwiFile ${dwifile} \
-            --maskFile ${maskfile} \
-            --seedsFile $1 \
-            --labels $2 \
-            --tracts $3 \
+        cmdtractography="UKFTractography \\
+            --dwiFile ${dwifile} \\
+            --maskFile ${maskfile} \\
+            --seedsFile $1 \\
+            --labels $2 \\
+            --tracts $3 \\
             ${tractographyoption}"
         echo "${cmdtractography}"
         eval "${cmdtractography}"
@@ -106,4 +121,10 @@ functractography ${caseprojdir}/${caseid}-cc-div-roi.nrrd 245 ${outputdir}/${cas
 # logfilename=${scriptname}.log
 # echo "${cmd}" | tee ${logfilename}
 # eval "${cmd}" 2>&1 | tee -a ${logfilename}
+
+# stop logging
+# echo "_tmplog ${_tmplog}"
+[[ -d ${logdir} ]] || mkdir ${logdir}
+echo "cp $_tmplog ${logfile}"
+cp $_tmplog ${logfile}
 

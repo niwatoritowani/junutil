@@ -1,0 +1,6 @@
+cc_1 = 241
+cc_2 = 242
+cc_3 = 243
+cc_4 = 244
+cc_5 = 245
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5

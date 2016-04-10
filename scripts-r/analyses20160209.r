@@ -96,7 +96,7 @@ data.amy=jun.stack(field.names,c("caseid2","GROUP"))
 field.names=c("r.Right.Hippocampus","r.Left.Hippocampus")   
 data.hip=jun.stack(field.names,c("caseid2","GROUP"))
 
-#library(ez)
+library(ez)
 #ezANOVA(data.lvt,dv=values,wid=caseid2,within=ind,between=GROUP,type=3,detailed=TRUE,return_aov=TRUE)
 ezANOVA(datax, dv=r.CC_Central,wid=caseid2,between=GROUP,type=3)
 ezANOVA(data.lv, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)

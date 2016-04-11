@@ -111,6 +111,33 @@ jun.cor.test <- function (items.row,items.col,items.ana,datax) {
 }
 
 
+# function jun.cor.test.lowtri
+#     - 2016/04/11
+#     - the jun.cor.test was modified
+#     - This creates lower triangular matrix with corerlation-analyses-results as componets.
+#     - for(j in 1:(m-1)){for(i in 1+j:(n-1)){cat(i);cat(":");cat(j);cat("\n")}}
+#     - You can change NA to 0 as below : matrix1[(is.na(matrix1)]=0
+#     - set default method as "spearman" and you can change the correlation-method
+
+jun.cor.test.lowtri <- function (items.row,items.col,items.ana,datax,mtd="spearman") {
+    n=length(items.row)   # i
+    m=length(items.col)   # j
+    o=length(items.ana)   # k
+    arr=array(NA,dim=c(n,m,o))
+    dimnames(arr)=list(items.row,items.col,items.ana)
+    for (k in 1:o) {
+        for (j in 1:(m-1)) {
+            for (i in 1+j:(n-1)) {
+                arr[i,j,k]=cor.test(datax[[items.row[i]]],datax[[items.col[j]]],method=mtd)[[items.ana[k]]]
+            }
+        }
+    }
+    arr
+}
+
+
+
+
 # function jun.cor.test.ps
 #     - 2016/02/10
 #     - created from jun.cor.test

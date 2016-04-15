@@ -1,0 +1,38 @@
+# This script was edited based on /projects/schiz/software/LabPython/tract_querier/queries/cc_queries.qry
+# needs fs2dwi cobined with corpus callosum label map which have values 241, 242, 243, 244, and 245.
+
+# note in the original file
+#     #Note: I have incorporated these definitions into the intrust_query.qry file
+
+import FreeSurfer.qry
+
+orbitofrontalgyrus.side |= (
+            lateralorbitofrontal.side or
+            medialorbitofrontal.side
+                    )
+occipital.side |= lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side or lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side
+
+hemisphere.side |= (
+        orbitofrontalgyrus.side 
+        or parstriangularis.side or parsorbitalis.side or superiorfrontal.side or rostralmiddlefrontal.side or frontalpole.side 
+        or rostralanteriorcingulate.side or caudalanteriorcingulate.side or caudalmiddlefrontal.side or parsopercularis.side 
+        or precentral.side 
+        or postcentral.side or posteriorcingulate.side or paracentral.side 
+        or postcentral.sidet or posteriorcingulate.side or paracentral.side   
+        or precuneus.side or supramarginal.side or superiorparietal.side or inferiorparietal.side 
+            or superiortemporal.side or middletemporal.side or bankssts.side or transversetemporal.side 
+            or isthmuscingulate.side or occipital.side or fusiform.side or lingual.side or inferiortemporal.side
+)
+
+cc_1 = ( endopoints_in(hemisphere.left) and 241 and endpoints_in(hemisphere.right) 
+    not in 242 not in 243 not in 244 not in 245 )
+cc_2 = ( endopoints_in(hemisphere.left) and 242 and endpoints_in(hemisphere.right)
+    not in 241 not in 243 not in 244 not in 245 )
+cc_3 = ( endopoints_in(hemisphere.left) and 243 and endpoints_in(hemisphere.right)
+    not in 241 not in 242 not in 244 not in 245 )
+cc_4 = ( endopoints_in(hemisphere.left) and 244 and endpoints_in(hemisphere.right)
+    not in 241 not in 242 not in 243 not in 245 )
+cc_5 = ( endopoints_in(hemisphere.left) and 245 and endpoints_in(hemisphere.right)
+    not in 241 not in 242 not in 243 not in 244 )
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5
+

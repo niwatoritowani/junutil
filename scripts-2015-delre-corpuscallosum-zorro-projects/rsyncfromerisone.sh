@@ -13,7 +13,7 @@ SCRIPT=$(readlink -m ${BASH_SOURCE[0]})   # read directory of this file even thi
 # "source SetUpData.sh" is witten in default do files. 
 SCRIPTDIR=${SCRIPT%/*}
 
-
+# output text
 caselist=../caselists/caselist.txt
 echo -n "rsync -av -e ssh "
 cat ${caselist} | while read line; do

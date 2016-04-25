@@ -1,0 +1,45 @@
+import freesurfer_queries_new_customer.qry
+
+
+#Define hemispheres using glob patterns ( http://en.wikipedia.org/wiki/Glob_(programming) )
+hemisphere.left |= '*.left'
+hemisphere.right |= '*.right'
+
+
+
+#Corpus Callosum
+CCommisural = cc_caudalmiddlefrontal or cc_lateralorbitofrontal or cc_medialorbitofrontal or cc_rostralmiddlefrontal or cc_superiorfrontal or cc_frontalpole or cc_lingual or cc_parahippocampal or cc_paracentral or cc_parsopercularis or cc_parsorbitalis or cc_parstriangularis or cc_pericalcarine or cc_postcentral or cc_superiorparietal or cc_posteriorcingulate or cc_precentral or cc_precuneus or cc_rostralanteriorcingulate or cc_superiorparietal or cc_supramarginal or cc_insula or cc_caudalanteriorcingulate or cc_cuneus or cc_entorhinal or cc_fusiform or cc_inferiorparietal or cc_inferiortemporal or cc_isthmuscingulate or cc_lateraloccipital or cc_middletemporal or cc_superiortemporal or cc_temporalpole or cc_transversetemporal
+
+orbitofrontalgyrus.side |= (
+			lateralorbitofrontal.side or
+			medialorbitofrontal.side
+                    )
+occipital.side |= lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side or lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side
+
+cc_1 = endpoints_in(orbitofrontalgyrus.left) and endpoints_in(orbitofrontalgyrus.right)
+
+cc_2 = endpoints_in(parstriangularis.left or parsorbitalis.left or superiorfrontal.left or rostralmiddlefrontal.left or frontalpole.left) and  endpoints_in(parstriangularis.right or parsorbitalis.right or superiorfrontal.right or rostralmiddlefrontal.right or frontalpole.right)
+
+cc_3 = endpoints_in(rostralanteriorcingulate.left or caudalanteriorcingulate.left or caudalmiddlefrontal.left or parsopercularis.left) and  endpoints_in(rostralanteriorcingulate.right or caudalanteriorcingulate.right or caudalmiddlefrontal.right or parsopercularis.right)
+
+cc_4 = endpoints_in(precentral.left) and endpoints_in(precentral.right)
+
+cc_5 = endpoints_in(postcentral.left or posteriorcingulate.left or paracentral.left) and endpoints_in(postcentral.right or posteriorcingulate.right or paracentral.right) and corpuscallosum.left and corpuscallosum.right) and endopoints_in(hemisphere.left and CC_manual_IV not in CC_manual_I not in CC_manual_II not in CC_manual_III not in CC_manual_V )
+
+cc_6 = endpoints_in(precuneus.left or supramarginal.left or superiorparietal.left or inferiorparietal.left or superiortemporal.left or middletemporal.left or bankssts.left or transversetemporal.left or isthmuscingulate.left) and endpoints_in(precuneus.right or supramarginal.right or superiorparietal.right or inferiorparietal.right or superiortemporal.right or middletemporal.right or bankssts.right or transversetemporal.right or isthmuscingulate.right) and corpuscallosum.left and corpuscallosum.right) and endpoints_in(hemisphere.left and CC_manual_V not in CC_manual_I not in CC_manual_II not in CC_manual_III not in CC_manual_IV )
+
+cc_7 = endpoints_in(occipital.left or fusiform.left or lingual.left or inferiortemporal.left) and endpoints_in(occipital.right or fusiform.right or lingual.right or inferiortemporal.right)
+
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5 or cc_6 or cc_7
+
+cc_TEST_1 = ( endopoints_in(hemisphere.left) and CC_manual_I and endpoints_in(hemisphere.right) 
+    not in CC_manual_II not in CC_manual_III not in CC_manual_IV not in CC_manual_V )
+cc_TEST_2 = ( endopoints_in(hemisphere.left) and CC_manual_II and endpoints_in(hemisphere.right)
+    not in CC_manual_I not in CC_manual_III not in CC_manual_IV not in CC_manual_V  )
+cc_TEST_3 = ( endopoints_in(hemisphere.left) and CC_manual_III and endpoints_in(hemisphere.right)
+    not in CC_manual_I not in CC_manual_II not in CC_manual_IV not in CC_manual_V )
+cc_TEST_4 = ( endopoints_in(hemisphere.left) and CC_manual_IV and endpoints_in(hemisphere.right)
+    not in CC_manual_I not in CC_manual_II not in CC_manual_III not in CC_manual_V )
+cc_TEST_5 = ( endopoints_in(hemisphere.left) and CC_manual_V and endpoints_in(hemisphere.right)
+    not in CC_manual_I not in CC_manual_II not in CC_manual_III not in CC_manual_IV )
+cc_TEST = cc_1 or cc_2 or cc_3 or cc_4 or cc_5

@@ -11,6 +11,29 @@
 # - plots of correlation 2 relative
 # - plots of correlation 3 relative, 2016/03/09
 
+# - to do
+# - plots of volumes between grops with hemi in one axis
+#     - jun.plot2()
+# - plots of volumes between grops separated by hemi
+#     - jun.plot3()
+# - output plot, 2016/02/24
+# - plots of volumes between grops separated by hemi 3, 2016/03/09
+#     - jun.plot31()
+#     - This is used for the poster. 
+# - plots of volumes between grops separated by hemi 4, 2016/03/14
+#     - jun.plot32()
+#     - This is a trial for new appearance. 
+# - plots of volumes between grops separated by hemi 5, 2016/03/17
+#     - This is for large error bar with excluding outlier
+# - plots of volumes between grops non-separated by hemi 2, 2016/03/17
+# - plots of volumes between grops separated by hemi 2 summarized relative 2016/03/04
+#     - jun.plot4()
+#     - code for setting up data were shortend but basically old code
+# - plots of correlation 1
+# - plots of correlation 2 relative
+# - plots of correlation 2 relative 2 trial, 2016/03/04
+# - plots of correlation 2 relative 3, 2016/03/09
+#     - This was used for the poster for Mysell. 
 
 # -----------------------------------------------
 # to do
@@ -99,6 +122,8 @@ print(p5,vp=define_region(5,1))
 # plots of volumes between grops separated by hemi
 # -----------------------------------------------
 
+# - fill by hemisphere
+# - error bar did not work
 
 # set up data
 
@@ -184,9 +209,8 @@ print(p4,vp=define_region(3,1))
 
 
 # ------------------------
-# output plot
+# output plot, 2016/02/24
 # ------------------------
-# - 2016/02/24
 
 ppi=300    # 300 is better
 png("plot_vol_group_201603031917.png",width=4*ppi, height=12*ppi, res=ppi)
@@ -198,10 +222,14 @@ dev.off()
 # plots of volumes between grops separated by hemi 3, 2016/03/09
 # --------------------------------------------------------------
 
+# - This is used for the poster for Mysell
+# - field name were changed from regions to specific vector in CC
+# - absolute volume to relative volume
+
 # set up data
 
 datax=data.ex3.exna
-field.names=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior")
+field.names=c("r.CC_Anterior", "r.CC_Mid_Anterior", "r.CC_Central", "r.CC_Mid_Posterior", "r.CC_Posterior") # default:regions
 data.cc=jun.stack(field.names,c("caseid2","GROUP","ICV"))
 data.cc.central=subset(data.cc,ind=="r.CC_Central")
 field.names=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle")
@@ -231,30 +259,30 @@ jun.plot31 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
         paste(levels(datax$ind)[rep(1:n,m)],levels(datax$GROUP)[sort(rep(1:m,n))],sep=".")    # hemi.Gr
     )
 
-    ylabel=paste("Relative olumes of",ylabel1)    # combine tests for y label
-    p1=ggplot(datax, aes(x=R2D2,y=values,fill=GROUP)) +
-        theme_bw() + # change the thema to brack and white
-        theme(text=element_text(size=7)) +
+    ylabel=paste("Relative volumes of",ylabel1)    # combine tests for y label
+    p1=ggplot(datax, aes(x=R2D2,y=values,fill=GROUP)) +    # fill by hemi -> GROUP
+        theme_bw() + # change the thema to brack and white, added
+        theme(text=element_text(size=7)) +    # added
         scale_fill_manual(values=c("grey","red"),labels=c("HC","CHR")) +    # use default color if commented out
         geom_dotplot(binaxis="y",stackdir="center") +
         stat_summary(fun.ymin=function(x) mean(x), fun.ymax=function(x) mean(x), 
             geom="errorbar", width=0.3) + # add mean as a error bar
         stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
             geom="errorbar", width=0.15) + # error bar
-        #guides(fill=FALSE) +    # don't display guide
-        theme(legend.position=posi1,legend.justification=posi2) +    # this works 
-        theme(legend.background=element_blank()) +
-        theme(legend.key=element_blank()) +
-        theme(legend.key.size=unit(0.2, "cm")) +
-        theme(legend.text=element_text(size=7)) +  # no effect? 
-        guides(fill=guide_legend(title=NULL)) +
+        #guides(fill=FALSE) +    # don't display guide, commented out
+        theme(legend.position=posi1,legend.justification=posi2) +    # this works, added 
+        theme(legend.background=element_blank()) +    # added
+        theme(legend.key=element_blank()) +    # added
+        theme(legend.key.size=unit(0.2, "cm")) +    # added
+        theme(legend.text=element_text(size=7)) +  # no effect?, added 
+        guides(fill=guide_legend(title=NULL)) +    # added
         theme(axis.title.x=element_blank()) +    # don't display x-axis-label : GROUP
-        #xlab("HC                                     CHR") +    #  change x-axils-label
+        #xlab("HC                                     CHR") +    #  change x-axils-label, commented out
         scale_x_discrete(breaks=c(levels(datax$R2D2)),
             labels=c(xlabel1)) +   # change the labels of the scale
         ylab(ylabel) +   # change the label of y axis
-        # scale_fill_discrete(labels=c("HC","CHR")) +   # This does not work 2016/03/10
-        annotate("text", x=-Inf, y=Inf, label=label1, hjust=-0.2, vjust=1.5)
+        # scale_fill_discrete(labels=c("HC","CHR")) +   # This does not work 2016/03/10, should be scale_fill_manual()
+        annotate("text", x=-Inf, y=Inf, label=label1, hjust=-0.2, vjust=1.5)    # added
     p1
 }
 
@@ -300,11 +328,11 @@ dev.off()
 # plots of volumes between grops separated by hemi 4, 2016/03/14
 # --------------------------------------------------------------
 
-# - a code for error bar was changed. 2016/03/14. 
 # - This plots are trial for new appearances. 2016/03/14. 
 # - For the poster, the plots above were planed to be used. 2016/03/14. 
-# - change fontsize from 7, 2016/03/17
-# - change legend size 2016/03/17
+# - a code for error bar was changed. 2016/03/14. 
+# - change fontsize from 7 to 8, 2016/03/17
+# - change legend size from 0.2 to 0.4, 2016/03/17
 
 # set up data
 
@@ -343,7 +371,7 @@ jun.plot32 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
             geom="errorbar", width=0.3) + # add mean as a error bar
         #stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
         #    geom="errorbar", width=0.15) + # error bar
-        stat_summary(fun.data="mean_sdl", mult=1, geom="errorbar", width=0.15) + # error bar
+        stat_summary(fun.data="mean_sdl", mult=1, geom="errorbar", width=0.15) + # error bar, added
         #guides(fill=FALSE) +    # don't display guide
         theme(legend.position=posi1,legend.justification=posi2) +    # this works 
         theme(legend.background=element_blank()) +
@@ -403,9 +431,13 @@ dev.off()
 # plots of volumes between grops separated by hemi 5, 2016/03/17
 # --------------------------------------------------------------
 
-# - a code for error bar was changed. 2016/03/14. 
 # - This plots are trial for new appearances. 2016/03/14. 
 # - For the poster, the plots above were planed to be used. 2016/03/14. 
+# - a code for error bar was changed. 2016/03/14. 
+# - error bar was changed from mult=1 into 2.5. 
+# - thinking about excluding outlier
+# - making plot for LV
+# - making plot after excluding outliers
 
 
 # set up data
@@ -445,7 +477,7 @@ jun.plot32 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
             geom="errorbar", width=0.3) + # add mean as a error bar
         #stat_summary(fun.ymin=function(x) mean(x) - sd(x), fun.ymax=function(x) mean(x) + sd(x), 
         #    geom="errorbar", width=0.15) + # error bar
-        stat_summary(fun.data="mean_sdl", mult=2.5, geom="errorbar", width=0.15) + # error bar
+        stat_summary(fun.data="mean_sdl", mult=2.5, geom="errorbar", width=0.15) + # error bar, default:mult=1
         #guides(fill=FALSE) +    # don't display guide
         theme(legend.position=posi1,legend.justification=posi2) +    # this works 
         theme(legend.background=element_blank()) +
@@ -466,11 +498,11 @@ jun.plot32 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
 xlabel1=c("","")
 p1=jun.plot32(data.cc.central,"\nthe CCC",xlabel1,"A",c(1.05,1.1),c(1,1))
 xlabel1=c("left","right","left","right")
-p2=jun.plot32(data.lv,"\nthe LV",xlabel1,"B",c(0.05,1.1),c(0,1))
+p2=jun.plot32(data.lv,"\nthe LV",xlabel1,"B",c(0.05,1.1),c(0,1))    # added
 p3=jun.plot32(data.lvt,"\nthe temporal horns of the LV",xlabel1,"B",c(0.05,1.1),c(0,1))
 p4=jun.plot32(data.amy,"\nthe amygdala",xlabel1,"C",c(1.05,1.1),c(1,1)) 
 options(scipen=2) # default: options(scipen=0)
-grid.arrange(p1, p2, p3, p4, main="exclude outlier of AMY1,  and TH")
+grid.arrange(p1, p2, p3, p4, main="exclude outlier of AMY1,  and TH")    # added main
 options(scipen=0) # default
 
 dev.copy2eps(file="plot_vol_group_20160311.eps",width=3.3, height=6)  # inches
@@ -611,6 +643,9 @@ dev.off()
 # ---------------------------------------------------------------------------------
 # plots of volumes between grops separated by hemi 2 summarized relative 2016/03/04
 # ---------------------------------------------------------------------------------
+
+# - code for setting up data was shortend
+# - basically old code, filled by hemisphere
 
 datax=data.ex3.exna
 items1=c("caseid2","GROUP","ICV")
@@ -775,6 +810,8 @@ p3=ggplot(data.hip, aes(x=SIPTOTEV, y=values,colour=ind)) +
 # ---------------------------------------------------
 # plots of correlation 2 relative 3, 2016/03/09
 # ---------------------------------------------------
+
+# - This was used for the poster for Mysell
 
 datax=data.ex3.exna
 data.pro=subset(datax,GROUP=="PRO");    data.hc=subset(datax,GROUP=="HVPRO")

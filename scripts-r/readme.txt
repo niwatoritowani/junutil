@@ -14,3 +14,4 @@ analyses20160209.r : ANOVA and effect size
 analyses20160212.r : partial correlation
 analyses20160218.r : plots 
 analyses20160410.r : final version
+analyses20160426.r : plots for article

@@ -1,0 +1,6 @@
+cc_div1orgmv = 241
+cc_div2orgmv = 242
+cc_div3orgmv = 243
+cc_div4orgmv = 244
+cc_div5orgmv = 245
+cc_wholeorgmv = cc_div1orgmv or cc_div2orgmv or cc_div3orgmv or cc_div4orgmv or cc_div5orgmv

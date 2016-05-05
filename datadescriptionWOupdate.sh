@@ -3,7 +3,7 @@
 # update remote datadescription
 
 pushd ~/projects
-rsync -avu --copy-unsafe-links datadescription datadescription_copy
+rsync -avu --copy-unsafe-links datadescription/ datadescription_copy
 pushd datadescription_copy
 git add .
 git commit -m "update"

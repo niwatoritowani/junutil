@@ -1,0 +1,8 @@
+import FreeSurfer.qry
+
+cc_1 = 255 
+cc_2 = 254 
+cc_3 = 253
+cc_4 = 252
+cc_5 = 251
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5

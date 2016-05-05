@@ -1,5 +1,6 @@
 # This script was edited based on /projects/schiz/software/LabPython/tract_querier/queries/cc_queries.qry
 # needs fs2dwi cobined with corpus callosum label map which have values 241, 242, 243, 244, and 245.
+# some words are repeated in the occipital.side definition. Why?
 
 # note in the original file
 #     #Note: I have incorporated these definitions into the intrust_query.qry file
@@ -18,7 +19,7 @@ hemisphere.side |= (
         or rostralanteriorcingulate.side or caudalanteriorcingulate.side or caudalmiddlefrontal.side or parsopercularis.side 
         or precentral.side 
         or postcentral.side or posteriorcingulate.side or paracentral.side 
-        or postcentral.sidet or posteriorcingulate.side or paracentral.side   
+        or postcentral.side or posteriorcingulate.side or paracentral.side   
         or precuneus.side or supramarginal.side or superiorparietal.side or inferiorparietal.side 
             or superiortemporal.side or middletemporal.side or bankssts.side or transversetemporal.side 
             or isthmuscingulate.side or occipital.side or fusiform.side or lingual.side or inferiortemporal.side

@@ -1,0 +1,58 @@
+# This is edited based on /projects/schiz/software/LabPython/tract_querier/queries/cc_queries.qry
+
+# note in the original file
+    #Note: I have incorporated these definitions into the intrust_query.qry file
+
+import FreeSurfer.qry
+
+orbitofrontalgyrus.side |= (
+			lateralorbitofrontal.side or
+			medialorbitofrontal.side
+)
+occipital.side |= lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side or lingual.side or pericalcarine.side or cuneus.side or lateraloccipital.side
+
+
+
+cc_1 = (
+    endpoints_in(orbitofrontalgyrus.left)
+    and endpoints_in(orbitofrontalgyrus.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_2 = (
+    endpoints_in(parstriangularis.left or parsorbitalis.left or superiorfrontal.left or rostralmiddlefrontal.left or frontalpole.left)
+    and  endpoints_in(parstriangularis.right or parsorbitalis.right or superiorfrontal.right or rostralmiddlefrontal.right or frontalpole.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_3 = (
+    endpoints_in(rostralanteriorcingulate.left or caudalanteriorcingulate.left or caudalmiddlefrontal.left or parsopercularis.left)
+    and  endpoints_in(rostralanteriorcingulate.right or caudalanteriorcingulate.right or caudalmiddlefrontal.right or parsopercularis.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_4 = (
+    endpoints_in(precentral.left)
+    and endpoints_in(precentral.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_5 = (
+    endpoints_in(postcentral.left or posteriorcingulate.left or paracentral.left)
+    and endpoints_in(postcentral.right or posteriorcingulate.right or paracentral.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_6 = (
+    endpoints_in(precuneus.left or supramarginal.left or superiorparietal.left or inferiorparietal.left or superiortemporal.left or middletemporal.left or bankssts.left or transversetemporal.left or isthmuscingulate.left)
+    and endpoints_in(precuneus.right or supramarginal.right or superiorparietal.right or inferiorparietal.right or superiortemporal.right or middletemporal.right or bankssts.right or transversetemporal.right or isthmuscingulate.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc_7 = (
+    endpoints_in(occipital.left or fusiform.left or lingual.left or inferiortemporal.left)
+    and endpoints_in(occipital.right or fusiform.right or lingual.right or inferiortemporal.right)
+    and corpuscallosum.left and corpuscallosum.right
+)
+
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5 or cc_6 or cc_7

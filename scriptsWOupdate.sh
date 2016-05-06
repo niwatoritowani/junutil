@@ -11,5 +11,5 @@ pushd ${dir_from}
 pwd
 cmd=$(echo rsync -avu ${file_copied} ${dir_to})    # delete line-break
 echo ${cmd}
-#eval ${cmd}
+eval ${cmd}
 

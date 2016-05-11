@@ -2,11 +2,14 @@
 
 # update remote datadescription
 
-pushd ~/projects
-rsync -avu --copy-unsafe-links datadescription/ datadescription_copy
+cmd="pushd ~/projects"
+echo "${cmd}"; eval "${cmd}"
+cmd="rsync -avu --copy-unsafe-links datadescription/ datadescription_copy"
+echo "${cmd}"; eval "${cmd}"
 #pushd datadescription_copy
 #git add .
 #git commit -m "update"
 #git push origin master
 #popd
-popd
+cmd="popd"
+echo "${cmd}"; eval "${cmd}"

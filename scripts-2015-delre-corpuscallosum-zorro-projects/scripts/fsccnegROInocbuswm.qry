@@ -1,0 +1,53 @@
+# created on 2016/05/05
+# upteted on 2016/05/10
+
+#import FreeSurfer.qry
+import freesurfer_queries_new.qry
+
+negativeROI |= (
+    Brain_Stem or third_Ventricle or fourth_Ventricle
+    or Cerebellum_Exterior.left     or Cerebral_Exterior.right
+    or Cerebellum_White_Matter.left or Cerebral_White_Matter.right 
+    or Cerebellum_Cortex.left       or Cerebral_Cortex.right
+    or Thalamus.left                or Thalamus.right
+    or Thalamus_Proper.left         or Thalamus_Proper.right
+    or VentralDC.left               or VentralDC.right
+    or choroid_plexus.left          or choroid_plexus.right
+)
+
+cc_1 = ( 255 
+    not in 254 not in 253 not in 252 not in 251
+    not in negativeROI
+    not in cb.left not in cb.right
+    not in UnsegmentedWhiteMatter.left not in UnsegmentedWhiteMatter.right
+)
+
+cc_2 = ( 254 
+    not in 255 not in 253 not in 252 not in 251
+    not in negativeROI
+    not in cb.left not in cb.right
+    not in UnsegmentedWhiteMatter.left not in UnsegmentedWhiteMatter.right
+)
+
+cc_3 = ( 253
+    not in 255 not in 254 not in 252 not in 251
+    not in negativeROI
+    not in cb.left not in cb.right
+    not in UnsegmentedWhiteMatter.left not in UnsegmentedWhiteMatter.right
+)
+
+cc_4 = ( 252
+    not in 255 not in 254 not in 253 not in 251
+    not in negativeROI
+    not in cb.left not in cb.right
+    not in UnsegmentedWhiteMatter.left not in UnsegmentedWhiteMatter.right
+)
+
+cc_5 = ( 251
+    not in 255 not in 254 not in 253 not in 252
+    not in negativeROI
+    not in cb.left not in cb.right
+    not in UnsegmentedWhiteMatter.left not in UnsegmentedWhiteMatter.right
+)
+
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5

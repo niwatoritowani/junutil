@@ -1,0 +1,78 @@
+# created on 2016/05/05
+# updated on 2016/05/09
+
+#import FreeSurfer.qry
+import freesurfer_queries_new.qry
+
+negativeROI |= (
+    Brain_Stem or third_Ventricle or fourth_Ventricle
+    or Cerebellum_Exterior.left     or Cerebral_Exterior.right
+    or Cerebellum_White_Matter.left or Cerebral_White_Matter.right 
+    or Cerebellum_Cortex.left       or Cerebral_Cortex.right
+    or Thalamus.left                or Thalamus.right
+    or Thalamus_Proper.left         or Thalamus_Proper.right
+    or VentralDC.left               or VentralDC.right
+    or choroid_plexus.left          or choroid_plexus.right
+)
+
+frontal_bil |= frontal.left or frontal.right
+temporal_bil |= temporal.left or temporal.right
+parietal_bil |= parietal.left or parietal.right
+occipital_bil |= occipital.left or occipital.left
+
+cc_1 = ( 255 
+    not in 254 not in 253 not in 252 not in 251
+    not in negativeROI
+    not in ( endpoints_in(frontal_bil) and endpoints_in(temporal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(parietal_bil) and endpoints_in(occipital_bil) )
+)
+
+cc_2 = ( 254 
+    not in 255 not in 253 not in 252 not in 251
+    not in negativeROI
+    not in ( endpoints_in(frontal_bil) and endpoints_in(temporal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(parietal_bil) and endpoints_in(occipital_bil) )
+)
+
+cc_3 = ( 253
+    not in 255 not in 254 not in 252 not in 251
+    not in negativeROI
+    not in ( endpoints_in(frontal_bil) and endpoints_in(temporal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(parietal_bil) and endpoints_in(occipital_bil) )
+)
+
+cc_4 = ( 252
+    not in 255 not in 254 not in 253 not in 251
+    not in negativeROI
+    not in ( endpoints_in(frontal_bil) and endpoints_in(temporal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(parietal_bil) and endpoints_in(occipital_bil) )
+)
+
+cc_5 = ( 251
+    not in 255 not in 254 not in 253 not in 252
+    not in negativeROI
+    not in ( endpoints_in(frontal_bil) and endpoints_in(temporal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(frontal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(parietal_bil) )
+    not in ( endpoints_in(temporal_bil) and endpoints_in(occipital_bil) )
+    not in ( endpoints_in(parietal_bil) and endpoints_in(occipital_bil) )
+)
+
+cc = cc_1 or cc_2 or cc_3 or cc_4 or cc_5

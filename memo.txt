@@ -1,4 +1,79 @@
+- memo.txt
+- memo.txt and memo_script.tx were combined into memo.txt. Notes from memo_scripts comes first then those from memo.txt comes. 2016/05/13. 
+
+#!/bin/bash
+
+echo "\$(pwd) : $(pwd)"
+echo "\$(readlink -m \${BASH_SOURCE[0]}) : $(readlink -m ${BASH_SOURCE[0]})"
+
+echo "kaki kukeko
+sasi suseso
+tati tuteto
+nani nuneno
+mami mumemo
+yayi yuyeyo
+rari rurero
+wawi wuwewo" > test.txt
+awk 'if ($2 == "mumemo"){print $1}'
+
+20150728. 
+
+
+
+```{cmdlog.sh}
+#!/bin/tcsh
+set cmd = $1
+set log = $2
+echo "${cmd}" | tee -a ${log} | tcsh |& tee -a ${log}
+
+# error message
+# set: Variable name must begin with a letter.
+# This works in my PC. 
+```
+
+```{cmdlog.csh}
+#!/bin/tcsh
+set cmd = $1
+set log = $2
+echo "${cmd}" | tee -a ${log} | tcsh |& tee -a ${log}
+
+# error message
+# set: Variable name must begin with a letter.
+# This works in my PC. 
+```
+
+
+
+```{default.do}
+#!/bin/bash
+
+echo '$1'"$1"
+echo '$2'"$2"
+echo '$2'"$3"
+
+# center_jun.py
+# correction1.sh
+# correction2.sh
+# dicom2nrrdxc2.sh -i $2 -w 1
+# dicom2nrrdxc2.sh -i $2 -w 2
+# dicom2nrrdxc2.sh -i $2 -w dwi
+# dicom2nrrdxc.sh
+# dicomread_jun.sh
+# eddycurrentcorrection.sh
+# README.md
+# setvars.txt
+# util.sh
+```
+
+2016/04/01
+
+CRIPT=$(readlink -m "$(type -p $0)")
+SCRIPTDIR=$(dirname "$SCRIPT")
+
+
+
 2015/07/08, 
+- memo.txt and memo_script.tx were combined. 2016/05/13. 
 ----------------------------------------------From terminal
 <2008> pnl-d74-1 /home/jkonishi/Downloads % firefox/firefox
 1436372277918	addons.repository	WARN	Search failed when repopulating cache
@@ -73,3 +148,65 @@ structure of this directory
     awk '{for(i=1;i<=NF;i++){printf("%s   ",$i)};printf("\n")}' caselist_jun2_blind.txt | xsel -bi
 
 [Wed Sep 30 11:31:58 EDT 2015]
+
+# 2016/05/13
+
+- Thinking about code for logging in bash script
+
+SCRIPT_NAME=$(readlink -m "$0")
+SCRIPT_NAME=${SCRIPT_NAME##*/}
+if [ -z "${SCRIPTDIR-}" ]; then
+    SCRIPTDIR=$(dirname "$0")
+fi
+
+# Begin Logging Section
+if [[ "${INTERACTIVE_MODE}" == "off" ]]
+then
+    # Then we don't care about log colors
+    declare -r LOG_DEFAULT_COLOR=""
+    declare -r LOG_ERROR_COLOR=""
+    declare -r LOG_INFO_COLOR=""
+    declare -r LOG_SUCCESS_COLOR=""
+    declare -r LOG_WARN_COLOR=""
+    declare -r LOG_DEBUG_COLOR=""
+else
+    declare -r LOG_DEFAULT_COLOR="\033[0m"
+    declare -r LOG_ERROR_COLOR="\033[1;31m"
+    declare -r LOG_INFO_COLOR="\033[1m"
+    declare -r LOG_SUCCESS_COLOR="\033[1;32m"
+    declare -r LOG_WARN_COLOR="\033[1;33m"
+    declare -r LOG_DEBUG_COLOR="\033[1;34m"
+fi
+
+scrubcolors() {
+    sed -i "s/[[:cntrl:]]\[[0-9;]*m//g" $1
+}
+
+# jun [[:cntrl:]] means "ESC key". It is "\033". 
+# jun "\[" means "[" in the code.
+# "[0-9;]*" means 0 or 1 or ... or 9 or ;
+
+log() {
+    local log_text="$1"
+    local log_level="${2:-"INFO"}"
+    local log_color="${3:-"$LOG_INFO_COLOR"}"
+    if [[ $log_level == "INFO" ]]; then
+        log_text_color=$LOG_WARN_COLOR
+    elif [[ $log_level == "SUCCESS" ]]; then
+        log_text_color=$LOG_SUCCESS_COLOR
+    else
+        log_text_color=$log_color
+    fi
+    echo -e "${LOG_INFO_COLOR}$(date +"%Y-%m-%d %H:%M:%S")|${log_level}|$PWD|$SCRIPTDIR/$SCRIPT_NAME ${log_text_color} ${log_text} ${LOG_DEFAULT_COLOR}" >&2;
+    return 0;
+}
+
+log_info()      { log "$@"; }
+log_success()   { log "$1" "SUCC" "${LOG_SUCCESS_COLOR}"; }
+
+
+
+
+
+
+

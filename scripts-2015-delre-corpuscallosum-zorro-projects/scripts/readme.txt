@@ -3,3 +3,5 @@
 - 2016/05/09
     - cp /projects/schiz/software/LabPython/tract_querier/queries/intrust_query.qry intrust_query.qry
     - cp /projects/schiz/software/LabPython/tract_querier/queries/freesurfer_queries_new.qry  freesurfer_queries_new.qry
+- 2016/05/20
+    - cp /projects/schiz/software/LabPython/tract_querier/queries/freesurfer_queries_new_forimport.qry freesurfer_queries_new_forimport.qry

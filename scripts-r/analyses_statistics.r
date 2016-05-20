@@ -54,10 +54,8 @@ arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
 mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
-#sig.mtx=sigmtx(mtx.p.pro); #kable(sig.mtx)
-mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); 
 mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
-#sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
 mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 
 #mtx.p.pro.adjust=matrix(p.adjust(mtx.p.pro,"bonferroni",n=36),nrow(mtx.p.pro),)
@@ -65,17 +63,14 @@ mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
 #colnames(mtx.p.pro.adjust)=colnames(mtx.p.pro)
 #kable(mtx.p.pro.adjust)    # for debugging
 mtx.p.pro.adjust=mtx.p.pro * 36
-mtx.p.pro.adjust[(mtx.p.pro.adjust > 1)]=1
+mtx.p.pro.adjust[(mtx.p.pro.adjust > 1)]=1    # If the values are greater than 1, they become 1. 
 mtx.p.pro.adjust.sig=sigmtx.rho(mtx.p.pro,mtx.p.pro.adjust)
 
 # --------------------
 # output table
 # --------------------
 
-# - input are supposed to be the results of above correlation analyses
-# - output table
-# - output table to file
-
+# - input : the results of above correlation analyses
 
 # output table: combine rho and p
 
@@ -100,7 +95,6 @@ sink()    # stop output
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
 for (p in 1:m) {
-#    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
     mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]
     mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.sig[,p]
 }
@@ -120,10 +114,10 @@ sink()    # stop output
 # output table 2
 # --------------------
 
-# - input are supposed to be the results of above correlation analyses
-# - output table
-# - output table to file
-
+# - input : the results of above correlation analyses
+#     - mpx.rho.pro      : rho values
+#     - mtx.p.pro.adjust : adjusted p values (instead of mtx.p.pro)
+#     - mtx.p.pro        : colmun names and raw names
 
 # output table: combine rho and p
 
@@ -148,7 +142,6 @@ sink()    # stop output
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
 for (p in 1:m) {
-#    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
     mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]  
     mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.adjust.sig[,p]    # mtx.p.pro.sig into mtx.p.pro.adjust.sig
 }
@@ -177,10 +170,9 @@ arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
 mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
 mtx.p.hc=arr.hc[,,2]
-#sig.mtx=sigmtx(mtx.p.pro); kable(sig.mtx)
-mtx.p.pro.sig=sigmtx(mtx.p.pro); #kable(mtx.p.pro.sig)
+mtx.p.pro.sig=sigmtx(mtx.p.pro); 
 mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
-sig.mtx=sigmtx(mtx.p.hc); #kable(sig.mtx)
+sig.mtx=sigmtx(mtx.p.hc); 
 
 mtx.p.pro.adjust=mtx.p.pro * 27
 mtx.p.pro.adjust[(mtx.p.pro.adjust > 1)]=1
@@ -192,8 +184,6 @@ mtx.p.pro.adjust.sig=sigmtx.rho(mtx.p.pro,mtx.p.pro.adjust)
 # --------------------
 
 # - input are supposed to be the results of above correlation analyses
-# - output table
-# - output table to file
 
 
 # output table: combine rho and p
@@ -219,7 +209,6 @@ sink()    # stop output
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
 for (p in 1:m) {
-#    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
     mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]
     mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.sig[,p]
 }
@@ -240,8 +229,6 @@ sink()    # stop output
 # --------------------
 
 # - input are supposed to be the results of above correlation analyses
-# - output table
-# - output table to file
 
 
 # output table: combine rho and p
@@ -267,7 +254,6 @@ sink()    # stop output
 
 m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
 for (p in 1:m) {
-#    mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro[,p]
     mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]  
     mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.adjust.sig[,p]    # mtx.p.pro.sig into mtx.p.pro.adjust.sig
 }
@@ -282,4 +268,7 @@ sink(file="tmp",append=TRUE)    # start output
 print(kable(mtx.pro.outtab.sig))
 sink()    # stop output
 
+
+# date
+# - 2016/05/20
 

@@ -150,3 +150,91 @@ tiff("plot_correlation_600dpi3.3w6.6h.tif",width=3.3*ppi, height=6.6*ppi, res=pp
 grid.arrange(p2,p3,nrow=2)
 dev.off()
 
+
+# ----------------------------------------------
+# plots of correlation 2016/05/23
+# ----------------------------------------------
+
+
+# the below is for the relation between the volume and the clinical parametere
+
+datax=data.ex3.exna
+data.pro=subset(datax,GROUP=="PRO");    data.hc=subset(datax,GROUP=="HVPRO")
+datax=data.pro
+items1=c("caseid2","GROUP","ICV","SINTOTEV","SIPTOTEV")
+data.lv=jun.stack(c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle"),items1)
+data.hip=jun.stack(c("r.Right.Hippocampus","r.Left.Hippocampus"),items1)
+
+jun.plot.cor <- function(datax,xlabel,ylabel) {
+    p2=ggplot(datax, aes(x=SINTOTEV, y=values,colour=ind)) +
+        theme_bw() +
+        theme(text=element_text(size=10, family="sans")) +
+        geom_point(size=2) +
+        stat_smooth(method=lm, se=FALSE) +
+        xlab(xlabel) +
+        ylab(ylabel) +
+        theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
+        theme(legend.background=element_blank()) +
+        theme(legend.key=element_blank()) +
+        guides(colour=guide_legend(title=NULL))  +
+        scale_colour_discrete(labels=c("left","right"))  +
+        annotate("text", x=-Inf, y=Inf, label="a", hjust=-0.2, vjust=1.5)
+    p2
+}
+
+p1=jun.plot.cor(data.lv,"Negative symptom score","Relative volumes of the LV")
+p1
+
+
+# the below is for the relation between the volume and the volume
+
+jun.plot.cor2 <- function(datax,xaxis.name,yaxis.name,xlabel,ylabel) {
+    datax[["xaxis"]]=datax[[xaxis.name]]
+    datax[["yaxis"]]=datax[[yaxis.name]]
+    p2=ggplot(datax, aes(x=xaxis, y=yaxis)) +    # "colour=ind" was delteted
+        theme_bw() +
+        theme(text=element_text(size=10, family="sans")) +
+        geom_point(size=2) +
+        stat_smooth(method=lm, se=FALSE) +
+        xlab(xlabel) +
+        ylab(ylabel) +
+        theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
+        theme(legend.background=element_blank()) +
+        theme(legend.key=element_blank()) +
+        guides(colour=guide_legend(title=NULL))  +
+        scale_colour_discrete(labels=c("left","right"))  +
+        annotate("text", x=-Inf, y=Inf, label="", hjust=-0.2, vjust=1.5)
+    p2
+}
+
+p1=jun.plot.cor2(datax,"r.Right.Lateral.Ventricle","r.Right.Hippocampus","Relative volume of the right LV","Relative volumes of the right hippocampus")
+p2=jun.plot.cor2(datax,"r.Left.Lateral.Ventricle","r.Left.Hippocampus","Relative volume of the left LV","Relative volumes of the left hippocampus")
+
+ppi=300
+tiff("plot_correlation_ltHIP_ltLV_300dpi3.3w3.3h.tif", width=3.3*ppi, height=3.3*ppi, res=ppi)
+p2
+dev.off()    # 2016/05/23
+
+# the below is a copy from the past code (the above) and not yet edited
+
+p3=ggplot(data.hip, aes(x=SIPTOTEV, y=values,colour=ind)) +
+    theme_bw() +
+    theme(text=element_text(size=10)) +
+    geom_point(size=2) +
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Positive symptom score") +
+    ylab("Relative volumes of the hippocampus") +
+    theme(legend.position=c(0,0),legend.justification=c(0,0)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))    +
+    annotate("text", x=-Inf, y=Inf, label="b", hjust=-0.2, vjust=1.5)
+grid.arrange(p2,p3,nrow=2)
+
+
+ppi=600    # 300 is better
+tiff("plot_correlation_600dpi3.3w6.6h.tif",width=3.3*ppi, height=6.6*ppi, res=ppi)
+grid.arrange(p2,p3,nrow=2)
+dev.off()
+

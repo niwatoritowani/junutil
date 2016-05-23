@@ -43,12 +43,22 @@ data.hc=subset(datax,GROUP=="HVPRO")
 # correlatinon between volumes, selected items, spearman, 2016/01/06
 # --------------------
 
-items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
-    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+#items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+#    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+#    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+#items.col=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+#    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+#    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.row=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent",
+    "r.CC_Central",
+    "r.Right.Amygdala","r.Left.Amygdala",
     "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
-items.col=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
-    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
-    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent",
+     "r.CC_Central",
+    "r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume, the order was changed 2016/05/23
 items.ana=c("estimate","p.value")
 arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
 arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
@@ -89,6 +99,11 @@ kable(mtx.pro.outtab)
 sink(file="tmp",append=TRUE)    # start output
 print(kable(mtx.pro.outtab))
 sink()    # stop output
+
+
+# output to file (in exel format)
+
+# write.csv(mtx.pro.outtab,file="outputtable20160523.csv")    # 2016/05/23
 
 
 # output table: combine rho and p (remain only significant p)
@@ -155,6 +170,99 @@ kable(mtx.pro.outtab.sig)
 sink(file="tmp",append=TRUE)    # start output
 print(kable(mtx.pro.outtab.sig))
 sink()    # stop output
+
+
+# --------------------------
+# correlation pearson
+# --------------------------
+
+# - 2016/05/23
+# - changed from spearman to pearson
+# - changed from rho to r
+
+#items.row=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+#    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+#    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+#items.col=c("r.CC_Central","r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+#    "r.Left.Inf.Lat.Vent","r.Right.Inf.Lat.Vent","r.Right.Amygdala","r.Left.Amygdala",
+#    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.row=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent",
+    "r.CC_Central",
+    "r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume
+items.col=c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle",
+    "r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent",
+     "r.CC_Central",
+    "r.Right.Amygdala","r.Left.Amygdala",
+    "r.Right.Hippocampus","r.Left.Hippocampus") # relative volume, the order was changed 2016/05/23
+items.ana=c("estimate","p.value")
+arr.pro=jun.cor.test.ps(items.row,items.col,items.ana,data.pro)
+arr.hc=jun.cor.test.ps(items.row,items.col,items.ana,data.hc)
+mtx.p.pro=arr.pro[,,2]; mtx.r.pro=arr.pro[,,1]
+mtx.p.hc=arr.hc[,,2]; mtx.r.hc=arr.hc[,,1]
+mtx.p.pro.sig=sigmtx(mtx.p.pro); 
+mtx.r.pro.sig=sigmtx.rho(mtx.p.pro,mtx.r.pro)    # 2016/03/03, data are "r" but function name is "rho"
+mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+
+#mtx.p.pro.adjust=matrix(p.adjust(mtx.p.pro,"bonferroni",n=36),nrow(mtx.p.pro),)
+#rownames(mtx.p.pro.adjust)=rownames(mtx.p.pro)
+#colnames(mtx.p.pro.adjust)=colnames(mtx.p.pro)
+#kable(mtx.p.pro.adjust)    # for debugging
+mtx.p.pro.adjust=mtx.p.pro * 36
+mtx.p.pro.adjust[(mtx.p.pro.adjust > 1)]=1    # If the values are greater than 1, they become 1. 
+mtx.p.pro.adjust.sig=sigmtx.rho(mtx.p.pro,mtx.p.pro.adjust)    # data are "r" but function name is "rho"
+
+# --------------------
+# output table
+# --------------------
+
+# - input : the results of above correlation analyses
+
+# output table: combine r and p
+
+m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab=matrix(NA,n,2*m)
+for (p in 1:m) {
+    mtx.pro.outtab[,2*p-1]=mtx.r.pro[,p]
+    mtx.pro.outtab[,2*p]  =mtx.p.pro[,p]
+}
+rownames(mtx.pro.outtab)=rownames(mtx.p.pro)
+colnames(mtx.pro.outtab)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("r","p"),m),sep=".")
+kable(mtx.pro.outtab)
+
+
+# output to file
+
+sink(file="tmp",append=TRUE)    # start output
+print(kable(mtx.pro.outtab))
+sink()    # stop output
+
+
+# output to file (in exel format)
+
+# write.csv(mtx.pro.outtab,file="outputtable_pearson20160523.csv")    # 2016/05/23
+
+
+# output table: combine r and p (remain only significant p)
+
+m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
+for (p in 1:m) {
+    mtx.pro.outtab.sig[,2*p-1]=mtx.r.pro.sig[,p]
+    mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.sig[,p]
+}
+rownames(mtx.pro.outtab.sig)=rownames(mtx.p.pro)
+colnames(mtx.pro.outtab.sig)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("r","p"),m),sep=".")
+kable(mtx.pro.outtab.sig)
+
+
+# output to file
+
+sink(file="tmp",append=TRUE)    # start output
+print(kable(mtx.pro.outtab.sig))
+sink()    # stop output
+
+
+
 
 
 # --------------------

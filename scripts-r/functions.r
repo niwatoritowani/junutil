@@ -247,6 +247,7 @@ extractsig <- function(sig.mtx) {
 
 
 # function sigmtx.rho
+#     - function name includes "rho" but thic can be used for "r". 2016/05/23
 
 sigmtx.rho <- function(p.mtx,rho.mtx) {
     mask.p.mtx=(p.mtx < 0.05)                          # mask for under 0.05

@@ -35,7 +35,16 @@ datax[["Bil.Hippocampus"]]=datax$Right.Hippocampus+datax$Left.Hippocampus
 datax[["xRight.Lateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Right.choroid.plexus
 datax[["xLeft.Lateral.Ventricle"]]=datax$Left.Lateral.Ventricle+datax$Left.choroid.plexus
 datax[["xBil.Lateral.Ventricle"]]=datax$xRight.Lateral.Ventricle+datax$xLeft.Lateral.Ventricle
+datax[["Right.xLateral.Ventricle"]]=datax$Right.Lateral.Ventricle+datax$Right.choroid.plexus # 2016/05/25
+datax[["Left.xLateral.Ventricle"]]=datax$Left.Lateral.Ventricle+datax$Left.choroid.plexus # 2016/05/25
+datax[["Bil.xLateral.Ventricle"]]=datax$Right.xLateral.Ventricle+datax$Left.xLateral.Ventricle # 2016/05/25
 datax[["CC_Total"]]=apply(datax[,c("CC_Anterior", "CC_Mid_Anterior", "CC_Central", "CC_Mid_Posterior", "CC_Posterior")],1,sum)
+datax[["Right.LVTH"]]=datax$Right.Lateral.Ventricle+datax$Right.Inf.Lat.Vent # 2016/05/25
+datax[["Left.LVTH"]]=datax$Left.Lateral.Ventricle+datax$Left.Inf.Lat.Vent # 2016/05/25
+datax[["Bil.LVTH"]]=datax$Right.LVTH+datax$Left.LVTH # 2016/05/25
+datax[["Right.HipAmyCom"]]=datax$Right.Amygdala+datax$Right.Hippocampus # 2016/05/25
+datax[["Left.HipAmyCom"]]=datax$Left.Amygdala+datax$Left.Hippocampus # 2016/05/25
+datax[["Bil.HipAmyCom"]]=datax$Right.HipAmyCom+datax$Left.HipAmyCom # 2016/05/25
 data.aseg=datax
 list.aseg=merge.tbl(data.aseg,data1)
 

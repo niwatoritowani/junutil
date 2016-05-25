@@ -24,7 +24,7 @@
 # - sublabel were changed from A to a, 2016/04/26
 # - 600 dpi is needed to submit to an article but too big to send with email, 2016/05/20
 # - 300 dpi is apropriate for a poster presentation. 2016/05/20
-
+# - dev.copy2eps() was added from analyses20160218. 2016/05/25. 
 
 # set up data
 
@@ -56,7 +56,7 @@ jun.plot32 <- function(datax,ylabel1,xlabel1,label1,posi1,posi2) {
     ylabel=paste("Relative volumes of",ylabel1)    # combine tests for y label
     p1=ggplot(datax, aes(x=R2D2,y=values,fill=GROUP)) +
         theme_bw() + # change the thema to brack and white
-        theme(text=element_text(size=10, family="sans")) +    # default: 7
+        theme(text=element_text(size=10)) +    # default: size=7, family="sans"
         scale_fill_manual(values=c("grey","red"),labels=c("HC","CHR")) +    # use default color if commented out
         geom_dotplot(binaxis="y",stackdir="center") +    # center plots to y axis
         stat_summary(fun.ymin=function(x) mean(x), fun.ymax=function(x) mean(x), 
@@ -90,6 +90,8 @@ options(scipen=2) # change exponent notation, default: options(scipen=0)
 grid.arrange(p1, p3, p4)    # line up automatically
 options(scipen=0) # return to the default setting
 
+dev.copy2eps(file="plot_vol_group_20160311.eps",width=3.3, height=6)  # inches, for journals
+# If use theme(text=element_text(family="sans")), stop with error, 2016/05/25. 
 
 ppi=600    # 300 is better for poster 
 tiff("plot_vol_group_600dpiw3.3h7.5.tif",width=3.3*ppi, height=7.5*ppi, res=ppi)    # default inches

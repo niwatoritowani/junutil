@@ -25,4 +25,4 @@ analyses20160410.r : final version
 analyses20160426.r : plots for article
 analyses_statistics.r : edited analyses20160410.r
 analyses_plots.r      : edited analyses20160426.r
-
+nalyses_statistics_additems.r : add many items for analyses

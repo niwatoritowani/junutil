@@ -26,3 +26,4 @@ analyses20160426.r : plots for article
 analyses_statistics.r : edited analyses20160410.r
 analyses_plots.r      : edited analyses20160426.r
 analyses_statistics_additems.r : add many items for analyses
+analyses20160610.r : based on analyses_statistics_additems.r

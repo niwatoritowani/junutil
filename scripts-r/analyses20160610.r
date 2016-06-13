@@ -2,26 +2,36 @@
 # data setup
 # --------------------------------
 
-datax=data.main
-datax[["caseid2"]] # display
-subset(datax,is.na(SEX))[["caseid2"]] # display 4 cases "321400178" "321400205" "321400270" "321400297"
-datax=subset(datax,!is.na(SEX))
-datax[["caseid2"]] # display
-subset(datax,is.na(CC_Mid_Anterior))[["caseid2"]] # display "321400204"
-datax=subset(datax,!is.na(CC_Mid_Anterior))
-datax[["caseid2"]] # display
-datax=subset(datax,caseid2!="321100267" & caseid2!="321400145" & caseid2!="321400119")
-datax[["caseid2"]] # display
-data.ex3.2.exna=datax
+# # The code below were commented out on 2016/06/13
+# datax=data.main
+# datax[["caseid2"]] # display
+# subset(datax,is.na(SEX))[["caseid2"]] # display 4 cases "321400178" "321400205" "321400270" "321400297"
+# datax=subset(datax,!is.na(SEX))
+# datax[["caseid2"]] # display
+# subset(datax,is.na(CC_Mid_Anterior))[["caseid2"]] # display "321400204"
+# datax=subset(datax,!is.na(CC_Mid_Anterior))
+# datax[["caseid2"]] # display
+# cat("exclude 3 cases (these cases were selected for display)\n")
+# datax=subset(datax,caseid2!="321100267" & caseid2!="321400145" & caseid2!="321400119")
+# datax[["caseid2"]] # display
+# data.ex3.2.exna=datax
+# 
+# datax=data.ex3.2.exna
+# sink(file="tmp",append=TRUE)    # start output caseids
+#     cat("\n----caselist----\n")
+#     print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
+# sink()
+# data.pro=subset(datax,GROUP=="PRO")
+# data.hc=subset(datax,GROUP=="HVPRO")
 
-datax=data.ex3.2.exna
+# using data "data.ex3.exna"
+datax=data.ex3.exna
 sink(file="tmp",append=TRUE)    # start output caseids
     cat("\n----caselist----\n")
     print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
 sink()
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
-
 
 # --------------------------------------
 # effect size 2016/03/10

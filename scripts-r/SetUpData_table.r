@@ -69,6 +69,7 @@ data.main=datay
 # ----------------------------------
 
 datax=data.main
+cat("exclude cases 321400280, 321100125,321100112, 321400081\n")
 datax=subset(datax,caseid2!="321100112" & caseid2!="321100125" & caseid2!="321400280" & caseid2!="321400081")
 data.ex4=datax
 
@@ -82,6 +83,7 @@ data.ex3=datax
 # -----------------
 
 delna <- function(datax){
+    cat("input data is ", deparse(substitute(datax)),"\n",sep="")
     cat("delete cases without information in SEX\n")
     print(subset(datax,is.na(SEX))[["caseid2"]]) # display 4 cases "321400178" "321400205" "321400270" "321400297"
     datax=subset(datax,!is.na(SEX))
@@ -92,6 +94,7 @@ delna <- function(datax){
 }
 data.main.exna=delna(data.main)
 data.ex3.exna=delna(data.ex3)
+data.ex4.exna=delna(data.ex4)
 
 # --------------------------------
 # variables

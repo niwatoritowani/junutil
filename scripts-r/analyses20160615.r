@@ -2,38 +2,43 @@
 # data setup
 # --------------------------------
 
-# # The code below were commented out on 2016/06/13
-# datax=data.main
-# datax[["caseid2"]] # display
-# subset(datax,is.na(SEX))[["caseid2"]] # display 4 cases "321400178" "321400205" "321400270" "321400297"
-# datax=subset(datax,!is.na(SEX))
-# datax[["caseid2"]] # display
-# subset(datax,is.na(CC_Mid_Anterior))[["caseid2"]] # display "321400204"
-# datax=subset(datax,!is.na(CC_Mid_Anterior))
-# datax[["caseid2"]] # display
-# cat("exclude 3 cases (these cases were selected for display)\n")
-# datax=subset(datax,caseid2!="321100267" & caseid2!="321400145" & caseid2!="321400119")
-# datax[["caseid2"]] # display
-# data.ex3.2.exna=datax
-# 
-# datax=data.ex3.2.exna
-# sink(file="tmp",append=TRUE)    # start output caseids
-#     cat("\n----caselist----\n")
-#     print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
-# sink()
-# data.pro=subset(datax,GROUP=="PRO")
-# data.hc=subset(datax,GROUP=="HVPRO")
-
-# using data "data.ex3.exna"
-# datax=data.ex3.exna # commented out on 2016/06/15
+# function
+run=function(cmd){cat(cmd,"\n",sep="");eval(parse(text=cmd))}
+WORKDIR="/rfanfs/pnl-zorro/projects/2015-jun-prodrome/stats/02_editedfreesurfer/20160615"
 
 # using data "data.ex4.exna"
-datax=data.ex4.exna # 2016/06/15
+# NEED TO SET UP ...
+    source("/home/jkonishi/junutil/scripts-r/SetUpData_env_PNL.r")
+    source("/home/jkonishi/junutil/scripts-r/SetUpData_table.r")
+    source("/home/jkonishi/junutil/scripts-r/functions.r")
 
-sink(file="tmp",append=TRUE)    # start output caseids
-    cat("\n----caselist----\n")
-    print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
-sink()
+datax=data.ex4.exna # 2016/06/15
+data.str=data.ex4.exna
+
+# set up other table
+setwd("/rfanfs/pnl-zorro/projects/2015-jun-prodrome/stats/20160609")
+source("script20160610.r")
+data.t1t2=datax
+
+# set working directory
+setwd(WORKDIR)
+
+d1=data.str
+d2=data.t1t2
+run('print(d1["caseid2"])')  # data.frame
+run('print(d2["caseid"]')  # data.frame
+run('print(data.frame(line=1:dim(datax)[1],d1[c("caseid2","GROUP")]))')
+run('print(data.frame(line=1:dim(datax)[1],d2[c("caseid","GROUP.t1")]))')
+run('d1[["caseid2"]] %in% d2[["caseid"]]')
+run('d2[["caseid"]] %in% d1[["caseid2"]]')
+run('dim(d1)')
+run('dim(d2)')
+run('d=merge(d1,d2,by.x="caseid2",by.y="caseid",suffixes = c("",".new"))')
+run('dim(d)')
+
+datax=d
+cat("\n----caselist----\n")
+print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
 data.pro=subset(datax,GROUP=="PRO")
 data.hc=subset(datax,GROUP=="HVPRO")
 
@@ -57,34 +62,25 @@ data.lvth=jun.stack(field.names,c("caseid2","GROUP"))
 field.names=c("r.Right.HipAmyCom","r.Left.HipAmyCom")
 data.hipamy=jun.stack(field.names,c("caseid2","GROUP"))
 
-library(ez)
+library(ez) # for ezANOVA
+
+cat{"ANOVA\n")
+cat("------\n")
 #ezANOVA(data.lvt,dv=values,wid=caseid2,within=ind,between=GROUP,type=3,detailed=TRUE,return_aov=TRUE)
+cat("CCC\n")
 ezANOVA(datax, dv=r.CC_Central,wid=caseid2,between=GROUP,type=3)
+cat("LV\n")
 ezANOVA(data.lv, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+cat("TH\n")
 ezANOVA(data.lvt, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+cat("AMY\n")
 ezANOVA(data.amy, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+cat("HIP\n")
 ezANOVA(data.hip, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+cat("LVTH\n")
 ezANOVA(data.lvth, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
+cat("HIPAMY\n")
 ezANOVA(data.hipamy, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-
-# output to file
-
-sink(file="tmp",append=TRUE)    # start output
-    cat("CCC\n")
-    ezANOVA(datax, dv=r.CC_Central,wid=caseid2,between=GROUP,type=3)
-    cat("LV\n")
-    ezANOVA(data.lv, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-    cat("TH\n")
-    ezANOVA(data.lvt, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-    cat("AMY\n")
-    ezANOVA(data.amy, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-    cat("HIP\n")
-    ezANOVA(data.hip, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-    cat("LVTH\n")
-    ezANOVA(data.lvth, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-    cat("HIPAMY\n")
-    ezANOVA(data.hipamy, dv=values,wid=caseid2,within=ind,between=GROUP,type=3)
-sink()    # stop output
 
 
 # -------------------
@@ -127,6 +123,11 @@ items.bilcomb=c("r.Bil.LVTH"
 items.clinical=c("GAFC","SIPTOTEV","SINTOTEV","SIGTOTEV","SIDTOTEV"
     ,"SOCFXC","ROLEFX")
 
+items.clinical.t1=c("GAFC.t1","SIPTOT.t1","SINTOT.t1","SIGTOT.t1","SIDTOT.t1"
+    ,"SOCFXC.t1","ROLEFX.t1")
+
+items.clinical.t2=c("GAFC.t2","SIPTOT.t2","SINTOT.t2","SIGTOT.t2","SIDTOT.t2"
+    ,"SOCFXC.t2","ROLEFX.t2")
 
 # ----------------------------------------------
 # correlatinon between volumes, spearman
@@ -298,20 +299,53 @@ myfunction <- function(){
     sink()    # stop output
 }
 
+# add t1 and t2
 items.row=items.hemi
 items.col=items.clinical
+myfunction()
+
+items.row=items.hemi
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.hemi
+items.col=items.clinical.t2
 myfunction()
 
 items.row=items.bil
 items.col=items.clinical
 myfunction()
 
+items.row=items.bil
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.bil
+items.col=items.clinical.t2
+myfunction()
+
 items.row=items.comb
 items.col=items.clinical
 myfunction()
 
+items.row=items.comb
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.comb
+items.col=items.clinical.t2
+myfunction()
+
 items.row=items.bilcomb
 items.col=items.clinical
+myfunction()
+
+items.row=items.bilcomb
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.bilcomb
+items.col=items.clinical.t2
 myfunction()
 
 
@@ -361,20 +395,55 @@ myfunction <- function(){
     sink()    # stop output
 }
 
+# add t1 and t2
 items.row=items.hemi
 items.col=items.clinical
+myfunction()
+
+items.row=items.hemi
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.hemi
+items.col=items.clinical.t2
 myfunction()
 
 items.row=items.bil
 items.col=items.clinical
 myfunction()
 
+items.row=items.bil
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.bil
+items.col=items.clinical.t2
+myfunction()
+
 items.row=items.comb
 items.col=items.clinical
+myfunction()
+
+items.row=items.comb
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.comb
+items.col=items.clinical.t2
 myfunction()
 
 items.row=items.bilcomb
 items.col=items.clinical
 myfunction()
 
+items.row=items.bilcomb
+items.col=items.clinical.t1
+myfunction()
+
+items.row=items.bilcomb
+items.col=items.clinical.t2
+myfunction()
+
+# notes
+# savehistory(file = ".Rhistory")
 

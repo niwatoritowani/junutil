@@ -27,3 +27,8 @@ analyses_statistics.r : edited analyses20160410.r
 analyses_plots.r      : edited analyses20160426.r
 analyses_statistics_additems.r : add many items for analyses
 analyses20160610.r : based on analyses_statistics_additems.r
+    - exclude 3 cases -> exclude 4 cases. 2016/06/15
+script201606141520.r : for reference
+script20160614.r     : for reference
+analyses20160615.r   : based on analyses20160610.r
+    - include data in t1 and t2

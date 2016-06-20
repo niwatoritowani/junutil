@@ -26,15 +26,20 @@ setwd(WORKDIR)
 d1=data.str
 d2=data.t1t2
 run('print(d1["caseid2"])')  # data.frame
-run('print(d2["caseid"]')  # data.frame
+run('print(d2["caseid"])')  # data.frame
 run('print(data.frame(line=1:dim(datax)[1],d1[c("caseid2","GROUP")]))')
 run('print(data.frame(line=1:dim(datax)[1],d2[c("caseid","GROUP.t1")]))')
 run('d1[["caseid2"]] %in% d2[["caseid"]]')
 run('d2[["caseid"]] %in% d1[["caseid2"]]')
 run('dim(d1)')
 run('dim(d2)')
-run('d=merge(d1,d2,by.x="caseid2",by.y="caseid",suffixes = c("",".new"))')
+#run('d=merge(d1,d2,by.x="caseid2",by.y="caseid",suffixes = c("",".new"))')
+print('d=merge(d1,d2,by.x="caseid2",by.y="caseid",suffixes = c("",".new"))')
+d=merge(d1,d2,by.x="caseid2",by.y="caseid",suffixes = c("",".new"))
 run('dim(d)')
+run('print(d[["caseid"]])')  # added on 2016/06/16
+run('d[["caseid"]]=d[["caseid2"]]') # added on 2016/06/16
+
 
 datax=d
 cat("\n----caselist----\n")
@@ -443,6 +448,36 @@ myfunction()
 items.row=items.bilcomb
 items.col=items.clinical.t2
 myfunction()
+
+
+# ---------------------------------
+# shapiro test, 2016/06/20
+# -------------------------------------
+
+
+myfunction.pro <- function(){
+    for (i in 1:length(items)) {
+        cat("---------------\n")
+        cat(items[i],"\n",sep="")
+        cat("shapiro.test(data.pro[[items[i]]])\n",sep="")
+        print(shapiro.test(data.pro[[items[i]]]))
+    }
+}
+myfunction.hc <- function(){
+    for (i in 1:length(items)) {
+        cat("---------------\n")
+        cat(items[i],"\n",sep="")
+        cat("shapiro.test(data.hc[[items[i]]])\n",sep="")
+        print(shapiro.test(data.hc[[items[i]]]))
+    }
+}
+
+items=items.base
+myfunction.pro()
+myfunction.hc
+items=items.clinical
+myfunction.pro()
+myfunction.hc()
 
 # notes
 # savehistory(file = ".Rhistory")

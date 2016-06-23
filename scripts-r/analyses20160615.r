@@ -197,6 +197,57 @@ items.col=items.bilcomb
 myfunction()
 
 
+# -------------------------------
+# corrected multipule comparisone
+# -------------------------------
+
+# "*36" were added. 2016/06/23. 
+
+myfunction <- function(){
+    items.ana=c("estimate","p.value")
+    arr.pro=jun.cor.test(items.row,items.col,items.ana,data.pro)
+    arr.hc=jun.cor.test(items.row,items.col,items.ana,data.hc)
+    mtx.p.pro=arr.pro[,,2]; mtx.rho.pro=arr.pro[,,1]
+    mtx.p.hc=arr.hc[,,2]; mtx.rho.hc=arr.hc[,,1]
+    mtx.p.pro.sig=sigmtx(mtx.p.pro); 
+    mtx.rho.pro.sig=sigmtx.rho(mtx.p.pro,mtx.rho.pro)    # 2016/03/03
+    mtx.p.hc.pro.sig=sigmtx(mtx.p.hc)
+    
+    # output table: combine rho and p
+    m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab=matrix(NA,n,2*m)
+    for (p in 1:m) {
+        mtx.pro.outtab[,2*p-1]=mtx.rho.pro[,p]
+        mtx.pro.outtab[,2*p]  =mtx.p.pro[,p] * 36
+    }
+    rownames(mtx.pro.outtab)=rownames(mtx.p.pro)
+    colnames(mtx.pro.outtab)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
+    kable(mtx.pro.outtab) # display
+    # output to file
+    sink(file="tmp",append=TRUE)    # start output
+    cat("\n----------------spearman * 36---------------\n")
+    print(kable(mtx.pro.outtab))
+    sink()    # stop output
+    
+    # output table: combine rho and p (remain only significant p)
+    m=ncol(mtx.p.pro);n=nrow(mtx.p.pro);mtx.pro.outtab.sig=matrix(NA,n,2*m)
+    for (p in 1:m) {
+        mtx.pro.outtab.sig[,2*p-1]=mtx.rho.pro.sig[,p]
+        mtx.pro.outtab.sig[,2*p]  =mtx.p.pro.sig[,p] * 36
+    }
+    rownames(mtx.pro.outtab.sig)=rownames(mtx.p.pro)
+    colnames(mtx.pro.outtab.sig)=paste(colnames(mtx.p.pro)[sort(rep(1:m,2))],rep(c("rho","p"),m),sep=".")
+    kable(mtx.pro.outtab.sig) # display
+    # output to file
+    sink(file="tmp",append=TRUE)    # start output
+    cat("\n----------------spearman * 36 ---------------\n")
+    print(kable(mtx.pro.outtab.sig))
+    sink()    # stop output
+}
+
+items.row=items.hemi
+items.col=items.hemi
+myfunction()
+
 # -------------------------------------
 # correlation between volumes, pearson
 # -------------------------------------

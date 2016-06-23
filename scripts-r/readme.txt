@@ -33,7 +33,8 @@ script201606141520.r : for reference
 script20160614.r     : for reference
 analyses20160615.r   : based on analyses20160610.r
     - include data in t1 and t2
-    - add shapiro test, 2016/06/20
+    - add shapiro test, 2016/06/20.
+    - add "*36" for multiple comparisons, 2016/06/23.
 analyses20160616.r   : based on analyses20160615.r
     - calculate mean sd ...
 analyses_plots20160622.r : based on analyses_plots.r

@@ -25,6 +25,7 @@ analyses20160410.r : final version
 analyses20160426.r : plots for article
 analyses_statistics.r : edited analyses20160410.r
 analyses_plots.r      : edited analyses20160426.r
+    - trun code into function but difficult to generalize
 analyses_statistics_additems.r : add many items for analyses
 analyses20160610.r : based on analyses_statistics_additems.r
     - exclude 3 cases -> exclude 4 cases. 2016/06/15
@@ -35,4 +36,4 @@ analyses20160615.r   : based on analyses20160610.r
     - add shapiro test, 2016/06/20
 analyses20160616.r   : based on analyses20160615.r
     - calculate mean sd ...
- 
+analyses_plots20160622.r : based on analyses_plots.r

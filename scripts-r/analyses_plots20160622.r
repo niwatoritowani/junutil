@@ -213,6 +213,140 @@ grid.arrange(p1,p2,p3,ncol=1)
 options(scipen=0) # default
 dev.off()
 
+# ----------------------------------------------------------------------------
+# plots of correlation, relative, hemisphere-separated, 2016/04/26, 2016/06/22
+# ----------------------------------------------------------------------------
+
+# - 2016/06/24
+# - created from "plots of correlation 2 relative 3, 2016/03/09"
+# - dev.copy2eps() was deleted
+# - png() were deleted
+# - font family sans, 2016/04/26
+# - sublabel were changed from A to a, 2016/04/26
+
+datax=data.pro
+cat("\n----caselist----\n")
+print(data.frame(line=1:dim(datax)[1],datax[c("caseid2","GROUP")]))
+
+items=c("caseid2","GROUP","ICV","SINTOTEV","SIPTOTEV","SIDTOTEV","ROLEFX")
+data.lv=jun.stack(c("r.Right.Lateral.Ventricle","r.Left.Lateral.Ventricle"),items)
+cat("\n----caselist-data.lv---\n")
+print(data.frame(line=1:dim(data.lv)[1],data.lv))
+
+data.lvt=jun.stack(c("r.Right.Inf.Lat.Vent","r.Left.Inf.Lat.Vent"),items)
+cat("\n----caselist-data.lvt---\n")
+print(data.frame(line=1:dim(data.lvt)[1],data.lvt))
+
+data.hip=jun.stack(c("r.Right.Hippocampus","r.Left.Hippocampus"),items)
+cat("\n----caselist-data.hip---\n")
+print(data.frame(line=1:dim(data.hip)[1],data.hip))
+
+p1=ggplot(data.lv,aes(x=SINTOTEV, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Negative symptom score") + 
+    ylab("Relative volume of the LV") +
+    theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="a", hjust=-0.2, vjust=1.5)  
+    ggtitle("a") +
+    theme(plot.title = element_text(hjust = 0))
+p2=ggplot(data.lv,aes(x=ROLEFX, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Score of the General Function: Role") + 
+    ylab("Relative volume of the LV") +
+    theme(legend.position=c(1,1),legend.justification=c(1,1)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="a", hjust=-0.2, vjust=1.5)  
+    ggtitle("b") +
+    theme(plot.title = element_text(hjust = 0))
+p3=ggplot(data.lvt, aes(x=SIDTOTEV, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Disorganized symptom score") + 
+    ylab("Relative volume of the temporal horns of LV") +
+    theme(legend.position=c(0,1),legend.justification=c(0,1)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="b", hjust=-0.2, vjust=1.5)  
+    ggtitle("c") +
+    theme(plot.title = element_text(hjust = 0))
+p4=ggplot(data.lvt, aes(x=ROLEFX, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Score of the General Functions: Role") + 
+    ylab("Relative volume of the temporal horns of LV") +
+    theme(legend.position=c(1,1),legend.justification=c(1,1)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="b", hjust=-0.2, vjust=1.5)  
+    ggtitle("d") +
+    theme(plot.title = element_text(hjust = 0))
+p5=ggplot(data.hip, aes(x=SIDTOTEV, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Disorganized symptom score") + 
+    ylab("Relative volume of the hippocampus") +
+    theme(legend.position=c(1,0),legend.justification=c(1,0)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="c", hjust=-0.2, vjust=1.5)  
+    ggtitle("e") +
+    theme(plot.title = element_text(hjust = 0))
+p6=ggplot(data.hip, aes(x=ROLEFX, y=values,colour=ind)) + # delete "colour=ind"
+    theme_bw() + 
+    theme(text=element_text(size=10, family="sans")) +
+    geom_point(size=2) + 
+    stat_smooth(method=lm, se=FALSE) +
+    xlab("Score of the General Functions: Role") + 
+    ylab("Relative volume of the hippocampus") +
+    theme(legend.position=c(1,0),legend.justification=c(1,0)) +    # this works 
+    theme(legend.background=element_blank()) +
+    theme(legend.key=element_blank()) +
+    guides(colour=guide_legend(title=NULL))  +
+    scale_colour_discrete(labels=c("left","right"))  +  # change labels in guide
+    #annotate("text", x=-Inf, y=Inf, label="c", hjust=-0.2, vjust=1.5)  
+    ggtitle("f") +
+    theme(plot.title = element_text(hjust = 0))
+
+
+ppi=300    # 300 is better for poster and email. 600 is better for an article (large size)
+tiff("plot_correlation_300dpi3.3w9.9h.tif.....",width=3.3*ppi, height=9.9*ppi, res=ppi)
+options(scipen=2) # change exponent notation, default: options(scipen=0)
+grid.arrange(p1,p2,p3,ncol=1)
+options(scipen=0) # default
+dev.off()
+
+ppi=300    # 300 is better for poster and email. 600 is better for an article (large size)
+tiff("plot_correlation_sep_300dpi6.6w9.9hcomplzw.tif",width=6.6*ppi, height=9.9*ppi, res=ppi,compression="lzw")
+options(scipen=2) # change exponent notation, default: options(scipen=0)
+grid.arrange(p1,p2,p3,p4,p5,p6,ncol=2)
+options(scipen=0) # default
+dev.off()
+
 
 # appendix
 

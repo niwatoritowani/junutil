@@ -38,3 +38,4 @@ analyses20160615.r   : based on analyses20160610.r
 analyses20160616.r   : based on analyses20160615.r
     - calculate mean sd ...
 analyses_plots20160622.r : based on analyses_plots.r
+    - hemisphere-combined version
